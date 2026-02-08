@@ -9,46 +9,33 @@ function isPiBrowser(req: NextRequest) {
 }
 
 export function middleware(req: NextRequest) {
-  try {
-    if (!PI_ONLY) return NextResponse.next();
+  if (!PI_ONLY) return NextResponse.next();
 
-    const { pathname } = req.nextUrl;
+  const { pathname } = req.nextUrl;
 
-    // ✅ Allow dev login & account
-    if (
-      pathname.startsWith("/pilogin") ||
-      pathname.startsWith("/account")
-    ) {
-      return NextResponse.next();
-    }
-
-    // Allow internals & static
-    if (
-      pathname.startsWith("/_next") ||
-      pathname.startsWith("/favicon") ||
-      pathname.startsWith("/robots") ||
-      pathname.startsWith("/sitemap")
-    ) {
-      return NextResponse.next();
-    }
-
-    // Safari / iOS có thể KHÔNG có header này
-    const secFetchDest = req.headers.get("sec-fetch-dest");
-    const isDocument = secFetchDest === "document" || secFetchDest === null;
-
-    if (isDocument && !isPiBrowser(req)) {
-      const url = req.nextUrl.clone();
-      url.pathname = "/";
-      url.searchParams.set("reason", "pi_browser_required");
-      return NextResponse.redirect(url);
-    }
-
-    return NextResponse.next();
-  } catch (err) {
-    // 🔥 CỰC KỲ QUAN TRỌNG – middleware KHÔNG ĐƯỢC CRASH
-    console.error("❌ Middleware error:", err);
+  // Allow Next internals & static
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/favicon") ||
+    pathname.startsWith("/robots") ||
+    pathname.startsWith("/sitemap")
+  ) {
     return NextResponse.next();
   }
+
+  // Chỉ kiểm tra navigation từ browser
+  const secFetchDest = req.headers.get("sec-fetch-dest") || "";
+  const isDocument = secFetchDest === "document";
+
+  // ❗️CHỈ chặn nếu KHÔNG phải Pi Browser
+  if (isDocument && !isPiBrowser(req)) {
+    const url = req.nextUrl.clone();
+    url.pathname = "/";
+    url.searchParams.set("reason", "pi_browser_required");
+    return NextResponse.redirect(url);
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {
