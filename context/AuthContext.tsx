@@ -77,35 +77,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
      (CALL piAuth ONLY)
   ------------------------- */
   const pilogin = async () => {
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const token = await getPiAccessToken();
+    // 🧪 DEV / Web thường → LOGIN GIẢ
+    if (typeof window === "undefined" || !window.Pi) {
+      const mockUser: PiUser = {
+        pi_uid: "dev-001",
+        username: "dev_admin",
+        role: "admin",
+        wallet_address: null,
+      };
 
-      const res = await fetch("/api/pi/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ accessToken: token }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok || !data?.success || !data?.user) {
-        alert("❌ Pi verify thất bại");
-        return;
-      }
-
-      const verifiedUser: PiUser = data.user;
-
-      localStorage.setItem(USER_KEY, JSON.stringify(verifiedUser));
-      setUser(verifiedUser);
-    } catch (err) {
-      console.error("❌ Pi login error:", err);
-      alert("❌ Lỗi đăng nhập Pi");
-    } finally {
-      setLoading(false);
+      localStorage.setItem(USER_KEY, JSON.stringify(mockUser));
+      setUser(mockUser);
+      return;
     }
-  };
+
+    // 🔐 Pi Browser → LOGIN THẬT
+    const token = await getPiAccessToken();
+
+    const res = await fetch("/api/pi/verify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ accessToken: token }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data?.success || !data?.user) {
+      alert("❌ Pi verify thất bại");
+      return;
+    }
+
+    const verifiedUser: PiUser = data.user;
+
+    localStorage.setItem(USER_KEY, JSON.stringify(verifiedUser));
+    setUser(verifiedUser);
+  } catch (err) {
+    console.error("❌ Login error:", err);
+    alert("❌ Lỗi đăng nhập");
+  } finally {
+    setLoading(false);
+  }
+};
 
   /* -------------------------
      LOGOUT
