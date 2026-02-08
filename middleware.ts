@@ -13,7 +13,15 @@ export function middleware(req: NextRequest) {
 
   const { pathname } = req.nextUrl;
 
-  // Allow Next internals & static
+  // ✅ ALLOW DEV LOGIN & ACCOUNT (ngoài Pi Browser)
+  if (
+    pathname.startsWith("/pilogin") ||
+    pathname.startsWith("/account")
+  ) {
+    return NextResponse.next();
+  }
+
+  // Allow Next internals & static files
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/favicon") ||
@@ -23,11 +31,10 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Chỉ kiểm tra navigation từ browser
   const secFetchDest = req.headers.get("sec-fetch-dest") || "";
   const isDocument = secFetchDest === "document";
 
-  // ❗️CHỈ chặn nếu KHÔNG phải Pi Browser
+  // ❗ Chỉ chặn navigation nếu KHÔNG phải Pi Browser
   if (isDocument && !isPiBrowser(req)) {
     const url = req.nextUrl.clone();
     url.pathname = "/";
@@ -41,38 +48,3 @@ export function middleware(req: NextRequest) {
 export const config = {
   matcher: ["/((?!api/).*)"],
 };
-export function middleware(req: NextRequest) {
-  if (!PI_ONLY) return NextResponse.next();
-
-  const { pathname } = req.nextUrl;
-
-  // ✅ BỎ QUA DEV LOGIN & ACCOUNT
-  if (
-    pathname.startsWith("/pilogin") ||
-    pathname.startsWith("/account")
-  ) {
-    return NextResponse.next();
-  }
-
-  // Allow Next internals & static
-  if (
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/favicon") ||
-    pathname.startsWith("/robots") ||
-    pathname.startsWith("/sitemap")
-  ) {
-    return NextResponse.next();
-  }
-
-  const secFetchDest = req.headers.get("sec-fetch-dest") || "";
-  const isDocument = secFetchDest === "document";
-
-  if (isDocument && !isPiBrowser(req)) {
-    const url = req.nextUrl.clone();
-    url.pathname = "/";
-    url.searchParams.set("reason", "pi_browser_required");
-    return NextResponse.redirect(url);
-  }
-
-  return NextResponse.next();
-}
