@@ -1,19 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
-
-const PI_ONLY = process.env.PI_BROWSER_ONLY === "true";
-
-// Heuristic UA check
-function isPiBrowser(req: NextRequest) {
-  const ua = req.headers.get("user-agent") || "";
-  return /PiBrowser/i.test(ua);
-}
-
 export function middleware(req: NextRequest) {
   if (!PI_ONLY) return NextResponse.next();
 
   const { pathname } = req.nextUrl;
 
-  // ✅ ALLOW DEV LOGIN & ACCOUNT (ngoài Pi Browser)
+  // ✅ THÊM ĐOẠN NÀY (CHO PHÉP LOGIN GIẢ KHI DEV)
   if (
     pathname.startsWith("/pilogin") ||
     pathname.startsWith("/account")
@@ -21,7 +11,8 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Allow Next internals & static files
+  // ----- PHẦN DƯỚI GIỮ NGUYÊN -----
+
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/favicon") ||
@@ -34,7 +25,6 @@ export function middleware(req: NextRequest) {
   const secFetchDest = req.headers.get("sec-fetch-dest") || "";
   const isDocument = secFetchDest === "document";
 
-  // ❗ Chỉ chặn navigation nếu KHÔNG phải Pi Browser
   if (isDocument && !isPiBrowser(req)) {
     const url = req.nextUrl.clone();
     url.pathname = "/";
@@ -44,7 +34,3 @@ export function middleware(req: NextRequest) {
 
   return NextResponse.next();
 }
-
-export const config = {
-  matcher: ["/((?!api/).*)"],
-};
