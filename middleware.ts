@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const PI_ONLY = process.env.PI_BROWSER_ONLY === "false";
+const PI_ONLY = process.env.PI_BROWSER_ONLY === "true";
 
 // Heuristic UA check
 function isPiBrowser(req: NextRequest) {
