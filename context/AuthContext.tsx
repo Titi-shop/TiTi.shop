@@ -29,6 +29,9 @@ type AuthContextType = {
 
 const USER_KEY = "pi_user";
 
+// 🔑 DEV flag (localhost / web thường)
+const DEV_LOGIN = process.env.NEXT_PUBLIC_DEV_LOGIN === "true";
+
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
@@ -43,13 +46,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [piReady, setPiReady] = useState(false);
 
   /* -------------------------
-     INIT PI SDK
+     INIT PI SDK (chỉ để biết Pi có sẵn hay không)
   ------------------------- */
   useEffect(() => {
     if (typeof window === "undefined") return;
 
     const timer = setInterval(() => {
-      if (window.Pi) {
+      if ((window as any).Pi) {
         setPiReady(true);
         clearInterval(timer);
       }
@@ -60,9 +63,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   /* -------------------------
      LOAD USER (BOOTSTRAP)
+     - DEV  : auto login giả
+     - PROD : load user thật
   ------------------------- */
   useEffect(() => {
     try {
+      // ✅ DEV / localhost → LOGIN GIẢ
+      if (DEV_LOGIN) {
+        const fakeUser: PiUser = {
+          pi_uid: "dev-local-001",
+          username: "hung12345",
+          wallet_address: null,
+          role: "admin",
+        };
+
+        localStorage.setItem(USER_KEY, JSON.stringify(fakeUser));
+        setUser(fakeUser);
+        return;
+      }
+
+      // 🔒 PROD / Pi Browser → load user thật (nếu có)
       const rawUser = localStorage.getItem(USER_KEY);
       if (rawUser) {
         setUser(JSON.parse(rawUser));
@@ -73,13 +93,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   /* -------------------------
-     LOGIN WITH PI
-     (CALL piAuth ONLY)
+     LOGIN
+     - DEV  : login giả
+     - PI   : login Pi thật
   ------------------------- */
   const pilogin = async () => {
-    try {
-      setLoading(true);
+    setLoading(true);
 
+    try {
+      // 🧪 DEV LOGIN (ngoài Pi Browser)
+      if (DEV_LOGIN || !(window as any).Pi) {
+        const fakeUser: PiUser = {
+          pi_uid: "dev-login-001",
+          username: "hung12345",
+          wallet_address: null,
+          role: "admin",
+        };
+
+        localStorage.setItem(USER_KEY, JSON.stringify(fakeUser));
+        setUser(fakeUser);
+        return;
+      }
+
+      // 🔐 PI LOGIN THẬT
       const token = await getPiAccessToken();
 
       const res = await fetch("/api/pi/verify", {
@@ -100,8 +136,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem(USER_KEY, JSON.stringify(verifiedUser));
       setUser(verifiedUser);
     } catch (err) {
-      console.error("❌ Pi login error:", err);
-      alert("❌ Lỗi đăng nhập Pi");
+      console.error("❌ Login error:", err);
+      alert("❌ Lỗi đăng nhập");
     } finally {
       setLoading(false);
     }
