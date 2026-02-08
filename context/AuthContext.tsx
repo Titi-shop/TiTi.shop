@@ -77,24 +77,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
      (CALL piAuth ONLY)
   ------------------------- */
   const pilogin = async () => {
-  try {
-    setLoading(true);
+  setLoading(true);
 
-    // 🧪 DEV / Web thường → LOGIN GIẢ
+  try {
+    // 🧪 LOGIN GIẢ – ngoài Pi Browser
     if (typeof window === "undefined" || !window.Pi) {
       const mockUser: PiUser = {
-        pi_uid: "dev-001",
-        username: "dev_admin",
+        pi_uid: "dev-hung-001",
+        username: "hung12345",
         role: "admin",
         wallet_address: null,
       };
 
       localStorage.setItem(USER_KEY, JSON.stringify(mockUser));
       setUser(mockUser);
-      return;
+
+      return; // ⚠️ vẫn cho finally chạy
     }
 
-    // 🔐 Pi Browser → LOGIN THẬT
+    // 🔐 LOGIN PI THẬT
     const token = await getPiAccessToken();
 
     const res = await fetch("/api/pi/verify", {
@@ -111,14 +112,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     const verifiedUser: PiUser = data.user;
-
     localStorage.setItem(USER_KEY, JSON.stringify(verifiedUser));
     setUser(verifiedUser);
   } catch (err) {
     console.error("❌ Login error:", err);
     alert("❌ Lỗi đăng nhập");
   } finally {
-    setLoading(false);
+    setLoading(false); // 🔴 BẮT BUỘC
   }
 };
 
