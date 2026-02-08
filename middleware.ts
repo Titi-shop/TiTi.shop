@@ -1,19 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const PI_ONLY = process.env.PI_BROWSER_ONLY === "false";
+/**
+ * Bật / tắt Pi Browser guard
+ * - PI_BROWSER_ONLY=false  → cho phép Chrome (DEV)
+ * - mặc định / production  → chỉ Pi Browser
+ */
+const ENABLE_PI_GUARD = process.env.PI_BROWSER_ONLY !== "false";
 
-// Heuristic UA check
-function isPiBrowser(req: NextRequest) {
+// Heuristic User-Agent check
+function isPiBrowser(req: NextRequest): boolean {
   const ua = req.headers.get("user-agent") || "";
   return /PiBrowser/i.test(ua);
 }
 
 export function middleware(req: NextRequest) {
-  if (!PI_ONLY) return NextResponse.next();
+  // Guard bị tắt → cho qua tất cả
+  if (!ENABLE_PI_GUARD) {
+    return NextResponse.next();
+  }
 
-  const { pathname } = req.nextUrl;
+  const { pathname, searchParams } = req.nextUrl;
 
-  // Allow Next internals & static
+  // Bỏ qua tài nguyên nội bộ của Next + static
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/favicon") ||
@@ -23,15 +31,21 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Chỉ kiểm tra navigation từ browser
+  // Chỉ chặn navigation document (không chặn fetch/XHR)
   const secFetchDest = req.headers.get("sec-fetch-dest") || "";
   const isDocument = secFetchDest === "document";
 
-  // ❗️CHỈ chặn nếu KHÔNG phải Pi Browser
+  // Nếu không phải Pi Browser
   if (isDocument && !isPiBrowser(req)) {
+    // ❗️Tránh redirect loop
+    if (pathname === "/" && searchParams.has("reason")) {
+      return NextResponse.next();
+    }
+
     const url = req.nextUrl.clone();
     url.pathname = "/";
     url.searchParams.set("reason", "pi_browser_required");
+
     return NextResponse.redirect(url);
   }
 
