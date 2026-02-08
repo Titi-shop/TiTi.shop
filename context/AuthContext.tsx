@@ -62,15 +62,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
      LOAD USER (BOOTSTRAP)
   ------------------------- */
   useEffect(() => {
-    try {
-      const rawUser = localStorage.getItem(USER_KEY);
-      if (rawUser) {
-        setUser(JSON.parse(rawUser));
-      }
-    } finally {
-      setLoading(false);
+  try {
+    // ✅ DEV LOGIN giả
+    if (DEV_LOGIN) {
+      const fakeUser: PiUser = {
+        pi_uid: "dev-uid-001",
+        username: "hung12345",
+        wallet_address: null,
+        role: "admin",
+      };
+
+      localStorage.setItem(USER_KEY, JSON.stringify(fakeUser));
+      setUser(fakeUser);
+      return;
     }
-  }, []);
+
+    // 🔒 Login thật
+    const rawUser = localStorage.getItem(USER_KEY);
+    if (rawUser) {
+      setUser(JSON.parse(rawUser));
+    }
+  } finally {
+    setLoading(false);
+  }
+}, []);
 
   /* -------------------------
      LOGIN WITH PI
