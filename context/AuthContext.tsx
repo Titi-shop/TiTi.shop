@@ -62,80 +62,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
      LOAD USER (BOOTSTRAP)
   ------------------------- */
   useEffect(() => {
-  try {
-    // ✅ DEV LOGIN giả
-    if (DEV_LOGIN) {
-      const fakeUser: PiUser = {
-        pi_uid: "dev-uid-001",
-        username: "hung12345",
-        wallet_address: null,
-        role: "admin",
-      };
-
-      localStorage.setItem(USER_KEY, JSON.stringify(fakeUser));
-      setUser(fakeUser);
-      return;
+    try {
+      const rawUser = localStorage.getItem(USER_KEY);
+      if (rawUser) {
+        setUser(JSON.parse(rawUser));
+      }
+    } finally {
+      setLoading(false);
     }
-
-    // 🔒 Login thật
-    const rawUser = localStorage.getItem(USER_KEY);
-    if (rawUser) {
-      setUser(JSON.parse(rawUser));
-    }
-  } finally {
-    setLoading(false);
-  }
-}, []);
+  }, []);
 
   /* -------------------------
      LOGIN WITH PI
      (CALL piAuth ONLY)
   ------------------------- */
   const pilogin = async () => {
-  setLoading(true);
+    try {
+      setLoading(true);
 
-  try {
-    // 🧪 LOGIN GIẢ – ngoài Pi Browser
-    if (typeof window === "undefined" || !window.Pi) {
-      const mockUser: PiUser = {
-        pi_uid: "dev-hung-001",
-        username: "hung12345",
-        role: "admin",
-        wallet_address: null,
-      };
+      const token = await getPiAccessToken();
 
-      localStorage.setItem(USER_KEY, JSON.stringify(mockUser));
-      setUser(mockUser);
+      const res = await fetch("/api/pi/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ accessToken: token }),
+      });
 
-      return; // ⚠️ vẫn cho finally chạy
+      const data = await res.json();
+
+      if (!res.ok || !data?.success || !data?.user) {
+        alert("❌ Pi verify thất bại");
+        return;
+      }
+
+      const verifiedUser: PiUser = data.user;
+
+      localStorage.setItem(USER_KEY, JSON.stringify(verifiedUser));
+      setUser(verifiedUser);
+    } catch (err) {
+      console.error("❌ Pi login error:", err);
+      alert("❌ Lỗi đăng nhập Pi");
+    } finally {
+      setLoading(false);
     }
-
-    // 🔐 LOGIN PI THẬT
-    const token = await getPiAccessToken();
-
-    const res = await fetch("/api/pi/verify", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ accessToken: token }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok || !data?.success || !data?.user) {
-      alert("❌ Pi verify thất bại");
-      return;
-    }
-
-    const verifiedUser: PiUser = data.user;
-    localStorage.setItem(USER_KEY, JSON.stringify(verifiedUser));
-    setUser(verifiedUser);
-  } catch (err) {
-    console.error("❌ Login error:", err);
-    alert("❌ Lỗi đăng nhập");
-  } finally {
-    setLoading(false); // 🔴 BẮT BUỘC
-  }
-};
+  };
 
   /* -------------------------
      LOGOUT
