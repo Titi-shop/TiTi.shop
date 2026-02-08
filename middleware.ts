@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const PI_ONLY = process.env.PI_BROWSER_ONLY === "true";
+const PI_ONLY = process.env.PI_BROWSER_ONLY === "false";
 
 // Heuristic UA check
 function isPiBrowser(req: NextRequest) {
@@ -41,3 +41,38 @@ export function middleware(req: NextRequest) {
 export const config = {
   matcher: ["/((?!api/).*)"],
 };
+export function middleware(req: NextRequest) {
+  if (!PI_ONLY) return NextResponse.next();
+
+  const { pathname } = req.nextUrl;
+
+  // ✅ BỎ QUA DEV LOGIN & ACCOUNT
+  if (
+    pathname.startsWith("/pilogin") ||
+    pathname.startsWith("/account")
+  ) {
+    return NextResponse.next();
+  }
+
+  // Allow Next internals & static
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/favicon") ||
+    pathname.startsWith("/robots") ||
+    pathname.startsWith("/sitemap")
+  ) {
+    return NextResponse.next();
+  }
+
+  const secFetchDest = req.headers.get("sec-fetch-dest") || "";
+  const isDocument = secFetchDest === "document";
+
+  if (isDocument && !isPiBrowser(req)) {
+    const url = req.nextUrl.clone();
+    url.pathname = "/";
+    url.searchParams.set("reason", "pi_browser_required");
+    return NextResponse.redirect(url);
+  }
+
+  return NextResponse.next();
+}
