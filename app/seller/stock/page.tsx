@@ -412,55 +412,36 @@ const isOff = product.isActive === false;
 
                 {/* IMAGE */}
 
-                <div className="w-24 h-24 relative rounded-lg overflow-hidden flex-shrink-0">
+                const badge =
+  isOut ? { text: t.out_of_stock, color: "bg-gray-600" } :
+  isOff ? { text: t.inactive, color: "bg-black" } :
+  isSale ? { text: "SALE", color: "bg-red-600" } :
+  upcoming ? { text: t.upcoming, color: "bg-blue-600" } :
+  ended ? { text: t.ended, color: "bg-gray-500" } :
+  null;
 
-                  {isSale && (
-                    <span className="absolute top-1 left-1 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded z-10">
-                      SALE
-                    </span>
-                  )}
+                 <div className="w-24 h-24 relative rounded-lg overflow-hidden flex-shrink-0">
 
-                  {upcoming && (
-                    <span className="absolute top-1 left-1 bg-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded z-10">
-                      UPCOMING
-                    </span>
-                  )}
+  {badge && (
+    <span className={`absolute top-1 left-1 z-10 badge ${badge.color}`}>
+      {badge.text}
+    </span>
+  )}
 
-                  {ended && (
-                    <span className="absolute top-1 left-1 bg-gray-500 text-white text-xs font-bold px-2 py-0.5 rounded z-10">
-                      ENDED
-                    </span>
-                  )}
+  {product.thumbnail ? (
+    <Image
+      src={product.thumbnail}
+      alt={product.name}
+      fill
+      className={`object-cover ${isOut || isOff ? "opacity-40" : ""}`}
+    />
+  ) : (
+    <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500 text-sm">
+      {t.no_image}
+    </div>
+  )}
 
-{isOut && (
-  <span className="absolute top-1 left-1 bg-gray-600 text-white text-xs px-2 py-0.5 rounded z-10">
-    {t.out_of_stock || "Hết hàng"}
-  </span>
-)}
-
-{isOff && (
-  <span className="absolute top-1 left-1 bg-black text-white text-xs px-2 py-0.5 rounded z-10">
-    {t.inactive || "Ngưng"}
-  </span>
-)}
-
-                  {product.thumbnail ? (
-              <Image
-  src={product.thumbnail || "/placeholder.png"}
-  alt={product.name}
-  fill
-  className={`object-cover ${
-    isOut || isOff ? "opacity-40" : ""
-  }`}
-/>
-) : (
-                    <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500 text-sm">
-                      {t.no_image}
-                    </div>
-                  )}
-
-                </div>
-
+</div>
                 {/* CONTENT */}
 
                 <div className="flex-1 min-w-0">
