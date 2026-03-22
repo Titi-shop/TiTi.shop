@@ -314,14 +314,16 @@ export default function SellerStockPage() {
 </div>
 
 {/* INFO */}
-<div className="mt-16 px-1">
-  <h2 className="font-bold text-lg">
-    {shop.shop_name || t.my_store}
-  </h2>
+ <div className="flex-1 min-w-0">
+    <h2 className="font-bold text-lg leading-tight">
+      {shop.shop_name || t.my_store}
+    </h2>
 
-  <p className="text-sm text-gray-500">
-    {shop.shop_description || t.no_description || "No description"}
-  </p>
+    <p className="text-sm text-gray-500 line-clamp-2">
+      {shop.shop_description || t.no_description || "No description"}
+    </p>
+  </div>
+
 </div>
 
         {/* STATS */}
