@@ -306,33 +306,29 @@ export default function SellerStockPage() {
 
         <div className="flex items-center gap-3 mt-4">
 
-  <div className="relative">
-
-  {/* AVATAR ĐÈ 50/50 */}
-  <div className="absolute left-4 -bottom-10 w-20 h-20 z-10">
+  {/* AVATAR */}
+  <div className="w-16 h-16 relative">
     <Image
       src={shop.avatar_url || "/avatar.png"}
       alt="avatar"
       fill
-      className="rounded-full object-cover border-4 border-white shadow"
+      className="rounded-full object-cover"
     />
+  </div>
+
+  {/* INFO */}
+  <div>
+    <h2 className="font-bold text-lg">
+      {shop.shop_name || t.my_store}
+    </h2>
+
+    <p className="text-sm text-gray-500">
+      {shop.shop_description || t.no_description || "No description"}
+    </p>
   </div>
 
 </div>
 
-{/* INFO SHOP */}
-<div className="mt-12 px-4">
-
-  <h2 className="font-bold text-lg">
-    {shop.shop_name || t.my_store}
-  </h2>
-
-  <p className="text-sm text-gray-500">
-    {shop.shop_description || t.no_description || "No description"}
-  </p>
-
-</div>
-</div>
         {/* SHOP NAME */}
 
         <h2 className="text-center font-bold text-xl mt-3">
@@ -373,8 +369,6 @@ export default function SellerStockPage() {
             {message.text}
           </p>
         )}
-
-        {/* EMPTY */}
 
         {products.length === 0 && (
           <p className="text-center text-gray-400">
@@ -425,7 +419,7 @@ const isOff = product.isActive === false;
                 onClick={() =>
                   router.push(`/product/${product.id}`)
                 }
-                className="flex gap-3 p-3 bg-white rounded-xl shadow border cursor-pointer active:scale-[0.98] transition"
+                className="flex gap-3 p-3 bg-white rounded-xl shadow border hover:bg-gray-50 cursor-pointer"
               >
 
                 {/* IMAGE */}
@@ -449,7 +443,6 @@ const isOff = product.isActive === false;
                       ENDED
                     </span>
                   )}
-                   
 
 {isOut && (
   <span className="absolute top-1 left-1 bg-gray-600 text-white text-xs px-2 py-0.5 rounded z-10">
