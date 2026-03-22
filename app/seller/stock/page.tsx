@@ -300,30 +300,28 @@ export default function SellerStockPage() {
     </button>
   </div>
 
-  <div className="mt-16 px-1 flex items-center gap-3">
-
-  {/* AVATAR */}
-  <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow bg-white flex-shrink-0">
+  {/* AVATAR (ĐÈ 50%) */}
+  <div className="absolute left-4 -bottom-12 w-24 h-24 border-4 border-white rounded-full overflow-hidden bg-white shadow">
     <Image
       src={shop.avatar_url || "/avatar.png"}
       alt="avatar"
       fill
-      unoptimized
       className="object-cover"
     />
   </div>
-     </div>
 
-  {/* TEXT */}
-  <div className="flex-1 min-w-0">
-    <h2 className="font-bold text-lg leading-tight">
-      {shop.shop_name || t.my_store}
-    </h2>
+</div>
 
-    <p className="text-sm text-gray-500 line-clamp-2">
-      {shop.shop_description || t.no_description || "No description"}
-    </p>
-  </div>
+{/* INFO */}
+<div className="mt-16 px-1">
+  <h2 className="font-bold text-lg">
+    {shop.shop_name || t.my_store}
+  </h2>
+
+  <p className="text-sm text-gray-500">
+    {shop.shop_description || t.no_description || "No description"}
+  </p>
+</div>
 
 
         {/* STATS */}
