@@ -324,8 +324,6 @@ export default function SellerStockPage() {
     </p>
   </div>
 
-</div>
-
         {/* STATS */}
 
         <div className="flex justify-center gap-6 text-sm text-gray-600 mt-2">
