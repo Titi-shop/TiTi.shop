@@ -412,22 +412,36 @@ const isOff = product.isActive === false;
 
                 {/* IMAGE */}
 
-                const badge =
-  isOut ? { text: t.out_of_stock, color: "bg-gray-600" } :
-  isOff ? { text: t.inactive, color: "bg-black" } :
-  isSale ? { text: "SALE", color: "bg-red-600" } :
-  upcoming ? { text: t.upcoming, color: "bg-blue-600" } :
-  ended ? { text: t.ended, color: "bg-gray-500" } :
-  null;
+                <div className="w-24 h-24 relative rounded-lg overflow-hidden flex-shrink-0">
 
-                 <div className="w-24 h-24 relative rounded-lg overflow-hidden flex-shrink-0">
+  {/* BADGES */}
+  <div className="absolute top-1 left-1 flex flex-col gap-1 z-10">
+    {isSale && (
+      <span className="badge bg-red-600">SALE</span>
+    )}
+    {upcoming && (
+      <span className="badge bg-blue-600">
+        {t.upcoming}
+      </span>
+    )}
+    {ended && (
+      <span className="badge bg-gray-500">
+        {t.ended}
+      </span>
+    )}
+    {isOut && (
+      <span className="badge bg-gray-600">
+        {t.out_of_stock || "Hết hàng"}
+      </span>
+    )}
+    {isOff && (
+      <span className="badge bg-black">
+        {t.inactive || "Ngưng"}
+      </span>
+    )}
+  </div>
 
-  {badge && (
-    <span className={`absolute top-1 left-1 z-10 badge ${badge.color}`}>
-      {badge.text}
-    </span>
-  )}
-
+  {/* IMAGE */}
   {product.thumbnail ? (
     <Image
       src={product.thumbnail}
