@@ -22,6 +22,10 @@
   /* Bạn có thể thêm các token khác nếu cần */
 }
 
+
+.badge {
+  @apply text-white text-xs font-bold px-2 py-0.5 rounded;
+}
 /* ===============================
    4️⃣  Dark mode (t tuỳ chọn)
 ================================ */
