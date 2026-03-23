@@ -22,7 +22,6 @@ type OrderRow = {
 /* =========================
 ORDER ITEM
 ========================= */
-
 type OrderItemRow = {
   id: string;
   order_id: string;
@@ -32,7 +31,6 @@ type OrderItemRow = {
 
   product_name: string;
   thumbnail: string;
-  images: string[] | null;
 
   unit_price: number;
   quantity: number;
@@ -95,27 +93,26 @@ if (!user) {
     ========================= */
 
     const { rows: items } = await query<OrderItemRow>(
-      `
-      select
-  id,
-  order_id,
-  product_id,
-  seller_id,
-  product_name,
-  thumbnail,
-  images,
-  unit_price,
-  quantity,
-  total_price,
-  status,
-  seller_message,
-  seller_cancel_reason
-from order_items
-where order_id = any($1::uuid[])
-order by created_at asc
-      `,
-      [orderIds]
-    );
+  `
+  select
+    id,
+    order_id,
+    product_id,
+    seller_id,
+    product_name,
+    thumbnail,
+    unit_price,
+    quantity,
+    total_price,
+    status,
+    seller_message,
+    seller_cancel_reason
+  from order_items
+  where order_id = any($1::uuid[])
+  order by created_at asc
+  `,
+  [orderIds]
+);
 
     /* =========================
        GROUP ITEMS
