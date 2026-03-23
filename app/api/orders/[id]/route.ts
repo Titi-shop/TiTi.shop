@@ -1,4 +1,22 @@
-const { rows } = await query(
+import { NextResponse } from "next/server";
+import { getUserFromBearer } from "@/lib/auth/getUserFromBearer";
+import { query } from "@/lib/db";
+
+export async function GET(
+  _req: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const user = await getUserFromBearer();
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "UNAUTHENTICATED" },
+        { status: 401 }
+      );
+    }
+
+    const { rows } = await query(
   `
   select
     o.id,
@@ -29,3 +47,24 @@ const { rows } = await query(
   `,
   [params.id, user.pi_uid]
 );
+    const order = rows[0];
+
+    if (!order) {
+      return NextResponse.json(
+        { error: "ORDER_NOT_FOUND" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(order);
+
+  } catch (error) {
+
+    console.error("GET ORDER ERROR:", error);
+
+    return NextResponse.json(
+      { error: "INTERNAL_SERVER_ERROR" },
+      { status: 500 }
+    );
+  }
+}
