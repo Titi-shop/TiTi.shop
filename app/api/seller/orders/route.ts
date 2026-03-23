@@ -79,61 +79,60 @@ export async function GET(req: Request) {
     params.push(offset);
 
     const { rows } = await query(
-      `
-      select
-        o.id,
-        o.order_number,
-        o.created_at,
+  `
+  select
+    o.id,
+    o.order_number,
+    o.created_at,
 
-        o.shipping_name,
-        o.shipping_phone,
-        o.shipping_address,
-        o.shipping_provider,
-        o.shipping_country,
-        o.shipping_postal_code,
+    o.shipping_name,
+    o.shipping_phone,
+    o.shipping_address,
+    o.shipping_provider,
+    o.shipping_country,
+    o.shipping_postal_code,
 
-        json_agg(
-          json_build_object(
-            'id', oi.id,
-            'product_id', oi.product_id,
-            'product_name', oi.product_name,
-            'thumbnail', oi.thumbnail,
-            'images', oi.images,
-            'quantity', oi.quantity,
-            'unit_price', oi.unit_price,
-            'total_price', oi.total_price,
-            'status', oi.status
-          )
-          order by oi.created_at asc
-        ) as order_items,
+    json_agg(
+      json_build_object(
+        'id', oi.id,
+        'product_id', oi.product_id,
+        'product_name', oi.product_name,
+        'thumbnail', oi.thumbnail,
+        'quantity', oi.quantity,
+        'unit_price', oi.unit_price,
+        'total_price', oi.total_price,
+        'status', oi.status
+      )
+      order by oi.created_at asc
+    ) as order_items,
 
-        sum(oi.total_price) as total
+    sum(oi.total_price) as total
 
-      from orders o
-      join order_items oi
-      on oi.order_id = o.id
+  from orders o
+  join order_items oi
+  on oi.order_id = o.id
 
-      where oi.seller_id = $1
-      ${statusFilter}
+  where oi.seller_id = $1
+  ${statusFilter}
 
-      group by
-        o.id,
-        o.order_number,
-        o.created_at,
-        o.shipping_name,
-        o.shipping_phone,
-        o.shipping_address,
-        o.shipping_provider,
-        o.shipping_country,
-        o.shipping_postal_code
+  group by
+    o.id,
+    o.order_number,
+    o.created_at,
+    o.shipping_name,
+    o.shipping_phone,
+    o.shipping_address,
+    o.shipping_provider,
+    o.shipping_country,
+    o.shipping_postal_code
 
-      order by o.created_at desc
+  order by o.created_at desc
 
-      limit $${limitIndex}
-      offset $${offsetIndex}
-      `,
-      params
-    );
+  limit $${limitIndex}
+  offset $${offsetIndex}
+  `,
+  params
+);
 
     return NextResponse.json(rows);
 
