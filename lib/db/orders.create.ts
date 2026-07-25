@@ -1,0 +1,543 @@
+import { withTransaction } from "@/lib/db";
+import {
+  logger,
+  maskId,
+} from "@/lib/logger";
+/* =========================================================
+   TYPES
+========================================================= */
+
+type OrderItemInternal = {
+  product: {
+    id: string;
+    seller_id: string;
+    name: string;
+    thumbnail: string | null;
+  };
+  variant_id: string | null;
+  price: number;
+  qty: number;
+  total: number;
+};
+
+type CreateOrderInput = {
+  userId: string;
+  piPaymentId: string;
+  txid: string;
+  idempotencyKey: string;
+
+  items: {
+    product_id: string;
+    quantity: number;
+    variant_id?: string | null;
+  }[];
+
+  country: string;
+  zone: string;
+
+  shipping: {
+    name: string;
+    phone: string;
+    address_line: string;
+    ward?: string | null;
+    district?: string | null;
+    region?: string | null;
+    postal_code?: string | null;
+  };
+   pricing: {
+  subtotal: number;
+  shipping_fee: number;
+  total: number;
+
+  items: {
+    product_id: string;
+    variant_id: string | null;
+    quantity: number;
+    unit_price: number;
+    subtotal: number;
+  }[];
+};
+};
+type ProductRow = {
+  id: string;
+  seller_id: string;
+
+  name: string;
+  thumbnail: string | null;
+  is_active: boolean;
+  deleted_at: Date | null;
+  stock: number | null;
+  reserved_stock: number | null;
+};
+
+type VariantRow = {
+  id: string;
+  product_id: string;
+  stock: number |null;
+  reserved_stock: number | null;
+  is_active: boolean;
+};
+function isUUID(v: string): boolean {
+  return /^[0-9a-f-]{36}$/i.test(v);
+}
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+export async function createOrder(input: CreateOrderInput) {
+  const { userId, items } = input;
+
+  if (!userId) throw new Error("INVALID_USER");
+  if (!items?.length) throw new Error("INVALID_ITEMS");
+
+  const zone = input.zone?.trim().toLowerCase();
+  const country = input.country?.trim().toUpperCase();
+
+  return withTransaction(async (client) => {
+     const existingOrder =
+  await client.query<{ id: string }>(
+    `
+    SELECT id
+    FROM orders
+    WHERE idempotency_key = $1
+    LIMIT 1
+    `,
+    [input.idempotencyKey]
+  );
+
+if (existingOrder.rows.length) {
+  logger.info("ORDER.IDEMPOTENT_HIT", {
+  orderId: maskId(existingOrder.rows[0].id),
+});
+  return {
+    orderId: existingOrder.rows[0].id,
+  };
+}
+    logger.info("ORDER.CREATE.START", {
+  userId: maskId(userId),
+  itemsCount: items.length,
+  piPaymentId: maskId(input.piPaymentId),
+  txid: maskId(input.txid),
+  idempotencyKey: maskId(input.idempotencyKey),
+});
+
+    /* =========================================================
+       PRODUCTS LOAD
+    ========================================================= */
+
+    const productIds = items.map((i) => i.product_id);
+
+    const { rows: products } =
+  await client.query<ProductRow>(
+      `
+      SELECT
+    id,
+    seller_id,
+    name,
+    thumbnail,
+    is_active,
+    deleted_at,
+    stock,
+    reserved_stock
+      FROM products
+      WHERE id = ANY($1::uuid[])
+      FOR UPDATE
+      `,
+      [productIds]
+    );
+
+    const productMap = new Map(products.map((p) => [p.id, p]));
+
+    /* =========================================================
+       VARIANTS
+    ========================================================= */
+
+    const variantIds = items.map((i) => i.variant_id).filter(Boolean);
+
+    const { rows: variants } =
+      variantIds.length > 0
+        ? await client.query<VariantRow>(
+            `
+            SELECT
+    id,
+    product_id,
+    stock,
+    reserved_stock,
+    is_active
+FROM product_variants
+WHERE id = ANY($1::uuid[])
+FOR UPDATE
+            `,
+            [variantIds]
+          )
+       : {
+    rows: [] as VariantRow[],
+  };
+
+    const variantMap = new Map(variants.map((v) => [v.id, v]));
+
+    /* =========================================================
+       CALCULATE
+    ========================================================= */
+    let totalQuantity = 0;
+
+    const orderItems: OrderItemInternal[] = [];
+const subtotal =
+  Number(input.pricing.subtotal);
+
+const shippingFee =
+  Number(input.pricing.shipping_fee);
+
+const total =
+  Number(input.pricing.total);
+    for (const item of items) {
+      if (!isUUID(item.product_id)) {
+        throw new Error("INVALID_PRODUCT_ID");
+      }
+
+      const p = productMap.get(item.product_id);
+
+if (!p) {
+  throw new Error("INVALID_PRODUCT");
+}
+
+const qty = Math.max(item.quantity, 1);
+
+if (
+  !item.variant_id &&
+  p.stock !== null &&
+  Number(p.stock) - Number(p.reserved_stock ?? 0) < qty
+) {
+  throw new Error("OUT_OF_STOCK");
+}
+
+if (!p.is_active || p.deleted_at) {
+  throw new Error("PRODUCT_NOT_AVAILABLE");
+}
+
+/* =========================================
+   VALIDATE VARIANT
+========================================= */
+
+if (item.variant_id) {
+  const v = variantMap.get(
+    item.variant_id
+  );
+
+  if (!v) {
+    throw new Error(
+      "INVALID_VARIANT"
+    );
+  }
+
+  if (v.product_id !== p.id) {
+    throw new Error(
+      "VARIANT_PRODUCT_MISMATCH"
+    );
+  }
+
+  if (!v.is_active) {
+    throw new Error(
+      "VARIANT_DISABLED"
+    );
+  }
+
+  if (
+  v.stock !== null &&
+  Number(v.stock) -
+    Number(v.reserved_stock ?? 0) <
+    qty
+) {
+  throw new Error("OUT_OF_STOCK");
+}
+}
+
+/* =========================================
+   PRICE FROM PAYMENT INTENT
+========================================= */
+
+const pricingItem =
+  input.pricing.items.find(
+    (x) =>
+      x.product_id === item.product_id &&
+      (x.variant_id ?? null) ===
+        (item.variant_id ?? null)
+  );
+
+if (!pricingItem) {
+  throw new Error(
+    "PRICING_ITEM_NOT_FOUND"
+  );
+}
+
+const price =
+  Number(pricingItem.unit_price);
+
+const lineTotal =
+  Number(pricingItem.subtotal);
+      totalQuantity += qty;
+      orderItems.push({
+  product: {
+    id: p.id,
+    seller_id: p.seller_id,
+    name: p.name,
+    thumbnail: p.thumbnail ?? null,
+  },
+  variant_id: item.variant_id ?? null,
+  price,
+  qty,
+  total: lineTotal,
+});
+
+      logger.debug("ORDER.ITEM", {
+  productId: maskId(p.id),
+  qty,
+  price,
+  total: lineTotal,
+});
+    }
+
+    /* =========================================================
+   STOCK DEDUCTION (STRICT)
+========================================================= */
+
+for (const item of orderItems) {
+  let res;
+
+  if (item.variant_id) {
+    logger.debug("ORDER.STOCK.VARIANT", {
+  variantId: maskId(item.variant_id),
+  qty: item.qty,
+});
+
+    res = await client.query(
+      `
+      UPDATE product_variants
+SET
+    stock = stock - $1,
+    reserved_stock = reserved_stock - $1
+WHERE id = $2
+AND reserved_stock >= $1
+      `,
+      [
+        item.qty,
+        item.variant_id,
+      ]
+    );
+
+    if (res.rowCount) {
+      await client.query(
+        `
+        UPDATE products
+        SET sold = sold + $1
+        WHERE id = $2
+        `,
+        [
+          item.qty,
+          item.product.id,
+        ]
+      );
+    }
+  } else {
+    logger.debug("ORDER.STOCK.PRODUCT", {
+  productId: maskId(item.product.id),
+  qty: item.qty,
+});
+
+    res = await client.query(
+      `
+      UPDATE products
+SET
+    stock = stock - $1,
+    reserved_stock = reserved_stock - $1,
+    sold = sold + $1
+WHERE id = $2
+AND reserved_stock >= $1
+      `,
+      [
+        item.qty,
+        item.product.id,
+      ]
+    );
+  }
+
+  if (!res.rowCount) {
+    logger.error("ORDER.STOCK_FAIL", {
+  productId: maskId(item.product.id),
+  variantId: item.variant_id
+    ? maskId(item.variant_id)
+    : null,
+  qty: item.qty,
+});
+
+    throw new Error("OUT_OF_STOCK");
+  }
+
+  logger.debug("ORDER.STOCK_OK", {
+  productId: maskId(item.product.id),
+  variantId: item.variant_id
+    ? maskId(item.variant_id)
+    : null,
+  qty: item.qty,
+});
+}
+
+    /* =========================================================
+       CREATE ORDER (PAID ONLY FLOW)
+    ========================================================= */
+
+    logger.debug("ORDER.INSERT");
+
+    const orderRes = await client.query<{ id: string }>(
+      `
+      INSERT INTO orders (
+        buyer_id,
+        seller_id,
+
+        pi_payment_id,
+        pi_txid,
+        idempotency_key,
+
+        payment_status,
+        paid_at,
+
+        fulfillment_status,
+
+        settlement_status,
+        shipment_status,
+        delivery_status,
+
+        items_total,
+        subtotal,
+        discount,
+        shipping_fee,
+        tax,
+        total,
+        currency,
+
+        shipping_name,
+        shipping_phone,
+        shipping_address_line,
+        shipping_ward,
+        shipping_district,
+        shipping_region,
+        shipping_country,
+        shipping_postal_code,
+
+        total_items,
+        total_quantity,
+
+        created_at,
+        updated_at
+      )
+      VALUES (
+        $1,$2,
+
+        $3,$4,$5,
+
+        'paid',
+        now(),
+
+        'pending_fulfillment',
+
+        'ESCROWED',
+        'PENDING',
+        'PENDING',
+
+        $6,$7,$8,$9,$10,$11,$12,
+
+        $13,$14,$15,$16,$17,$18,$19,$20,
+
+        $21,$22,
+
+        now(),
+        now()
+      )
+      RETURNING id
+      `,
+      [
+        userId,
+        orderItems[0].product.seller_id,
+
+        input.piPaymentId,
+        input.txid,
+        input.idempotencyKey,
+
+        orderItems.length,
+        subtotal,
+        0,
+        shippingFee,
+        0,
+        total,
+        "PI",
+
+        input.shipping.name,
+        input.shipping.phone,
+        input.shipping.address_line,
+        input.shipping.ward ?? null,
+        input.shipping.district ?? null,
+        input.shipping.region ?? null,
+        country,
+        input.shipping.postal_code ?? null,
+
+        orderItems.length,
+        totalQuantity,
+      ]
+    );
+
+    const orderId = orderRes.rows[0].id;
+
+    logger.info("ORDER.CREATED", {
+  orderId: maskId(orderId),
+  buyerId: maskId(userId),
+  sellerId: maskId(orderItems[0].product.seller_id),
+  total,
+});
+
+    /* =========================================================
+       ORDER ITEMS INSERT
+    ========================================================= */
+
+    for (const item of orderItems) {
+      await client.query(
+        `
+        INSERT INTO order_items (
+          order_id,
+          product_id,
+          variant_id,
+          seller_id,
+          product_name,
+          thumbnail,
+          unit_price,
+          quantity,
+          total_price
+        )
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+        `,
+        [
+          orderId,
+          item.product.id,
+          item.variant_id,
+          item.product.seller_id,
+          item.product.name,
+          item.product.thumbnail ?? "",
+          item.price,
+          item.qty,
+          item.total,
+        ]
+      );
+    }
+
+    logger.info("ORDER.ITEMS_CREATED", {
+  orderId: maskId(orderId),
+  items: orderItems.length,
+});
+
+    /* =========================================================
+       RETURN
+    ========================================================= */
+
+    return { orderId };
+  });
+      }

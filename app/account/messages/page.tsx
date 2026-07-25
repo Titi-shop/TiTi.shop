@@ -1,0 +1,365 @@
+
+
+"use client";
+import {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
+import { useAuth } from "@/context/AuthContext";
+
+import { getPiAccessToken } from "@/lib/piAuth";
+type ChatMessage = {
+  id: string;
+  room_id: string;
+  sender_id: string;
+  message_type: string;
+  content: string;
+  created_at: string;
+};
+
+export default function MessagesPage() {
+  const [input, setInput] = useState("");
+const {
+  user,
+  loading,
+} = useAuth();
+
+const [roomId, setRoomId] =
+  useState<string | null>(null);
+  useEffect(() => {
+
+  if (!roomId) {
+    return;
+  }
+
+  const timer =
+    setInterval(() => {
+
+  if (
+    document.visibilityState === "visible"
+  ) {
+    loadMessages(roomId);
+  }
+
+}, 2000);
+  return () => {
+
+    clearInterval(timer);
+
+  };
+
+}, [roomId]);
+  
+  useEffect(() => {
+  if (loading) return;
+
+  if (!user) return;
+
+  loadRoom();
+}, [loading, user]);
+  
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const bottomRef =
+  useRef<HTMLDivElement>(null);
+  function scrollToBottom() {
+
+  bottomRef.current?.scrollIntoView({
+    behavior: "smooth",
+  });
+
+}
+  useEffect(() => {
+  scrollToBottom();
+}, [messages]);
+  async function loadRoom() {
+  try {
+    const token =
+      await getPiAccessToken();
+
+    if (!token) {
+      return;
+    }
+
+    const res =
+      await fetch("/api/chat/room", {
+        headers: {
+          Authorization:
+            `Bearer ${token}`,
+        },
+      });
+
+    if (!res.ok) {
+      return;
+    }
+
+    const data =
+      await res.json();
+
+    setRoomId(data.room.id);
+
+setMessages(
+  data.messages ?? []
+);
+  } catch (err) {
+    console.error(err);
+  }
+}
+  async function loadMessages(roomId: string) {
+  const token = await getPiAccessToken();
+
+  if (!token) return;
+  const res = await fetch(
+    `/api/chat/messages?roomId=${roomId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (!res.ok) return;
+  const data = await res.json();
+console.log("[CHAT]", data);
+const newMessages =
+  data.messages ?? [];
+
+setMessages((old) => {
+
+  if (
+  old.length === newMessages.length &&
+  old.at(-1)?.id === newMessages.at(-1)?.id
+) {
+  return old;
+}
+
+  return newMessages;
+
+});
+}
+  
+  async function handleSend() {
+  if (!roomId) {
+    return;
+  }
+
+  const content = input.trim();
+
+if (!content) {
+  return;
+}
+
+const optimisticMessage: ChatMessage = {
+  id: `temp-${Date.now()}`,
+  room_id: roomId,
+  sender_id: user!.id,
+  message_type: "text",
+  content,
+  created_at: new Date().toISOString(),
+};
+
+setInput("");
+
+setMessages((prev) => [
+  ...prev,
+  optimisticMessage,
+]);
+
+try {
+
+  console.time("[CHAT][UI] GET_TOKEN");
+
+  const token =
+    await getPiAccessToken();
+
+console.timeEnd("[CHAT][UI] GET_TOKEN");
+
+    if (!token) {
+      return;
+    }
+
+    console.time("[CHAT][UI] POST_MESSAGE");
+
+const res = await fetch(
+  "/api/chat/messages",
+  {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      roomId,
+      content,
+    }),
+  }
+);
+
+console.timeEnd("[CHAT][UI] POST_MESSAGE");
+console.log(
+  "[CHAT][UI] POST_STATUS",
+  res.status
+);
+    if (!res.ok) {
+  const error =
+    await res.json();
+  setMessages((prev) =>
+    prev.filter(
+      (m) =>
+        m.id !==
+        optimisticMessage.id
+    )
+  );
+
+  console.error(
+    "[CHAT][SEND]",
+    error
+  );
+
+  return;
+}
+
+const data =
+  await res.json();
+
+setMessages((prev) =>
+  prev.map((m) =>
+    m.id === optimisticMessage.id
+      ? data.message
+      : m
+  )
+);
+ } catch (err) {
+
+  setMessages((prev) =>
+    prev.filter(
+      (m) =>
+        m.id !==
+        optimisticMessage.id
+    )
+  );
+
+  console.error(
+    "[CHAT][SEND]",
+    err
+  );
+
+}
+}
+  
+  return (
+    <main className="flex min-h-[100dvh] flex-col bg-gray-100">
+      {/* Header */}
+      <header className="sticky top-0 border-b bg-white px-4 py-4">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => history.back()}
+            className="text-xl"
+          >
+            ←
+          </button>
+
+          <div>
+            <h1 className="text-lg font-semibold">
+              Hỗ trợ Titi Marketplace
+            </h1>
+
+            <p className="text-sm text-green-600">
+              Online
+            </p>
+          </div>
+        </div>
+      </header>
+
+      {/* Messages */}
+    <section className="flex-1 overflow-y-auto px-4 py-6">
+  <div className="mx-auto flex max-w-3xl flex-col gap-4">
+
+    {messages.map((message) => {
+
+      const isUser =
+        message.sender_id === user?.id;
+const isSystem =
+  message.sender_id === null;
+      return (
+        <div
+          key={message.id}
+          className={`flex ${
+            isUser
+              ? "justify-end"
+              : "justify-start"
+          }`}
+        >
+          <div
+            className={`max-w-[80%] rounded-2xl px-4 py-3 shadow-sm ${
+              isUser
+                ? "bg-blue-600 text-white"
+                : "bg-white text-gray-900"
+            }`}
+          >
+            <p className="mb-2 whitespace-pre-wrap text-sm">
+              {message.content}
+            </p>
+
+            <div
+              className={`text-xs ${
+                isUser
+                  ? "text-blue-100"
+                  : "text-gray-500"
+              }`}
+            >
+              {new Date(
+                message.created_at
+              ).toLocaleTimeString()}
+            </div>
+          </div>
+        </div>
+      );
+
+    })}
+<div ref={bottomRef} />
+  </div>
+</section>
+
+      {/* Input */}
+      <footer
+  className="
+    fixed
+    bottom-16
+    left-0
+    right-0
+    z-50
+    border-t
+    bg-white
+    p-4
+    pb-[max(env(safe-area-inset-bottom),16px)]
+  "
+>
+        <div className="mx-auto flex max-w-3xl gap-3">
+          <input
+            type="text"
+            placeholder="Nhập tin nhắn..."
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSend();
+              }
+            }}
+            className="flex-1 rounded-full border border-gray-300 px-4 py-3 outline-none focus:border-blue-500"
+          />
+
+          <button
+            type="button"
+            onClick={handleSend}
+            className="rounded-full bg-blue-600 px-6 py-3 font-medium text-white transition hover:bg-blue-700"
+          >
+            Gửi
+          </button>
+        </div>
+      </footer>
+    </main>
+  );
+}
