@@ -30,6 +30,13 @@ import {
   validateProductForm,
 } from "./product/product-form.validation";
 
+import {
+  notifyProductValidation,
+  notifyUploadFailed,
+  notifySubmitFailed,
+  notifySaleStockExceeded,
+} from "./product/product-notify";
+
 import type {
   ProductFormProps,
   ProductFormErrors,
@@ -143,10 +150,13 @@ export default function ProductForm({
 
       const urls = await Promise.all(uploads);
       form.setImages((prev: string[]) => [...prev, ...urls]);
-    } catch (error) {
-      console.error("💥 UPLOAD ERROR:", error);
-      alert(t.upload_failed);
-    } finally {
+      } catch (error) {
+  console.error(
+    "💥 UPLOAD ERROR:",
+    error
+  );
+  notifyUploadFailed(t);
+     } finally {
       setUploading(false);
     }
   };
@@ -191,11 +201,13 @@ setErrors((prev) => ({
   images: false,
 }));
     } catch (error) {
-      console.error("💥 DETAIL IMAGE ERROR:", error);
-
-      alert(t.upload_failed);
-    }
-  };
+  console.error(
+    "💥 DETAIL IMAGE ERROR:",
+    error
+  );
+  notifyUploadFailed(t);
+   }
+     };
 
   /* =========================
      LOADING
@@ -232,41 +244,17 @@ setErrors((prev) => ({
     validateProductForm(form);
 
   if (!validation.valid) {
-    setErrors(
-      validation.errors
-    );
+  setErrors(
+    validation.errors
+  );
 
-    switch (
-      validation.message
-    ) {
-      case "sale_price_less_than_price":
-        alert(
-          t.sale_price_less_than_price
-        );
-        break;
+  notifyProductValidation(
+    validation.message,
+    t
+  );
 
-      case "invalid_sale_time":
-        alert(
-          t.invalid_sale_time
-        );
-        break;
-
-      case "sale_price_required":
-        alert(
-          t.sale_price_required
-        );
-        break;
-
-      case "sale_date_required":
-        alert(
-          t.sale_date_required ??
-            "Please select sale start and end date"
-        );
-        break;
-    }
-
-    return;
-  }
+  return;
+}
 
   setErrors({});
 
@@ -300,9 +288,9 @@ setErrors((prev) => ({
      SUBMIT
   ========================= */
 
-  } catch (error) {
+} catch (error) {
   console.error(error);
-  alert(t.submit_failed);
+  notifySubmitFailed(t);
 } finally {
   setSubmitting(false);
 }
@@ -560,11 +548,9 @@ style={inputStyle}
             );
 
             if (value > form.stock) {
-              alert(
-                t.sale_stock_exceed
-              );
-              return;
-            }
+        notifySaleStockExceeded(t);
+     return;
+     }
 
             form.setSale_stock(value);
           }}
