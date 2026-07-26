@@ -18,6 +18,18 @@ import type {
   ProductVariant,
   ShippingRate,
 } from "@/types/product";
+import {
+  inputClass,
+  inputStyle,
+  cardStyle,
+  getDateTimeInputStyle,
+  imagePreviewStyle,
+  imageRemoveButtonStyle,
+  getImageUploadStyle,
+  detailImageUploadStyle,
+  loadingStyle,
+  getSubmitButtonStyle,
+} from "./product/product-form.styles";
 /* =========================
    TYPES
 ========================= */
@@ -62,26 +74,10 @@ export default function ProductForm({
   sale_end?: boolean;
 }>({});
 
-  const inputClass =
-  "w-full border p-2 rounded transition-colors";
-
-const inputStyle = {
-  background: "var(--card-bg)",
-  color: "var(--foreground)",
-  borderColor: "var(--nav-border)",
-};
-
-const cardStyle = {
-  background: "var(--card-bg)",
-  color: "var(--foreground)",
-  borderColor: "var(--nav-border)",
-};
+  
   /* =========================
      HELPERS
   ========================= */
-
-  const generateKey = (): string =>
-    `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
   const toNumber = (value: string): number => {
     if (value.trim() === "") return 0;
@@ -225,17 +221,15 @@ setErrors((prev) => ({
   ========================= */
 
   if (loading || !user) {
-    return (
-      <div
-  className="p-8 text-center"
-  style={{
-    color: "var(--foreground)",
-  }}
->
-        {t.loading}
-      </div>
-    );
-  }
+  return (
+    <div
+      className="p-8 text-center"
+      style={loadingStyle}
+    >
+      {t.loading}
+    </div>
+  );
+}
 
   /* =========================
      SUBMIT
@@ -581,9 +575,7 @@ await onSubmit(payload);
  className={`w-full border p-2 rounded ${
   errors.category ? "border-red-500" : ""
 }`}
-style={{
-  ...inputStyle,
-}}
+style={inputStyle}
 >
   <option value="">
     {t.select_category}
@@ -618,9 +610,7 @@ style={{
   className={`w-full border p-2 rounded ${
   errors.name ? "border-red-500" : ""
 }`}
-style={{
-  ...inputStyle,
-}}
+style={inputStyle}
 />
 
       {/* IMAGES */}
@@ -631,14 +621,12 @@ style={{
               key={`${img}-${i}`}
               className="relative group"
             >
-              <img
-                src={img}
-                alt=""
-                className="h-24 w-full object-cover rounded-lg border"
-style={{
-  borderColor: "var(--nav-border)",
-}}
-              />
+             <img
+  src={img}
+  alt=""
+  className="h-24 w-full object-cover rounded-lg border"
+  style={imagePreviewStyle}
+/>
 
               <button
                 type="button"
@@ -650,10 +638,7 @@ style={{
                   )
                 }
                className="absolute top-1 right-1 px-2 rounded text-xs opacity-0 group-hover:opacity-100"
-style={{
-  background: "rgba(0,0,0,.65)",
-  color: "#fff",
-}}
+style={imageRemoveButtonStyle}
               >
                 ✕
               </button>
@@ -661,15 +646,11 @@ style={{
           ))}
         </div>
 
-        <label
+       <label
   className="flex flex-col items-center justify-center border-2 border-dashed h-28 rounded-xl cursor-pointer transition-colors"
-  style={{
-    background: "var(--card-bg)",
-    borderColor: errors.images
-      ? "#ef4444"
-      : "var(--nav-border)",
-    color: "var(--foreground)",
-  }}
+  style={getImageUploadStyle(
+    Boolean(errors.images)
+  )}
 >
           {uploading
             ? t.uploading
@@ -694,7 +675,7 @@ style={{
       {/* PRICE */}
       {form.variants.length === 0 && (
         <>
-          <input
+         <input
   required
   type="number"
   step="0.00001"
@@ -719,6 +700,7 @@ style={{
       ? "border-red-500"
       : ""
   }`}
+  style={inputStyle}
 />
 
           {/* STOCK */}
@@ -792,10 +774,11 @@ style={{
   }}
   placeholder={t.sale_price}
   className={`w-full border p-2 rounded ${
-    errors.sale_price
-      ? "border-red-500"
-      : ""
-  }`}
+  errors.sale_price
+    ? "border-red-500"
+    : ""
+}`}
+style={inputStyle}
 />
           )}
 
@@ -825,63 +808,50 @@ style={{
           }}
           placeholder={t.sale_stock}
           className={`w-full border p-2 rounded ${
-            errors.sale_stock
-              ? "border-red-500"
-              : ""
-          }`}
-        />
+  errors.sale_stock
+    ? "border-red-500"
+    : ""
+}`}
+style={inputStyle}
+/>
       )}
 </>
 )}
       {/* SALE TIME */}
 <div className="grid grid-cols-2 gap-2">
   <input
-    type="datetime-local"
-    value={form.sale_start || ""}
-    onChange={(e) => {
-      setErrors((prev) => ({
-        ...prev,
-        sale_start: false,
-      }));
+  type="datetime-local"
+  value={form.sale_start || ""}
+  onChange={(e) => {
+    setErrors((prev) => ({
+      ...prev,
+      sale_start: false,
+    }));
 
-      form.setSale_start(e.target.value);
-    }}
-    className={`border p-2 rounded ${
-      errors.sale_start ? "border-red-500" : ""
-    }`}
-    style={{
-      ...inputStyle,
-      colorScheme: document?.documentElement?.classList.contains(
-        "theme-dark"
-      )
-        ? "dark"
-        : "light",
-    }}
-  />
+    form.setSale_start(e.target.value);
+  }}
+  className={`border p-2 rounded ${
+    errors.sale_start ? "border-red-500" : ""
+  }`}
+  style={getDateTimeInputStyle()}
+/>
 
-  <input
-    type="datetime-local"
-    value={form.sale_end || ""}
-    onChange={(e) => {
-      setErrors((prev) => ({
-        ...prev,
-        sale_end: false,
-      }));
+ <input
+  type="datetime-local"
+  value={form.sale_end || ""}
+  onChange={(e) => {
+    setErrors((prev) => ({
+      ...prev,
+      sale_end: false,
+    }));
 
-      form.setSale_end(e.target.value);
-    }}
-    className={`border p-2 rounded ${
-      errors.sale_end ? "border-red-500" : ""
-    }`}
-    style={{
-      ...inputStyle,
-      colorScheme: document?.documentElement?.classList.contains(
-        "theme-dark"
-      )
-        ? "dark"
-        : "light",
-    }}
-  />
+    form.setSale_end(e.target.value);
+  }}
+  className={`border p-2 rounded ${
+    errors.sale_end ? "border-red-500" : ""
+  }`}
+  style={getDateTimeInputStyle()}
+/>
 </div>
   
       {/* SHIPPING */}
@@ -946,13 +916,9 @@ style={inputStyle}
       />
 
       {/* DETAIL IMAGE */}
-      <label
+     <label
   className="border-2 border-dashed h-20 flex items-center justify-center rounded cursor-pointer"
-  style={{
-    background: "var(--card-bg)",
-    borderColor: "var(--nav-border)",
-    color: "var(--foreground)",
-  }}
+  style={detailImageUploadStyle}
 >
         {t.upload_detail_image}
 
@@ -972,27 +938,16 @@ style={inputStyle}
       </label>
 
       {/* SUBMIT */}
-      <button
+     <button
   type="submit"
   disabled={submitting}
   className="w-full py-3 rounded transition-all duration-200 active:scale-95"
-  style={{
-    background: submitting
-      ? "var(--text-muted)"
-      : "var(--color-primary)",
-    color:
-      document?.documentElement?.classList.contains(
-        "theme-dark"
-      )
-        ? "#000"
-        : "#fff",
-    opacity: submitting ? 0.7 : 1,
-  }}
+  style={getSubmitButtonStyle(submitting)}
 >
-        {submitting
-          ? t.submitting
-          : t.submit_product}
-      </button>
+  {submitting
+    ? t.submitting
+    : t.submit_product}
+</button>
     </form>
   );
 }
