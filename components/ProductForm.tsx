@@ -26,9 +26,9 @@ import {
   getSubmitButtonStyle,
 } from "./product/product-form.styles";
 
-import type {
-  ProductVariant,
-} from "@/types/product";
+import {
+  validateProductForm,
+} from "./product/product-form.validation";
 
 import type {
   ProductFormProps,
@@ -224,300 +224,83 @@ setErrors((prev) => ({
     setSubmitting(true);
 
     try {
-      const hasVariants = form.variants.length > 0;
+  /* =========================
+     VALIDATION
+  ========================= */
 
-      const hasSaleTime =
-        Boolean(form.sale_start) &&
-        Boolean(form.sale_end);
+  const validation =
+    validateProductForm(form);
 
-      const hasSalePrice =
-        form.sale_price !== "" &&
-        form.sale_price !== null &&
-        form.sale_price !== undefined &&
-        !Number.isNaN(Number(form.sale_price));
-
-      /* =========================
-         VALIDATION
-      ========================= */
-
-      if (!form.name.trim()) {
-  setErrors({
-    name: true,
-  });
-  setSubmitting(false);
-  return;
-}
-if (
-  !form.category_id ||
-  Number(form.category_id) <= 0
-) {
-  setErrors({
-    category: true,
-  });
-  setSubmitting(false);
-  return;
-}
-      if (!form.images.length) {
-  setErrors({
-    images: true,
-  });
-  setSubmitting(false);
-  return;
-      }
-
-      /* =========================
-         PRODUCT PRICE
-      ========================= */
-
-      if (
-  hasVariants &&
-  form.sale_enabled
-) {
-  form.setSale_enabled(false);
-      }
-
-      /* =========================
-         SALE VALIDATION
-      ========================= */
-
-if (
-  !hasVariants &&
-  form.sale_enabled
-) {
-
-  const sale = Number(
-    form.sale_price
-  );
-
-  const price = Number(
-    form.price
-  );
-
-  /* =====================
-     SALE PRICE
-  ===================== */
-
-if (
-  Number.isNaN(sale) ||
-  sale < 0.00001
-) {
-  setErrors((prev) => ({
-    ...prev,
-    sale_price: true,
-  }));
-  setSubmitting(false);
-  return;
-}
-
-  /* =====================
-     SALE STOCK
-  ===================== */
-
-  if (
-  !form.sale_stock ||
-  Number(form.sale_stock) <= 0
-) {
-  setErrors((prev) => ({
-    ...prev,
-    sale_stock: true,
-  }));
-
-  setSubmitting(false);
-  return;
-}
-
-  /* =====================
-     SALE TIME
-  ===================== */
-
-if (!hasSaleTime) {
-  setErrors((prev) => ({
-    ...prev,
-    sale_start: !form.sale_start,
-    sale_end: !form.sale_end,
-  }));
-  setSubmitting(false);
-  return;
-}
-
-  /* =====================
-     SALE PRICE < PRICE
-  ===================== */
-
-  if (sale >= price) {
-    alert(
-      t.sale_price_less_than_price
+  if (!validation.valid) {
+    setErrors(
+      validation.errors
     );
 
-    setSubmitting(false);
+    switch (
+      validation.message
+    ) {
+      case "sale_price_less_than_price":
+        alert(
+          t.sale_price_less_than_price
+        );
+        break;
+
+      case "invalid_sale_time":
+        alert(
+          t.invalid_sale_time
+        );
+        break;
+
+      case "sale_price_required":
+        alert(
+          t.sale_price_required
+        );
+        break;
+
+      case "sale_date_required":
+        alert(
+          t.sale_date_required ??
+            "Please select sale start and end date"
+        );
+        break;
+    }
 
     return;
   }
 
-  /* =====================
-     INVALID TIME RANGE
-  ===================== */
+  setErrors({});
 
-  if (
-    new Date(
-      form.sale_start
-    ).getTime() >=
-    new Date(
-      form.sale_end
-    ).getTime()
-  ) {
-    alert(
-      t.invalid_sale_time
-    );
+  /* =========================
+     BUILD PAYLOAD
+  ========================= */
 
-    setSubmitting(false);
+  const payload =
+    buildProductPayload(form);
 
-    return;
-  }
-}
-      /* =========================
-         SALE TIME BUT NO PRICE
-      ========================= */
-
-      if (
-        !hasVariants &&
-        hasSaleTime &&
-        !hasSalePrice
-      ) {
-        alert(t.sale_price_required);
-        setSubmitting(false);
-        return;
-      }
-
-
-      /* =========================
-         VARIANTS
-      ========================= */
-
-      const normalizedVariants: ProductVariant[] =
-        form.variants.map((v) => ({
-          ...v,
-
-          sale_enabled: Boolean(v.sale_enabled),
-
-          sale_price:
-            v.sale_enabled &&
-            v.sale_price !== null
-              ? Number(v.sale_price)
-              : null,
-
-          sale_stock:
-            v.sale_enabled
-              ? Number(v.sale_stock || 0)
-              : 0,
-
-          sale_sold: Number(v.sale_sold || 0),
-      final_price:
-     v.sale_enabled &&
-       v.sale_price !== null &&
-            Number(v.sale_price) > 0 &&
-            Number(v.sale_price) < Number(v.price)
-              ? Number(v.sale_price)
-              : Number(v.price),
-        }));
-
-      /* =========================
-         PAYLOAD
-      ========================= */
-      const hasVariantSale = normalizedVariants.some(
-  (v) =>
-    Boolean(v.sale_enabled) &&
-    Number(v.sale_price) > 0
-);
-
-console.log(
-  "🧪 VARIANT SALE CHECK",
-  {
-    hasVariants,
-    hasVariantSale,
-    variants: normalizedVariants,
-  }
-);
-/* =========================
-   VARIANT SALE VALIDATION
-========================= */
-
-if (
-  hasVariantSale &&
-  (
-    !form.sale_start ||
-    !form.sale_end
-  )
-) {
-  setErrors((prev) => ({
-    ...prev,
-    sale_start:
-      !form.sale_start,
-
-    sale_end:
-      !form.sale_end,
-  }));
-
-  alert(
-    t.sale_date_required ??
-    "Please select sale start and end date"
+  console.log(
+    "🧪 FORM CATEGORY:",
+    form.category_id
   );
 
-  setSubmitting(false);
-
-  return;
-}
-
-/* =========================
-   INVALID SALE RANGE
-========================= */
-
-if (
-  hasVariantSale &&
-  form.sale_start &&
-  form.sale_end &&
-  new Date(
-    form.sale_start
-  ).getTime() >=
-    new Date(
-      form.sale_end
-    ).getTime()
-) {
-  alert(
-    t.invalid_sale_time
+  console.log(
+    "📦 PRODUCT PAYLOAD:",
+    payload
   );
 
-  setSubmitting(false);
+  console.log(
+    "📦 PRODUCT PAYLOAD",
+    JSON.stringify(
+      payload,
+      null,
+      2
+    )
+  );
 
-  return;
-}
-/* =========================
-   BUILD PAYLOAD
-========================= */
+  /* =========================
+     SUBMIT
+  ========================= */
 
-const payload = buildProductPayload(form);
-
-console.log(
-  "🧪 FORM CATEGORY:",
-  form.category_id
-);
-
-console.log(
-  "📦 PRODUCT PAYLOAD:",
-  payload
-);
-
-console.log(
-  "📦 PRODUCT PAYLOAD",
-  JSON.stringify(payload, null, 2)
-);
-
-/* =========================
-   SUBMIT
-========================= */
-
-await onSubmit(payload);
-
+  await onSubmit(payload);
 } catch (error) {
   console.error(error);
   alert(t.submit_failed);
@@ -525,7 +308,6 @@ await onSubmit(payload);
   setSubmitting(false);
 }
 
-};
 
   /* =========================
      UI
