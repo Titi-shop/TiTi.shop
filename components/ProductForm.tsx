@@ -517,7 +517,41 @@ if (
 
   return;
 }
-console.log("🧪 FORM CATEGORY:", form.category_id);
+/* =========================
+   BUILD PAYLOAD
+========================= */
+
+const payload = buildProductPayload(form);
+
+console.log(
+  "🧪 FORM CATEGORY:",
+  form.category_id
+);
+
+console.log(
+  "📦 PRODUCT PAYLOAD:",
+  payload
+);
+
+console.log(
+  "📦 PRODUCT PAYLOAD",
+  JSON.stringify(payload, null, 2)
+);
+
+/* =========================
+   SUBMIT
+========================= */
+
+await onSubmit(payload);
+
+} catch (error) {
+  console.error(error);
+  alert(t.submit_failed);
+} finally {
+  setSubmitting(false);
+}
+
+};
 
   /* =========================
      UI
