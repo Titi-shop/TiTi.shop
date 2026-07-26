@@ -300,18 +300,17 @@ setErrors((prev) => ({
      SUBMIT
   ========================= */
 
-  await onSubmit(payload);
-} catch (error) {
+  } catch (error) {
   console.error(error);
   alert(t.submit_failed);
 } finally {
   setSubmitting(false);
 }
+};
 
-
-  /* =========================
-     UI
-  ========================= */
+/* =========================
+   UI
+========================= */
 
   return (
     <form
