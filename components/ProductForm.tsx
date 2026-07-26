@@ -2,12 +2,8 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { compressImage } from "@/lib/upload/imageUtils";
-import { apiAuthFetch } from "@/lib/api/apiAuthFetch";
 import { useTranslationClient as useTranslation } from "@/app/lib/i18n/client";
 import { useAuth } from "@/context/AuthContext";
-import { supabase } from "@/lib/supabase/client";
-
 import { useProductForm } from "./product/useProductForm";
 import ShippingRates from "./product/ShippingRates";
 import VariantEditor from "./product/VariantEditor";
@@ -40,9 +36,11 @@ import {
 import type {
   ProductFormProps,
   ProductFormErrors,
-  SignedUrlResponse,
 } from "./product/product-form.types";
-
+import {
+  uploadProductImages,
+  uploadProductDetailImages,
+} from "./product/product-upload";
 
 /* =========================
    COMPONENT
@@ -75,139 +73,88 @@ export default function ProductForm({
   };
 
   /* =========================
-     UPLOAD
-  ========================= */
-
-  const uploadWithProgress = (
-    url: string,
-    file: File,
-    index: number
-  ): Promise<void> =>
-    new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.open("PUT", url);
-      xhr.upload.onprogress = (e) => {
-        if (e.lengthComputable) {
-          const percent = Math.round((e.loaded / e.total) * 100);
-
-          console.log(`📊 [${index}] ${percent}%`);
-        }
-      };
-
-      xhr.onload = () => {
-        if (xhr.status === 200) {
-          resolve();
-        } else {
-          reject(new Error(String(xhr.status)));
-        }
-      };
-
-      xhr.onerror = () => {
-        reject(new Error("NETWORK_ERROR"));
-      };
-
-      xhr.setRequestHeader("Content-Type", file.type);
-
-      xhr.send(file);
-    });
-
-  const getSignedUrl = async (): Promise<SignedUrlResponse> => {
-  const res = await apiAuthFetch("/api/upload-url", {
-    method: "POST",
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    console.error("❌ SIGNED URL FAIL:", text);
-    throw new Error("SIGNED_URL_FAILED");
-  }
-
-  const data: SignedUrlResponse = await res.json();
-
-  if (!data.uploadUrl || !data.publicUrl) {
-    throw new Error("NO_UPLOAD_URL");
-  }
-
-  return data;
-};
-
-  /* =========================
      MAIN IMAGE UPLOAD
   ========================= */
 
-  const handleUpload = async (files: File[]) => {
-    if (!files.length) return;
+  const handleUpload = async (
+  files: File[]
+) => {
+  if (!files.length) return;
 
-    try {
-      setUploading(true);
+  try {
+    setUploading(true);
 
-      const uploads = files.map(async (file, index) => {
-        const compressed = await compressImage(file);
-        const { uploadUrl, publicUrl } = await getSignedUrl();
-        await uploadWithProgress(uploadUrl, compressed, index);
-        return publicUrl;
-      });
+    const urls =
+      await uploadProductImages(
+        files
+      );
 
-      const urls = await Promise.all(uploads);
-      form.setImages((prev: string[]) => [...prev, ...urls]);
-      } catch (error) {
-  console.error(
-    "💥 UPLOAD ERROR:",
-    error
-  );
-  notifyUploadFailed(t);
-     } finally {
-      setUploading(false);
-    }
-  };
+    form.setImages(
+      (prev: string[]) => [
+        ...prev,
+        ...urls,
+      ]
+    );
+
+    setErrors((prev) => ({
+      ...prev,
+      images: false,
+    }));
+  } catch (error) {
+    console.error(
+      "💥 UPLOAD ERROR:",
+      error
+    );
+
+    notifyUploadFailed(t);
+  } finally {
+    setUploading(false);
+  }
+};
 
   /* =========================
      DETAIL IMAGE UPLOAD
   ========================= */
 
-  const uploadDetailImages = async (files: File[]) => {
-    if (!files.length || !user) return;
+  const uploadDetailImages = async (
+  files: File[]
+) => {
+  if (
+    !files.length ||
+    !user
+  ) {
+    return;
+  }
 
-    try {
-      const uploads = files.map(async (file) => {
-        const path = `products/${user.id}/detail-${Date.now()}.jpg`;
+  try {
+    const urls =
+      await uploadProductDetailImages(
+        files,
+        user.id
+      );
 
-        const { error } = await supabase.storage
-          .from("products")
-          .upload(path, file);
-
-        if (error) {
-          throw error;
-        }
-
-        const { data } = supabase.storage
-          .from("products")
-          .getPublicUrl(path);
-
-        return data.publicUrl;
-      });
-
-      const urls = await Promise.all(uploads);
-     setErrors({});
-      form.setDetail((prev: string) => {
-        const html = urls
-          .map((url) => `<img src="${url}" />`)
-          .join("\n");
+    form.setDetail(
+      (prev: string) => {
+        const html =
+          urls
+            .map(
+              (url) =>
+                `<img src="${url}" />`
+            )
+            .join("\n");
 
         return `${prev}\n${html}`;
-      });
-setErrors((prev) => ({
-  ...prev,
-  images: false,
-}));
-    } catch (error) {
-  console.error(
-    "💥 DETAIL IMAGE ERROR:",
-    error
-  );
-  notifyUploadFailed(t);
-   }
-     };
+      }
+    );
+  } catch (error) {
+    console.error(
+      "💥 DETAIL IMAGE ERROR:",
+      error
+    );
+
+    notifyUploadFailed(t);
+  }
+};
 
   /* =========================
      LOADING
