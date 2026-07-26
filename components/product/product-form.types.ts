@@ -4,14 +4,13 @@ import type {
 } from "@/types/product";
 
 /* =========================
-   PROPS
+   PRODUCT FORM PROPS
 ========================= */
 
 export interface ProductFormProps {
   categories: Category[];
 
-  initialData?:
-    Partial<ProductPayload>;
+  initialData?: Partial<ProductPayload>;
 
   onSubmit: (
     payload: ProductPayload
@@ -19,33 +18,26 @@ export interface ProductFormProps {
 }
 
 /* =========================
-   ERRORS
-========================= */
-
-export interface ProductFormErrors {
-  name?: boolean;
-
-  category?: boolean;
-
-  images?: boolean;
-
-  price?: boolean;
-
-  sale_price?: boolean;
-
-  sale_stock?: boolean;
-
-  sale_start?: boolean;
-
-  sale_end?: boolean;
-}
-
-/* =========================
-   UPLOAD URL
+   SIGNED UPLOAD URL
 ========================= */
 
 export interface SignedUrlResponse {
   uploadUrl: string;
-
   publicUrl: string;
+}
+
+/* =========================
+   FORM ERRORS
+========================= */
+
+export interface ProductFormErrors {
+  name?: boolean;
+  category?: boolean;
+  images?: boolean;
+  price?: boolean;
+
+  sale_price?: boolean;
+  sale_stock?: boolean;
+  sale_start?: boolean;
+  sale_end?: boolean;
 }
