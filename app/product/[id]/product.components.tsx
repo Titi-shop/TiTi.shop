@@ -188,33 +188,70 @@ const toggleFavorite = async () => {
   className="relative" style={{  backgroundColor: "var(--card-bg)",  }}
 >
         {/* Favorite */}
-<button
-  onClick={toggleFavorite}
-  disabled={favoriteLoading}
+{/* FAVORITE — BOTTOM LEFT */}
+<div
   className="
     absolute
-    top-3
     left-3
+    bottom-3
     z-20
-    w-10
-    h-10
-    rounded-full
     flex
     items-center
-    justify-center
-    backdrop-blur
-    transition
-    active:scale-90
+    gap-2
   "
-  style={{
-    background: "rgba(0,0,0,.45)",
-    color: favorite ? "#ef4444" : "#ffffff",
-  }}
 >
-  <span className="text-xl">
-    {favorite ? "❤" : "♡"}
-  </span>
-</button>
+  <button
+    type="button"
+    onClick={toggleFavorite}
+    disabled={favoriteLoading}
+    aria-label={t.favorites}
+    className="
+      w-11
+      h-11
+      rounded-full
+      flex
+      items-center
+      justify-center
+      backdrop-blur
+      shadow-md
+      transition
+      active:scale-90
+      disabled:opacity-60
+    "
+    style={{
+      background: "rgba(0,0,0,.50)",
+      color: favorite
+        ? "#ef4444"
+        : "#ffffff",
+    }}
+  >
+    <span className="text-2xl leading-none">
+      {favorite ? "❤" : "♡"}
+    </span>
+  </button>
+
+  <div
+    className="
+      min-w-8
+      h-8
+      px-2
+      rounded-full
+      flex
+      items-center
+      justify-center
+      text-sm
+      font-semibold
+      backdrop-blur
+      shadow-sm
+    "
+    style={{
+      background: "rgba(0,0,0,.50)",
+      color: "#ffffff",
+    }}
+  >
+    {favoriteCount}
+  </div>
+</div>
         {(
   hasVariants
     ? selectedVariant &&
@@ -445,7 +482,7 @@ let newScale =
 </div>
 </div>
 
-   {/* ===== PRODUCT META ===== */}
+ {/* ===== PRODUCT META ===== */}
 
 <div
   className="px-4 pb-4"
@@ -455,11 +492,16 @@ let newScale =
 >
   <div className="flex items-center justify-between text-sm">
 
+    {/* RATING */}
     <div className="flex items-center gap-1">
-      <span className="text-yellow-400">⭐</span>
+      <span className="text-yellow-400">
+        ⭐
+      </span>
 
       <span className="font-medium">
-        {Number(product.rating_avg ?? 0).toFixed(1)}
+        {Number(
+          product.rating_avg ?? 0
+        ).toFixed(1)}
       </span>
 
       <span
@@ -471,14 +513,7 @@ let newScale =
       </span>
     </div>
 
-    <div
-      style={{
-        color: "var(--text-muted)",
-      }}
-    >
-      ❤️ {favoriteCount} {t.favorites}
-    </div>
-
+    {/* VIEWS */}
     <div
       style={{
         color: "var(--text-muted)",
@@ -487,6 +522,7 @@ let newScale =
       👁 {product.views ?? 0} {t.views}
     </div>
 
+    {/* SOLD */}
     <div
       style={{
         color: "var(--text-muted)",
