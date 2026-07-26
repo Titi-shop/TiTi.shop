@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   },
 
   description:
-    "Sàn thương mại điện tử Pi Network",
+    "Pi Network Marketplace",
 
   applicationName:
     "TiTi Shop",
@@ -32,18 +32,22 @@ export const metadata: Metadata = {
   ],
 
   openGraph: {
-    title: "TiTi Shop",
+    title:
+      "TiTi Shop",
+
     description:
-      "Sàn thương mại điện tử Pi Network",
+      "Pi Network Marketplace",
 
     siteName:
       "TiTi Shop",
 
-    type: "website",
+    type:
+      "website",
 
     images: [
       {
-        url: "/logo.png",
+        url:
+          "/logo.png",
       },
     ],
   },
@@ -56,7 +60,7 @@ export const metadata: Metadata = {
       "TiTi Shop",
 
     description:
-      "Sàn thương mại điện tử Pi Network",
+      "Pi Network Marketplace",
 
     images: [
       "/logo.png",
@@ -70,7 +74,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi" className="theme-light">
+    <html lang="en" className="theme-light">
       <head>
         <link rel="preload" as="image" href="/avatar.png" />
         <link rel="preload" as="image" href="/banners/default-shop.png" />
