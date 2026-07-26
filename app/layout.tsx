@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     images: [
       {
         url:
-          "/logo.png",
+          "/banners/3D035BE4-0822-403D-9631-6C4CF674A519.png",
       },
     ],
   },
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
       "Pi Network Marketplace",
 
     images: [
-      "/logo.png",
+      "/banners/3D035BE4-0822-403D-9631-6C4CF674A519.png",
     ],
   },
 };
