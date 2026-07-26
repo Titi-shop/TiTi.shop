@@ -347,12 +347,14 @@ export function useProductForm(
     /* ================= SALE ================= */
 
     const hasSale =
-      typeof initialData.sale_price ===
-        "number" &&
-      initialData.sale_price >=
-        0.00001;
+  typeof initialData.sale_enabled === "boolean"
+    ? initialData.sale_enabled
+    : (
+        typeof initialData.sale_price === "number" &&
+        initialData.sale_price >= 0.00001
+      );
 
-    setSale_enabled(hasSale);
+setSale_enabled(hasSale);
 
     setSale_price(
       normalizePriceInput(
@@ -377,11 +379,16 @@ export function useProductForm(
 
     /* ================= STOCK ================= */
 
-    setStock(
-      normalizePriceInput(
-        initialData.stock
-      ) || 1
-    );
+    const initialStock =
+  normalizePriceInput(
+    initialData.stock
+  );
+
+setStock(
+  initialStock === ""
+    ? 1
+    : initialStock
+);
 
     /* ================= STATUS ================= */
 
@@ -494,7 +501,7 @@ export function useProductForm(
       setSale_stock(stock);
     }
   }, [stock, sale_stock]);
-  /* =========================================================
+ /* =========================================================
    AUTO DISABLE PRODUCT SALE WHEN HAS VARIANTS
 ========================================================= */
 
@@ -503,11 +510,17 @@ useEffect(() => {
     return;
   }
 
+  /*
+   * Khi sản phẩm có variants:
+   * - Tắt sale cấp product.
+   * - Xóa giá/stock sale cấp product.
+   * - KHÔNG xóa sale_start/sale_end vì variant sale
+   *   đang sử dụng thời gian sale chung của product.
+   */
+
   setSale_enabled(false);
   setSale_price("");
   setSale_stock(0);
-  setSale_start("");
-  setSale_end("");
 }, [variants.length]);
 
   /* =========================================================
