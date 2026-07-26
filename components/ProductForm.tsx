@@ -41,14 +41,12 @@ import {
 } from "./product/product-form.styles";
 
 import {
-  notifyUploadFailed,
   notifySaleStockExceeded,
 } from "./product/product-notify";
 
 import {
-  uploadProductImages,
-  uploadProductDetailImages,
-} from "./product/product-upload";
+  useProductUpload,
+} from "./product/useProductUpload";
 
 import type {
   ProductFormProps,
@@ -71,15 +69,21 @@ export default function ProductForm({
 const form =
   useProductForm(initialData);
 
-const [uploading, setUploading] =
-  useState(false);
-
 const [submitting, setSubmitting] =
   useState(false);
 
 const [errors, setErrors] =
   useState<ProductFormErrors>({});
-
+const {
+  uploading,
+  handleUpload,
+  uploadDetailImages,
+} = useProductUpload({
+  form,
+  userId: user?.id,
+  setErrors,
+  t,
+});
 const {
   handleSubmit,
 } = useProductSubmit({
@@ -101,90 +105,6 @@ const {
     const n = Number(value);
     return Number.isNaN(n) ? 0 : n;
   };
-
-  /* =========================
-     MAIN IMAGE UPLOAD
-  ========================= */
-
-  const handleUpload = async (
-  files: File[]
-) => {
-  if (!files.length) return;
-
-  try {
-    setUploading(true);
-
-    const urls =
-      await uploadProductImages(
-        files
-      );
-
-    form.setImages(
-      (prev: string[]) => [
-        ...prev,
-        ...urls,
-      ]
-    );
-
-    setErrors((prev) => ({
-      ...prev,
-      images: false,
-    }));
-  } catch (error) {
-    console.error(
-      "💥 UPLOAD ERROR:",
-      error
-    );
-
-    notifyUploadFailed(t);
-  } finally {
-    setUploading(false);
-  }
-};
-
-  /* =========================
-     DETAIL IMAGE UPLOAD
-  ========================= */
-
-  const uploadDetailImages = async (
-  files: File[]
-) => {
-  if (
-    !files.length ||
-    !user
-  ) {
-    return;
-  }
-
-  try {
-    const urls =
-      await uploadProductDetailImages(
-        files,
-        user.id
-      );
-
-    form.setDetail(
-      (prev: string) => {
-        const html =
-          urls
-            .map(
-              (url) =>
-                `<img src="${url}" />`
-            )
-            .join("\n");
-
-        return `${prev}\n${html}`;
-      }
-    );
-  } catch (error) {
-    console.error(
-      "💥 DETAIL IMAGE ERROR:",
-      error
-    );
-
-    notifyUploadFailed(t);
-  }
-};
 
   /* =========================
      LOADING
