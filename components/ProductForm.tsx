@@ -445,22 +445,25 @@ style={inputStyle}
           type="number"
           value={form.sale_stock || 0}
           onChange={(e) => {
-            setErrors((prev) => ({
-              ...prev,
-              sale_stock: false,
-            }));
+  setErrors((prev) => ({
+    ...prev,
+    sale_stock: false,
+  }));
 
-            const value = Number(
-              e.target.value
-            );
+  const value = Number(
+    e.target.value
+  );
 
-            if (value > form.stock) {
-        notifySaleStockExceeded(t);
-     return;
-     }
+  if (
+    typeof form.stock === "number" &&
+    value > form.stock
+  ) {
+    notifySaleStockExceeded(t);
+    return;
+  }
 
-            form.setSale_stock(value);
-          }}
+  form.setSale_stock(value);
+}}
           placeholder={t.sale_stock}
           className={`w-full border p-2 rounded ${
   errors.sale_stock
