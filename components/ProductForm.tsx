@@ -12,7 +12,7 @@ import { supabase } from "@/lib/supabase/client";
 import { useProductForm } from "./product/useProductForm";
 import ShippingRates from "./product/ShippingRates";
 import VariantEditor from "./product/VariantEditor";
-
+import { buildProductPayload } from "./product/product-form.payload";
 import type {
   Category,
   ProductPayload,
@@ -415,30 +415,6 @@ if (!hasSaleTime) {
         return;
       }
 
-      /* =========================
-         SHIPPING
-      ========================= */
-
-      const shippingRatesPayload: ShippingRate[] =
-  Object.entries(form.shipping_rates)
-    .filter(([, price]) => {
-      return (
-        price !== "" &&
-        price !== null &&
-        price !== undefined
-      );
-    })
-    .map(([zone, price]) => ({
-      zone:
-        zone as ShippingRate["zone"],
-
-      price: Number(price),
-
-      domestic_country_code:
-        zone === "domestic"
-          ? form.domestic_country_code
-          : null,
-    }));
 
       /* =========================
          VARIANTS
@@ -542,91 +518,7 @@ if (
   return;
 }
 console.log("🧪 FORM CATEGORY:", form.category_id);
-const payload: ProductPayload = {
-  id:
-    typeof form.id === "string"
-      ? form.id
-      : undefined,
-  name: form.name,
-  category_id:
-    form.category_id !== "" &&
-    form.category_id !== null &&
-    form.category_id !== undefined
-      ? Number(form.category_id)
-      : undefined,
 
-  description: form.description,
-  detail: form.detail,
-  images: form.images,
-  thumbnail: form.images[0] || null,
-  is_active: form.is_active,
-  has_variants: hasVariants,
-  shipping_rates: shippingRatesPayload,
-  domestic_country_code:
-  form.domestic_country_code || null,
-  price: hasVariants
-    ? undefined
-    : Number(form.price),
-
-  stock: hasVariants
-    ? undefined
-    : Number(form.stock || 0),
-
-  sale_enabled:
-  hasVariants
-    ? hasVariantSale
-    : (
-        form.sale_enabled &&
-        hasSaleTime &&
-        hasSalePrice
-      ),
-
-  sale_price:
-    hasVariants
-      ? null
-      : !form.sale_enabled
-        ? null
-        : Number(form.sale_price),
-
-  sale_stock:
-    hasVariants || !form.sale_enabled
-      ? 0
-      : Number(form.sale_stock || 0),
-
-  sale_start:
-  hasSaleTime
-    ? toUTCFromInput(
-        form.sale_start
-      )
-    : null,
-
-sale_end:
-  hasSaleTime
-    ? toUTCFromInput(
-        form.sale_end
-      )
-    : null,
-
-  variants: normalizedVariants,
-  idempotency_key: generateKey(),
-};
-
-console.log("🧪 FORM CATEGORY:", form.category_id);
-console.log("📦 PRODUCT PAYLOAD:", payload);
-console.log(
-  "📦 PRODUCT PAYLOAD",
-  JSON.stringify(payload, null, 2)
-);
-
-await onSubmit(payload);
-    } catch (error) {
-      console.error(error);
-      alert(t.submit_failed);
-    } finally {
-      setSubmitting(false);
-    }
-
-  };
   /* =========================
      UI
   ========================= */
