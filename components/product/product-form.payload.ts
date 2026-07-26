@@ -6,28 +6,85 @@ import type {
   ShippingRate,
 } from "@/types/product";
 
-type BuildPayloadParams = {
-  form: any;
+/* =========================
+   TYPES
+========================= */
+
+export interface ProductFormPayloadData {
+  id?: unknown;
+
+  name: string;
+
+  category_id?:
+    | string
+    | number
+    | null;
+
+  description: string;
+  detail: string;
+
+  images: string[];
+
+  is_active: boolean;
+
+  price:
+    | string
+    | number;
+
+  stock:
+    | string
+    | number;
+
+  sale_enabled: boolean;
+
+  sale_price?:
+    | string
+    | number
+    | null;
+
+  sale_stock?:
+    | string
+    | number
+    | null;
+
+  sale_start?:
+    | string
+    | null;
+
+  sale_end?:
+    | string
+    | null;
 
   variants: ProductVariant[];
 
-  shippingRates: ShippingRate[];
+  shipping_rates: Record<
+    string,
+    string | number | null | undefined
+  >;
 
-  hasVariantSale: boolean;
+  domestic_country_code?:
+    | string
+    | null;
+}
 
-  generateKey: () => string;
-};
+/* =========================
+   HELPERS
+========================= */
 
-export function buildProductPayload({
-  form,
-  variants,
-  shippingRates,
-  hasVariantSale,
-  generateKey,
-}: BuildPayloadParams): ProductPayload {
+const generateKey = (): string =>
+  `${Date.now()}-${Math.random()
+    .toString(36)
+    .slice(2)}`;
 
+/* =========================
+   BUILD PRODUCT PAYLOAD
+========================= */
+
+export function buildProductPayload(
+  form: ProductFormPayloadData
+): ProductPayload {
   const hasVariants =
-    variants.length > 0;
+    form.variants.length > 0;
 
   const hasSaleTime =
     Boolean(form.sale_start) &&
@@ -36,9 +93,92 @@ export function buildProductPayload({
   const hasSalePrice =
     form.sale_price !== "" &&
     form.sale_price !== null &&
-    form.sale_price !== undefined;
+    form.sale_price !== undefined &&
+    !Number.isNaN(
+      Number(form.sale_price)
+    );
 
-  return {
+  /* =========================
+     SHIPPING
+  ========================= */
+
+  const shippingRatesPayload: ShippingRate[] =
+    Object.entries(
+      form.shipping_rates
+    )
+      .filter(([, price]) => {
+        return (
+          price !== "" &&
+          price !== null &&
+          price !== undefined
+        );
+      })
+      .map(([zone, price]) => ({
+        zone:
+          zone as ShippingRate["zone"],
+
+        price: Number(price),
+
+        domestic_country_code:
+          zone === "domestic"
+            ? form.domestic_country_code ||
+              null
+            : null,
+      }));
+
+  /* =========================
+     VARIANTS
+  ========================= */
+
+  const normalizedVariants: ProductVariant[] =
+    form.variants.map((v) => ({
+      ...v,
+
+      sale_enabled:
+        Boolean(v.sale_enabled),
+
+      sale_price:
+        v.sale_enabled &&
+        v.sale_price !== null
+          ? Number(v.sale_price)
+          : null,
+
+      sale_stock:
+        v.sale_enabled
+          ? Number(
+              v.sale_stock || 0
+            )
+          : 0,
+
+      sale_sold:
+        Number(v.sale_sold || 0),
+
+      final_price:
+        v.sale_enabled &&
+        v.sale_price !== null &&
+        Number(v.sale_price) > 0 &&
+        Number(v.sale_price) <
+          Number(v.price)
+          ? Number(v.sale_price)
+          : Number(v.price),
+    }));
+
+  /* =========================
+     VARIANT SALE
+  ========================= */
+
+  const hasVariantSale =
+    normalizedVariants.some(
+      (v) =>
+        Boolean(v.sale_enabled) &&
+        Number(v.sale_price) > 0
+    );
+
+  /* =========================
+     PAYLOAD
+  ========================= */
+
+  const payload: ProductPayload = {
     id:
       typeof form.id === "string"
         ? form.id
@@ -72,10 +212,11 @@ export function buildProductPayload({
       hasVariants,
 
     shipping_rates:
-      shippingRates,
+      shippingRatesPayload,
 
     domestic_country_code:
-      form.domestic_country_code || null,
+      form.domestic_country_code ||
+      null,
 
     price:
       hasVariants
@@ -85,9 +226,7 @@ export function buildProductPayload({
     stock:
       hasVariants
         ? undefined
-        : Number(
-            form.stock || 0
-          ),
+        : Number(form.stock || 0),
 
     sale_enabled:
       hasVariants
@@ -116,22 +255,27 @@ export function buildProductPayload({
           ),
 
     sale_start:
-      hasSaleTime
+      hasSaleTime &&
+      form.sale_start
         ? toUTCFromInput(
             form.sale_start
           )
         : null,
 
     sale_end:
-      hasSaleTime
+      hasSaleTime &&
+      form.sale_end
         ? toUTCFromInput(
             form.sale_end
           )
         : null,
 
-    variants,
+    variants:
+      normalizedVariants,
 
     idempotency_key:
       generateKey(),
   };
+
+  return payload;
 }
