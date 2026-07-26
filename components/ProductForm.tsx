@@ -1,13 +1,31 @@
 
 "use client";
 
-import { FormEvent, useState } from "react";
-import { useTranslationClient as useTranslation } from "@/app/lib/i18n/client";
-import { useAuth } from "@/context/AuthContext";
-import { useProductForm } from "./product/useProductForm";
-import ShippingRates from "./product/ShippingRates";
-import VariantEditor from "./product/VariantEditor";
-import { buildProductPayload } from "./product/product-form.payload";
+import {
+  useState,
+} from "react";
+
+import {
+  useTranslationClient as useTranslation,
+} from "@/app/lib/i18n/client";
+
+import {
+  useAuth,
+} from "@/context/AuthContext";
+
+import {
+  useProductForm,
+} from "./product/useProductForm";
+
+import {
+  useProductSubmit,
+} from "./product/useProductSubmit";
+
+import ShippingRates
+  from "./product/ShippingRates";
+
+import VariantEditor
+  from "./product/VariantEditor";
 
 import {
   inputClass,
@@ -23,24 +41,19 @@ import {
 } from "./product/product-form.styles";
 
 import {
-  validateProductForm,
-} from "./product/product-form.validation";
-
-import {
-  notifyProductValidation,
   notifyUploadFailed,
-  notifySubmitFailed,
   notifySaleStockExceeded,
 } from "./product/product-notify";
+
+import {
+  uploadProductImages,
+  uploadProductDetailImages,
+} from "./product/product-upload";
 
 import type {
   ProductFormProps,
   ProductFormErrors,
 } from "./product/product-form.types";
-import {
-  uploadProductImages,
-  uploadProductDetailImages,
-} from "./product/product-upload";
 
 /* =========================
    COMPONENT
@@ -54,12 +67,29 @@ export default function ProductForm({
   const { t } = useTranslation();
 
   const { user, loading } = useAuth();
-  const form = useProductForm(initialData);
-  const [uploading, setUploading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [errors, setErrors] =
+
+const form =
+  useProductForm(initialData);
+
+const [uploading, setUploading] =
+  useState(false);
+
+const [submitting, setSubmitting] =
+  useState(false);
+
+const [errors, setErrors] =
   useState<ProductFormErrors>({});
 
+const {
+  handleSubmit,
+} = useProductSubmit({
+  form,
+  submitting,
+  setSubmitting,
+  setErrors,
+  onSubmit,
+  t,
+});
   
   /* =========================
      HELPERS
@@ -171,77 +201,7 @@ export default function ProductForm({
   );
 }
 
-  /* =========================
-     SUBMIT
-  ========================= */
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (submitting) return;
-
-    setSubmitting(true);
-
-    try {
-  /* =========================
-     VALIDATION
-  ========================= */
-
-  const validation =
-    validateProductForm(form);
-
-  if (!validation.valid) {
-  setErrors(
-    validation.errors
-  );
-
-  notifyProductValidation(
-    validation.message,
-    t
-  );
-
-  return;
-}
-
-  setErrors({});
-
-  /* =========================
-     BUILD PAYLOAD
-  ========================= */
-
-  const payload =
-    buildProductPayload(form);
-
-  console.log(
-    "🧪 FORM CATEGORY:",
-    form.category_id
-  );
-
-  console.log(
-    "📦 PRODUCT PAYLOAD:",
-    payload
-  );
-
-  console.log(
-    "📦 PRODUCT PAYLOAD",
-    JSON.stringify(
-      payload,
-      null,
-      2
-    )
-  );
-
-  /* =========================
-     SUBMIT
-  ========================= */
-
-} catch (error) {
-  console.error(error);
-  notifySubmitFailed(t);
-} finally {
-  setSubmitting(false);
-}
-};
 
 /* =========================
    UI
