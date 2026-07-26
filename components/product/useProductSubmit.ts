@@ -1,134 +1,157 @@
 "use client";
 
 import {
-  validateProductSale,
-  validateVariantSale,
+  useCallback,
+  type FormEvent,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
+
+import {
+  validateProductForm,
 } from "./product-form.validation";
 
 import {
   buildProductPayload,
-  normalizeVariants,
 } from "./product-form.payload";
 
 import {
-  showMessage,
+  notifyProductValidation,
+  notifySubmitFailed,
 } from "./product-notify";
 
-export async function submitProductForm({
+import type {
+  ProductPayload,
+} from "@/types/product";
+
+import type {
+  ProductFormErrors,
+} from "./product-form.types";
+
+import type {
+  ProductFormState,
+} from "./useProductForm";
+
+/* =========================
+   TYPES
+========================= */
+
+type ProductSubmitTranslations =
+  Parameters<
+    typeof notifyProductValidation
+  >[1];
+
+interface UseProductSubmitParams {
+  form: ProductFormState;
+
+  submitting: boolean;
+
+  setSubmitting: Dispatch<
+    SetStateAction<boolean>
+  >;
+
+  setErrors: Dispatch<
+    SetStateAction<ProductFormErrors>
+  >;
+
+  onSubmit: (
+    payload: ProductPayload
+  ) => Promise<void>;
+
+  t: ProductSubmitTranslations;
+}
+
+/* =========================
+   HOOK
+========================= */
+
+export function useProductSubmit({
   form,
-  t,
+  submitting,
+  setSubmitting,
   setErrors,
   onSubmit,
-}: any) {
+  t,
+}: UseProductSubmitParams) {
+  const handleSubmit = useCallback(
+    async (
+      e: FormEvent<HTMLFormElement>
+    ) => {
+      e.preventDefault();
 
-  if (!form.name.trim()) {
-    setErrors({
-      name: true,
-    });
+      if (submitting) {
+        return;
+      }
 
-    return;
-  }
+      setSubmitting(true);
 
-  if (
-    !form.category_id ||
-    Number(form.category_id) <= 0
-  ) {
-    setErrors({
-      category: true,
-    });
+      try {
+        /* =========================
+           VALIDATION
+        ========================= */
 
-    return;
-  }
+        const validation =
+          validateProductForm(form);
 
-  if (!form.images.length) {
-    setErrors({
-      images: true,
-    });
+        if (!validation.valid) {
+          setErrors(
+            validation.errors
+          );
 
-    return;
-  }
+          notifyProductValidation(
+            validation.message,
+            t
+          );
 
-  const normalizedVariants =
-    normalizeVariants(
-      form.variants
-    );
+          return;
+        }
 
-  const productSaleError =
-    validateProductSale(
-      Boolean(
-        form.sale_enabled
-      ),
-      Number(form.price),
-      Number(form.sale_price),
-      Number(form.sale_stock),
-      form.sale_start,
-      form.sale_end
-    );
+        setErrors({});
 
-  if (productSaleError) {
-    showMessage(
-      t[
-        productSaleError.toLowerCase() as keyof typeof t
-      ] ?? productSaleError
-    );
+        /* =========================
+           BUILD PAYLOAD
+        ========================= */
 
-    return;
-  }
+        const payload =
+          buildProductPayload(form);
 
-  const variantSaleError =
-    validateVariantSale(
-      normalizedVariants,
-      form.sale_start,
-      form.sale_end
-    );
+        console.log(
+          "🧪 FORM CATEGORY:",
+          form.category_id
+        );
 
-  if (variantSaleError) {
-    showMessage(
-      t[
-        variantSaleError.toLowerCase() as keyof typeof t
-      ] ?? variantSaleError
-    );
+        console.log(
+          "📦 PRODUCT PAYLOAD:",
+          payload
+        );
 
-    return;
-  }
+        /* =========================
+           SUBMIT
+        ========================= */
 
-  const shippingRates =
-    Object.entries(
-      form.shipping_rates
-    ).map(([zone, price]) => ({
-      zone,
-      price: Number(price || 0),
-      domestic_country_code:
-        zone === "domestic"
-          ? form.domestic_country_code
-          : null,
-    }));
+        await onSubmit(payload);
+      } catch (error) {
+        console.error(
+          "💥 PRODUCT SUBMIT ERROR:",
+          error
+        );
 
-  const hasVariantSale =
-    normalizedVariants.some(
-      (variant) =>
-        Boolean(
-          variant.sale_enabled
-        ) &&
-        Number(
-          variant.sale_price
-        ) > 0
-    );
-
-  const payload =
-    buildProductPayload({
+        notifySubmitFailed(t);
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [
       form,
-      variants:
-        normalizedVariants,
-      shippingRates,
-      hasVariantSale,
-      generateKey: () =>
-        `${Date.now()}-${Math.random()
-          .toString(36)
-          .slice(2)}`,
-    });
-
-  await onSubmit(
-    payload
+      submitting,
+      setSubmitting,
+      setErrors,
+      onSubmit,
+      t,
+    ]
   );
+
+  return {
+    handleSubmit,
+  };
 }
