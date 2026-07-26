@@ -12,12 +12,7 @@ import { useProductForm } from "./product/useProductForm";
 import ShippingRates from "./product/ShippingRates";
 import VariantEditor from "./product/VariantEditor";
 import { buildProductPayload } from "./product/product-form.payload";
-import type {
-  Category,
-  ProductPayload,
-  ProductVariant,
-  ShippingRate,
-} from "@/types/product";
+
 import {
   inputClass,
   inputStyle,
@@ -30,22 +25,17 @@ import {
   loadingStyle,
   getSubmitButtonStyle,
 } from "./product/product-form.styles";
-/* =========================
-   TYPES
-========================= */
-interface ProductFormProps {
-  categories: Category[];
 
-  initialData?: Partial<ProductPayload>;
+import type {
+  ProductVariant,
+} from "@/types/product";
 
-  onSubmit: (
-    payload: ProductPayload
-  ) => Promise<void>;
-}
-interface SignedUrlResponse {
-  uploadUrl: string;
-  publicUrl: string;
-}
+import type {
+  ProductFormProps,
+  ProductFormErrors,
+  SignedUrlResponse,
+} from "./product/product-form.types";
+
 
 /* =========================
    COMPONENT
@@ -62,17 +52,8 @@ export default function ProductForm({
   const form = useProductForm(initialData);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [errors, setErrors] = useState<{
-  name?: boolean;
-  category?: boolean;
-  images?: boolean;
-  price?: boolean;
-
-  sale_price?: boolean;
-  sale_stock?: boolean;
-  sale_start?: boolean;
-  sale_end?: boolean;
-}>({});
+  const [errors, setErrors] =
+  useState<ProductFormErrors>({});
 
   
   /* =========================
