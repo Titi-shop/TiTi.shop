@@ -1,37 +1,99 @@
-import { getPiAccessToken, clearPiToken } from "@/lib/piAuth";
+import {
+  getPiAccessToken,
+  clearPiToken,
+} from "@/lib/piAuth";
 
 export async function apiAuthFetch(
   input: RequestInfo,
   init?: RequestInit
-) {
-  let token = localStorage.getItem("pi_token");
-
-  // 🔥 LUÔN đảm bảo token hợp lệ
-  if (!token) {
-    token = await getPiAccessToken();
+): Promise<Response> {
+  if (typeof window === "undefined") {
+    throw new Error("PI_BROWSER_REQUIRED");
   }
 
-  const doFetch = async (tk: string) =>
+  let token =
+    localStorage.getItem(
+      "pi_access_token"
+    );
+
+  /*
+   * Nếu chưa có token:
+   * - Pi Browser: getPiAccessToken() có thể authenticate.
+   * - Browser thường: token OAuth phải được lấy qua /pilogin.
+   */
+  if (!token) {
+    try {
+      token =
+        await getPiAccessToken();
+    } catch (err) {
+      if (
+        err instanceof Error &&
+        err.message ===
+          "PI_SDK_NOT_AVAILABLE"
+      ) {
+        throw new Error(
+          "PI_REAUTH_REQUIRED"
+        );
+      }
+
+      throw err;
+    }
+  }
+
+  const doFetch = (
+    tk: string
+  ): Promise<Response> =>
     fetch(input, {
       ...init,
       headers: {
         ...(init?.headers || {}),
-        Authorization: `Bearer ${tk}`,
+        Authorization:
+          `Bearer ${tk}`,
       },
     });
 
-  let res = await doFetch(token);
+  let res =
+    await doFetch(token);
 
-  // 🔥 AUTO RETRY (SAFE)
+  /*
+   * 401:
+   * Token hiện tại không còn được API chấp nhận.
+   */
   if (res.status === 401) {
     clearPiToken();
 
-    const newToken = await getPiAccessToken(true);
+    /*
+     * Browser thường không có Pi SDK.
+     * Không có refresh token để lấy token mới.
+     * UI phải chạy lại OAuth qua /pilogin.
+     */
+    if (
+      !window.Pi ||
+      typeof window.Pi.authenticate !==
+        "function"
+    ) {
+      throw new Error(
+        "PI_REAUTH_REQUIRED"
+      );
+    }
 
-    // 🔥 QUAN TRỌNG: update localStorage
-    localStorage.setItem("pi_token", newToken);
+    /*
+     * Pi Browser:
+     * chạy lại Pi authentication để lấy token mới.
+     */
+    const newToken =
+      await getPiAccessToken(true);
 
-    res = await doFetch(newToken);
+    localStorage.setItem(
+      "pi_access_token",
+      newToken
+    );
+
+    /*
+     * Chỉ retry đúng một lần.
+     */
+    res =
+      await doFetch(newToken);
   }
 
   return res;
