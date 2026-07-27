@@ -1,143 +1,117 @@
-import type {
-  Metadata,
-} from "next";
+import "./globals.css";
+import Script from "next/script";
+import PiRootClient from "./PiRootClient";
+import { AuthProvider } from "@/context/AuthContext";
+import AlertProvider from "@/app/components/AlertProvider";
+import { SWRConfig } from "swr";
+import ThemeProvider from "@/components/ThemeProvider";
+import type { Metadata } from "next";
 
-import {
-  getProductService,
-} from "@/lib/services/products/by-id";
+export const metadata: Metadata = {
+  metadataBase: new URL(
+    "https://muasam.titi.onl"
+  ),
 
-export const runtime =
-  "nodejs";
+  title: {
+    default: "TiTi Shop",
+    template: "%s | TiTi Shop",
+  },
 
-export const dynamic =
-  "force-dynamic";
+  description:
+    "Pi Network Marketplace",
 
-export async function generateMetadata(
-  {
-    params,
-  }: {
-    params: Promise<{
-      id: string;
-    }>;
-  }
-): Promise<Metadata> {
-  const { id } =
-    await params;
+  applicationName:
+    "TiTi Shop",
 
-  const result =
-    await getProductService(
-      id
-    );
+  keywords: [
+    "Pi Network",
+    "TiTi Shop",
+    "Marketplace",
+    "Pi Commerce",
+  ],
 
-  if (
-    !result ||
-    "error" in result
-  ) {
-    return {
-      title:
-        "TiTi Shop",
+  openGraph: {
+    title:
+      "TiTi Shop",
 
-      description:
-        "Sàn thương mại điện tử Pi Network",
+    description:
+      "Pi Network Marketplace",
 
-      openGraph: {
-        title:
-          "TiTi Shop",
+    siteName:
+      "TiTi Shop",
 
-        description:
-          "Sàn thương mại điện tử Pi Network",
+    type:
+      "website",
 
-        type:
-          "website",
-
-        images: [
-          {
-            url:
-              "/logo.png",
-          },
-        ],
+    images: [
+      {
+        url:
+          "/banners/3D035BE4-0822-403D-9631-6C4CF674A519.png",
       },
+    ],
+  },
 
-      twitter: {
-        card:
-          "summary_large_image",
+  twitter: {
+    card:
+      "summary_large_image",
 
-        title:
-          "TiTi Shop",
+    title:
+      "TiTi Shop",
 
-        description:
-          "Sàn thương mại điện tử Pi Network",
+    description:
+      "Pi Network Marketplace",
 
-        images: [
-          "/logo.png",
-        ],
-      },
-    };
-  }
+    images: [
+      "/banners/3D035BE4-0822-403D-9631-6C4CF674A519.png",
+    ],
+  },
+};
 
-  const title =
-    result.name;
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en" className="theme-light">
+      <head>
+        <link rel="preload" as="image" href="/avatar.png" />
+        <link rel="preload" as="image" href="/banners/default-shop.png" />
 
-  const description =
-    result.short_description?.trim()
-      ? result.short_description
-      : result.description
-          ?.replace(
-            /<[^>]*>/g,
-            ""
-          )
-          .slice(
-            0,
-            160
-          ) ??
-        "Sàn thương mại điện tử Pi Network";
+        <Script
+          src="https://sdk.minepi.com/pi-sdk.js"
+          strategy="afterInteractive"
+        />
 
-  const image =
-    result.thumbnail ||
-    "/logo.png";
+        {/* 🔥 FIX: tránh FOUC (nháy theme khi load) */}
+        <Script id="theme-init" strategy="beforeInteractive">
+          {`
+            (function () {
+              try {
+                const theme = localStorage.getItem("theme") || "theme-light";
+                document.documentElement.className = theme;
+              } catch (e) {}
+            })();
+          `}
+        </Script>
+      </head>
 
-  return {
-    title,
-
-    description,
-
-    openGraph: {
-      title,
-
-      description,
-
-      type:
-        "website",
-
-      images: [
-        {
-          url:
-            image,
-        },
-      ],
-    },
-
-    twitter: {
-      card:
-        "summary_large_image",
-
-      title,
-
-      description,
-
-      images: [
-        image,
-      ],
-    },
-  };
-}
-
-export default function ProductLayout(
-  {
-    children,
-  }: {
-    children: React.ReactNode;
-  }
-) {
-  return children;
+      <body>
+        <SWRConfig
+          value={{
+            revalidateOnFocus: false,
+            dedupingInterval: 5000,
+            shouldRetryOnError: false,
+          }}
+        >
+          <AlertProvider />
+          <AuthProvider>
+            <ThemeProvider>
+              <PiRootClient>{children}</PiRootClient>
+            </ThemeProvider>
+          </AuthProvider>
+        </SWRConfig>
+      </body>
+    </html>
+  );
 }
