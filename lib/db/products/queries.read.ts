@@ -150,6 +150,41 @@ export async function getProductById(
   }
 }
 /* =========================================================
+   GET PRODUCT METADATA
+========================================================= */
+
+export type ProductMetadataRecord = {
+  name: string;
+  short_description: string | null;
+  description: string | null;
+  thumbnail: string | null;
+};
+
+export async function getProductMetadata(
+  productId: string
+): Promise<ProductMetadataRecord | null> {
+  if (!productId || !isUUID(productId)) {
+    return null;
+  }
+
+  const { rows } = await query<ProductMetadataRecord>(
+    `
+    SELECT
+      name,
+      short_description,
+      description,
+      thumbnail
+    FROM products
+    WHERE id = $1
+      AND deleted_at IS NULL
+    LIMIT 1
+    `,
+    [productId]
+  );
+
+  return rows[0] ?? null;
+}
+/* =========================================================
    GET PRODUCTS BY IDS
 ========================================================= */
 
