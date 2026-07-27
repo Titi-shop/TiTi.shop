@@ -1,117 +1,130 @@
-import "./globals.css";
-import Script from "next/script";
-import PiRootClient from "./PiRootClient";
-import { AuthProvider } from "@/context/AuthContext";
-import AlertProvider from "@/app/components/AlertProvider";
-import { SWRConfig } from "swr";
-import ThemeProvider from "@/components/ThemeProvider";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(
-    "https://muasam.titi.onl"
-  ),
+import {
+  getProductMetadata,
+} from "@/lib/db/products";
 
-  title: {
-    default: "TiTi Shop",
-    template: "%s | TiTi Shop",
-  },
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-  description:
-    "Pi Network Marketplace",
+/* =========================================================
+   DEFAULT METADATA
+========================================================= */
 
-  applicationName:
-    "TiTi Shop",
+const DEFAULT_TITLE = "TiTi Shop";
 
-  keywords: [
-    "Pi Network",
-    "TiTi Shop",
-    "Marketplace",
-    "Pi Commerce",
-  ],
+const DEFAULT_DESCRIPTION =
+  "Sàn thương mại điện tử Pi Network";
 
-  openGraph: {
-    title:
-      "TiTi Shop",
+const DEFAULT_IMAGE = "/logo.png";
 
-    description:
-      "Pi Network Marketplace",
+function defaultMetadata(): Metadata {
+  return {
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
 
-    siteName:
-      "TiTi Shop",
+    openGraph: {
+      title: DEFAULT_TITLE,
+      description: DEFAULT_DESCRIPTION,
+      type: "website",
+      images: [
+        {
+          url: DEFAULT_IMAGE,
+        },
+      ],
+    },
 
-    type:
-      "website",
+    twitter: {
+      card: "summary_large_image",
+      title: DEFAULT_TITLE,
+      description: DEFAULT_DESCRIPTION,
+      images: [DEFAULT_IMAGE],
+    },
+  };
+}
 
-    images: [
-      {
-        url:
-          "/banners/3D035BE4-0822-403D-9631-6C4CF674A519.png",
+/* =========================================================
+   GENERATE METADATA
+========================================================= */
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{
+    id: string;
+  }>;
+}): Promise<Metadata> {
+  try {
+    const { id } = await params;
+
+    if (!id) {
+      return defaultMetadata();
+    }
+
+    const product =
+      await getProductMetadata(id);
+
+    if (!product) {
+      return defaultMetadata();
+    }
+
+    const title =
+      product.name?.trim() ||
+      DEFAULT_TITLE;
+
+    const description =
+      product.short_description?.trim() ||
+      product.description
+        ?.replace(/<[^>]*>/g, "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 160) ||
+      DEFAULT_DESCRIPTION;
+
+    const image =
+      product.thumbnail?.trim() ||
+      DEFAULT_IMAGE;
+
+    return {
+      title,
+      description,
+
+      openGraph: {
+        title,
+        description,
+        type: "website",
+        images: [
+          {
+            url: image,
+          },
+        ],
       },
-    ],
-  },
 
-  twitter: {
-    card:
-      "summary_large_image",
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+        images: [image],
+      },
+    };
+  } catch (error) {
+    console.error(
+      "[PRODUCT_METADATA_ERROR]",
+      error
+    );
 
-    title:
-      "TiTi Shop",
+    return defaultMetadata();
+  }
+}
 
-    description:
-      "Pi Network Marketplace",
+/* =========================================================
+   LAYOUT
+========================================================= */
 
-    images: [
-      "/banners/3D035BE4-0822-403D-9631-6C4CF674A519.png",
-    ],
-  },
-};
-
-export default function RootLayout({
+export default function ProductLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <html lang="en" className="theme-light">
-      <head>
-        <link rel="preload" as="image" href="/avatar.png" />
-        <link rel="preload" as="image" href="/banners/default-shop.png" />
-
-        <Script
-          src="https://sdk.minepi.com/pi-sdk.js"
-          strategy="afterInteractive"
-        />
-
-        {/* 🔥 FIX: tránh FOUC (nháy theme khi load) */}
-        <Script id="theme-init" strategy="beforeInteractive">
-          {`
-            (function () {
-              try {
-                const theme = localStorage.getItem("theme") || "theme-light";
-                document.documentElement.className = theme;
-              } catch (e) {}
-            })();
-          `}
-        </Script>
-      </head>
-
-      <body>
-        <SWRConfig
-          value={{
-            revalidateOnFocus: false,
-            dedupingInterval: 5000,
-            shouldRetryOnError: false,
-          }}
-        >
-          <AlertProvider />
-          <AuthProvider>
-            <ThemeProvider>
-              <PiRootClient>{children}</PiRootClient>
-            </ThemeProvider>
-          </AuthProvider>
-        </SWRConfig>
-      </body>
-    </html>
-  );
+  return children;
 }
