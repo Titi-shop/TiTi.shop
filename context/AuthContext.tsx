@@ -4,10 +4,11 @@ import {
   createContext,
   useContext,
   useEffect,
-  useState,
   useRef,
+  useState,
   ReactNode,
 } from "react";
+
 import {
   getPiAccessToken,
   clearPiToken,
@@ -32,166 +33,269 @@ type AuthContextType = {
 };
 
 const USER_KEY = "pi_user";
+const TOKEN_KEY = "pi_access_token";
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  loading: true,
-  piReady: false,
-  pilogin: async () => {},
-  logout: () => {},
-});
+const AuthContext =
+  createContext<AuthContextType>({
+    user: null,
+    loading: true,
+    piReady: false,
+    pilogin: async () => {},
+    logout: () => {},
+  });
 
 /* ========================= PROVIDER ========================= */
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<PiUser | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [piReady, setPiReady] = useState(false);
-const loginRef = useRef(false);
+export function AuthProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const [user, setUser] =
+    useState<PiUser | null>(null);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [piReady, setPiReady] =
+    useState(false);
+
+  const loginRef = useRef(false);
+
   /* ================= PI READY ================= */
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined") {
+      return;
+    }
 
-    const timer = setInterval(() => {
-      if (window.Pi) {
-        setPiReady(true);
-        clearInterval(timer);
-      }
-    }, 300);
+    /*
+     * Pi Browser SDK có thể được load sau React.
+     * piReady chỉ biểu thị SDK sẵn sàng,
+     * không quyết định OAuth browser có đăng nhập hay không.
+     */
+    if (window.Pi) {
+      setPiReady(true);
+      return;
+    }
 
-    return () => clearInterval(timer);
+    const timer = window.setInterval(
+      () => {
+        if (window.Pi) {
+          setPiReady(true);
+          window.clearInterval(timer);
+        }
+      },
+      300
+    );
+
+    return () =>
+      window.clearInterval(timer);
   }, []);
 
-  /* ================= INIT (NO AUTO LOGIN) ================= */
+  /* ================= VERIFY USER ================= */
 
-  useEffect(() => {
-  if (!piReady) return;
-
-  const initAuth = async () => {
-    try {
-      const token = await getPiAccessToken();
-
-      if (!token) {
-        setUser(null);
-        return;
-      }
-
-      const res = await fetch("/api/pi/verify", {
+  const verifyToken = async (
+    token: string
+  ): Promise<PiUser> => {
+    const res = await fetch(
+      "/api/pi/verify",
+      {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization:
+            `Bearer ${token}`,
         },
-      });
-
-      if (!res.ok) {
-        setUser(null);
-        return;
       }
+    );
 
-      const data: unknown = await res.json();
-
-      if (
-        typeof data === "object" &&
-        data !== null &&
-        "user" in data
-      ) {
-        const verifiedUser = (data as { user: PiUser }).user;
-
-        setUser(verifiedUser);
-        localStorage.setItem(USER_KEY, JSON.stringify(verifiedUser));
-      } else {
-        setUser(null);
-      }
-    } catch {
-      setUser(null);
-    } finally {
-      setLoading(false);
+    if (!res.ok) {
+      throw new Error(
+        "VERIFY_FAILED"
+      );
     }
+
+    const data: unknown =
+      await res.json();
+
+    if (
+      typeof data !== "object" ||
+      data === null ||
+      !("user" in data)
+    ) {
+      throw new Error(
+        "VERIFY_FAILED"
+      );
+    }
+
+    const verifiedUser =
+      (data as { user: PiUser }).user;
+
+    if (!verifiedUser) {
+      throw new Error(
+        "VERIFY_FAILED"
+      );
+    }
+
+    return verifiedUser;
   };
 
-  initAuth();
-}, [piReady]);
+  /* ================= INIT ================= */
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const initAuth = async () => {
+      try {
+        /*
+         * Không tự bật Pi.authenticate khi người dùng
+         * chưa có phiên đăng nhập.
+         *
+         * Pi Browser mới vẫn phải đăng nhập qua pilogin().
+         * Browser OAuth callback cũng lưu token ở đây.
+         */
+        const storedToken =
+          localStorage.getItem(
+            TOKEN_KEY
+          );
+
+        if (!storedToken) {
+          setUser(null);
+          return;
+        }
+
+        /*
+         * getPiAccessToken() sẽ:
+         *
+         * - Browser OAuth:
+         *   verify stored token qua Pi /v2/me.
+         *
+         * - Pi Browser:
+         *   sử dụng stored token hiện tại.
+         */
+        const token =
+          await getPiAccessToken();
+
+        const verifiedUser =
+          await verifyToken(token);
+
+        setUser(verifiedUser);
+
+        localStorage.setItem(
+          USER_KEY,
+          JSON.stringify(
+            verifiedUser
+          )
+        );
+      } catch {
+        /*
+         * Token cũ/không hợp lệ.
+         * Không gọi logout() vì logout xóa cả cart.
+         */
+        clearPiToken();
+
+        localStorage.removeItem(
+          USER_KEY
+        );
+
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void initAuth();
+  }, []);
 
   /* ================= LOGIN ================= */
 
   const pilogin = async () => {
-  if (!piReady) {
-    return;
-  }
+    /*
+     * pilogin() này là Pi SDK login.
+     * Browser thường bắt đầu OAuth tại /pilogin/page.tsx,
+     * không đi qua hàm này nếu không có SDK.
+     */
+    if (!piReady || !window.Pi) {
+      return;
+    }
 
-  if (loginRef.current) {
-    return;
-  }
+    if (loginRef.current) {
+      return;
+    }
 
-  loginRef.current = true;
+    loginRef.current = true;
 
-  try {
+    try {
       setLoading(true);
 
-const token = await getPiAccessToken();
+      const token =
+        await getPiAccessToken();
 
-if (!token) {
-  throw new Error("NO_ACCESS_TOKEN");
-}
+      const verifiedUser =
+        await verifyToken(token);
 
-const res = await fetch("/api/pi/verify", {
-  method: "POST",
-  headers: {
-    Authorization: `Bearer ${token}`,
-  },
-});
+      setUser(verifiedUser);
 
-const data = await res.json();
+      localStorage.setItem(
+        USER_KEY,
+        JSON.stringify(
+          verifiedUser
+        )
+      );
 
-if (!res.ok || !data?.user) {
-  throw new Error("VERIFY_FAILED");
-}
+      sessionStorage.removeItem(
+        "cart_merged"
+      );
 
-const verifiedUser: PiUser = data.user;
-
-setUser(verifiedUser);
-
-localStorage.setItem(
-  USER_KEY,
-  JSON.stringify(verifiedUser)
-);
-
-sessionStorage.removeItem("cart_merged");
-
-console.log("🟢 LOGIN SUCCESS");
-   } catch (err) {
-  console.error("❌ LOGIN ERROR:", err);
-} finally {
-  loginRef.current = false;
-  setLoading(false);
-}
+      console.log(
+        "🟢 LOGIN SUCCESS"
+      );
+    } catch (err) {
+      console.error(
+        "❌ LOGIN ERROR:",
+        err
+      );
+    } finally {
+      loginRef.current = false;
+      setLoading(false);
+    }
   };
 
   /* ================= LOGOUT ================= */
 
   const logout = () => {
-  console.log("🔴 LOGOUT");
+    console.log("🔴 LOGOUT");
 
-  // 🧹 clear user
-  localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(
+      USER_KEY
+    );
 
-  // 🧹 clear cart (QUAN TRỌNG)
-  localStorage.removeItem("cart");
+    localStorage.removeItem(
+      "cart"
+    );
 
-  // 🧹 reset merge flag
-  sessionStorage.removeItem("cart_merged");
+    sessionStorage.removeItem(
+      "cart_merged"
+    );
 
-  // 🧹 clear Pi token
-  clearPiToken();
+    clearPiToken();
 
-  setUser(null);
-};
+    setUser(null);
+  };
+
   /* ================= PROVIDER ================= */
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, piReady, pilogin, logout }}
+      value={{
+        user,
+        loading,
+        piReady,
+        pilogin,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>
@@ -200,4 +304,5 @@ console.log("🟢 LOGIN SUCCESS");
 
 /* ================= HOOK ================= */
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () =>
+  useContext(AuthContext);
