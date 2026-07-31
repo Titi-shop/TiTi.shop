@@ -61,9 +61,12 @@ export async function POST(
     );
 
     const auth =
-      await requireAuth(
-        request
-      );
+      await requireAuth();
+
+    if (!auth.ok) {
+      log("AUTH_FAILED");
+      return auth.response;
+    }
 
     log(
       "AUTH_SUCCESS",

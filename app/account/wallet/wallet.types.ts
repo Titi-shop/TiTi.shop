@@ -1,4 +1,4 @@
-// =====================================================
+﻿// =====================================================
 // app/account/wallet/wallet.types.ts
 // =====================================================
 
@@ -26,7 +26,7 @@ export type WalletTransaction = {
 
   amount: number;
 
-  entryType: string;
+  entryType: JournalEntryType;
 
   createdAt: string;
 };
@@ -102,3 +102,4 @@ export type JournalEntryType =
   | "ADMIN_ADJUST"
   | "ADMIN_REVERSE"
   | "SYSTEM_COMPENSATION";
+

@@ -24,8 +24,24 @@ import type {
 
 function getDb(
   client?: WalletClient
-) {
-  return client ?? { query };
+): WalletClient {
+  if (client) {
+    return client;
+  }
+
+  return {
+    query: async <T>(
+      sql: string,
+      params?: unknown[]
+    ) => {
+      const result = await query(sql, params);
+
+      return {
+        rows: result.rows as T[],
+        rowCount: result.rowCount,
+      };
+    },
+  };
 }
 
 function toNumberSafe(
@@ -207,7 +223,9 @@ export async function debitWallet(
         [params.userId]
       );
 
-    if (!rows.length) {
+    const wallet = rows[0];
+
+    if (!wallet) {
       throw new Error(
         "WALLET_NOT_FOUND"
       );
@@ -215,13 +233,13 @@ export async function debitWallet(
 
     const balance =
       toNumberSafe(
-        rows[0].balance,
+        wallet.balance,
         "balance"
       );
 
     const available =
       toNumberSafe(
-        rows[0].available_balance,
+        wallet.available_balance,
         "available_balance"
       );
 
@@ -317,7 +335,9 @@ export async function reserveWalletBalance(
         [userId]
       );
 
-    if (!rows.length) {
+    const wallet = rows[0];
+
+    if (!wallet) {
       throw new Error(
         "WALLET_NOT_FOUND"
       );
@@ -325,8 +345,7 @@ export async function reserveWalletBalance(
 
     const available =
       toNumberSafe(
-        rows[0]
-          .available_balance,
+        wallet.available_balance,
         "available_balance"
       );
 
@@ -506,7 +525,7 @@ export async function getWalletRecordByUserId(
   await ensureWallet(userId, client);
 
   const { rows } =
-    await db.query(
+    await db.query<WalletRow>(
       `
       SELECT *
       FROM wallets
@@ -517,77 +536,4 @@ export async function getWalletRecordByUserId(
     );
 
   return rows[0] ?? null;
-}
-export async function markWithdrawalFailed(
-  withdrawalId: string,
-  reason: string
-): Promise<void> {
-
-  vlog("MARK_FAILED_START", {
-    withdrawalId,
-    reason,
-  });
-
-  await withTransaction(async (client) => {
-
-    const rs =
-      await client.query<{
-        user_id: string;
-        amount: string;
-      }>(
-        `
-        SELECT
-          user_id,
-          amount
-        FROM wallet_withdrawals
-        WHERE id = $1
-        FOR UPDATE
-        `,
-        [withdrawalId]
-      );
-
-    if (rs.rowCount !== 1) {
-      throw new Error(
-        "WITHDRAWAL_NOT_FOUND"
-      );
-    }
-
-    const row = rs.rows[0];
-
-    await releaseReservedBalance(
-      row.user_id,
-      Number(row.amount),
-      client
-    );
-
-    const updateRs =
-      await client.query(
-        `
-        UPDATE wallet_withdrawals
-
-        SET
-          status = 'FAILED',
-          fail_reason = $2,
-          updated_at = NOW()
-
-        WHERE id = $1
-          AND status = 'PROCESSING'
-        `,
-        [
-          withdrawalId,
-          reason,
-        ]
-      );
-
-    if (updateRs.rowCount !== 1) {
-      throw new Error(
-        "WITHDRAWAL_FAIL_UPDATE_FAILED"
-      );
-    }
-
-  });
-
-  vlog("MARK_FAILED_DONE", {
-    withdrawalId,
-  });
 }

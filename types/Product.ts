@@ -89,7 +89,62 @@ export interface ProductVariant {
   updated_at?: string;
   deleted_at?: string | null;
 }
+/* =========================================================
+   PRODUCT VARIANT DB ROW
+========================================================= */
 
+export interface ProductVariantDB {
+  id: string;
+  product_id: string;
+
+  option_1: string | null;
+  option_2: string | null;
+  option_3: string | null;
+
+  option_label_1: string | null;
+  option_label_2: string | null;
+  option_label_3: string | null;
+
+  name: string;
+  sku: string | null;
+
+  price: number;
+  sale_price: number | null;
+  final_price: number;
+
+  currency: CurrencyCode;
+
+  sale_enabled: boolean;
+  sale_stock: number;
+  sale_sold: number;
+
+  stock: number;
+  is_unlimited: boolean;
+  sold: number;
+
+  image: string;
+  is_active: boolean;
+  sort_order: number;
+
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+
+  reserved_stock: number;
+}
+
+/* =========================================================
+   PRODUCT VARIANT DB INSERT
+========================================================= */
+
+export type ProductVariantDBInput = Omit<
+  ProductVariantDB,
+  | "id"
+  | "created_at"
+  | "updated_at"
+  | "deleted_at"
+  | "reserved_stock"
+>;
 /* =========================================================
    PRODUCT CORE (DB)
 ========================================================= */
@@ -151,6 +206,21 @@ export interface ProductRecord {
   deleted_at?: string | null;
 }
 
+/* =========================================================
+   PRODUCT DB ROW
+========================================================= */
+
+export type ProductRow = ProductRecord;
+
+/* =========================================================
+   PRODUCT API / UI
+========================================================= */
+
+export interface Product extends ProductRecord {
+  options?: {
+    size?: string[];
+  };
+}
 /* =========================================================
    FORM STATE
 ========================================================= */
@@ -307,7 +377,6 @@ rating_count: number;
 favorite_count: number;
 is_favorite: boolean;
 meta_title: string;
-meta_description: string;
   meta_description: string;
   status: ProductStatus;
   is_active: boolean;
@@ -334,15 +403,15 @@ export interface CreateProductInput {
   detail_images?: string[];
   video_url?: string;
   category_id?: number | null;
-  price?: number;
+  price?: number | null;
   sale_price?: number | null;
   currency?: CurrencyCode;
-  stock?: number;
+  stock?: number | null;
   is_unlimited?: boolean;
   is_featured?: boolean;
   is_digital?: boolean;
   sale_enabled?: boolean;
-  sale_stock?: number;
+  sale_stock?: number | null;
   sale_start?: string | null;
   sale_end?: string | null;
   meta_title?: string;
@@ -352,8 +421,12 @@ export interface CreateProductInput {
   has_variants?: boolean;
 }
 
-export type UpdateProductInput =
-  Partial<CreateProductInput>;
+export type UpdateProductInput = {
+  [K in keyof CreateProductInput]?:
+    K extends "price" | "stock" | "sale_stock"
+      ? CreateProductInput[K] | null | undefined
+      : CreateProductInput[K] | undefined;
+};
 
 /* =========================================================
    VIEW TYPES
@@ -380,7 +453,6 @@ export type ProductVariantView = {
 
 export type RelatedProduct = {
   id: string;
-  categoryId: string;
   name: string;
   thumbnail?: string;
   price: number;

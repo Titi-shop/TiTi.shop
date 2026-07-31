@@ -92,7 +92,7 @@ const [initialScale, setInitialScale] =
 
       try {
         const res = await fetch(
-  `/api/products?category_id=${product.category_id}`
+  `/api/products?category_id=${product.category_id}&mode=related&exclude_id=${product.id}`
 );
 
         if (!res.ok) return;
@@ -100,11 +100,7 @@ const [initialScale, setInitialScale] =
         const data: ProductRecord[] =
           await res.json();
 
-        const filtered = data
-          .filter((p) => p.id !== product.id)
-          .slice(0, 10);
-
-        setRelated(filtered);
+        setRelated(data);
       } catch (err) {
         console.error(
           "[RELATED ERROR]",
@@ -222,29 +218,47 @@ if (!product) {
     selectedVariant?.sale_price ??
     product.sale_price,
 
+
+  final_price:
+    selectedVariant?.final_price ??
+    product.final_price,
   thumbnail: product.thumbnail,
 
   images: product.images ?? [],
 
   quantity: 1,
 
-  variant_name:
+  ...(
     [
       selectedVariant?.option1,
       selectedVariant?.option2,
       selectedVariant?.option3,
     ]
       .filter(Boolean)
-      .join(" / ") || null,
+      .join(" / ")
+      ? {
+          variant_name: [
+            selectedVariant?.option1,
+            selectedVariant?.option2,
+            selectedVariant?.option3,
+          ]
+            .filter(Boolean)
+            .join(" / "),
+        }
+      : {}
+  ),
 
-  option_1:
-    selectedVariant?.option1 ?? null,
+  ...(selectedVariant?.option1
+    ? { option_1: selectedVariant.option1 }
+    : {}),
 
-  option_2:
-    selectedVariant?.option2 ?? null,
+  ...(selectedVariant?.option2
+    ? { option_2: selectedVariant.option2 }
+    : {}),
 
-  option_3:
-    selectedVariant?.option3 ?? null,
+  ...(selectedVariant?.option3
+    ? { option_3: selectedVariant.option3 }
+    : {}),
 });
 
   const add = (): void => {
@@ -302,7 +316,16 @@ setInitialScale={setInitialScale}
   onClose={() => setOpenCheckout(false)}
   product={{
     id: product.id,
-    selectedVariant,
+    selectedVariant:
+      selectedVariant?.id
+        ? {
+            id: selectedVariant.id,
+            price: selectedVariant.price,
+            sale_price: selectedVariant.sale_price ?? null,
+            final_price: selectedVariant.final_price ?? selectedVariant.price,
+            stock: selectedVariant.stock,
+          }
+        : null,
 
     name:
       hasVariants && selectedVariant
@@ -315,9 +338,7 @@ setInitialScale={setInitialScale}
 
     sale_price:
       selectedVariant?.sale_price ??
-      product.sale_price,
-
-    final_price:
+      product.sale_price,    final_price:
       selectedVariant?.final_price ??
       product.final_price,
 
@@ -326,7 +347,7 @@ setInitialScale={setInitialScale}
     stock,
 
     shipping_rates:
-      product.shipping_rates,
+      product.shipping_rates ?? [],
 
     variant_id:
       selectedVariant?.id ?? null,

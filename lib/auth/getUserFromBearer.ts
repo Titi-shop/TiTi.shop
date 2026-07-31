@@ -33,7 +33,8 @@ const tokenCache = new Map<
 
 export async function getUserFromBearer(): Promise<AuthUser | null> {
   try {
-    const authHeader = headers().get("authorization");
+    const requestHeaders = await headers();
+    const authHeader = requestHeaders.get("authorization");
 
     if (!authHeader?.startsWith("Bearer ")) {
       return null;

@@ -1,3 +1,4 @@
+import type { PoolClient } from "pg";
 import {  query,  withTransaction,} from "@/lib/db";
 
 /* =========================================================

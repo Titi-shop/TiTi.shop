@@ -109,8 +109,7 @@ const finalPrice = hasVariants
   : calcFinalPrice({
       price,
       sale_price: salePrice,
-      sale_enabled:
-        input.sale_enabled,
+      sale_enabled: Boolean(input.sale_enabled),
     });
 
 const stock = hasVariants

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMemo, useState } from "react";
 import Image from "next/image";
@@ -108,6 +108,12 @@ export default function CartPage() {
     return;
   }
   const item = selectedItems[0];
+
+  if (!item) {
+    showMessage("No item selected for checkout.");
+    return;
+  }
+
   const res = await apiAuthFetch(
   `/api/products/${item.product_id}`
 );
@@ -319,7 +325,7 @@ if (authLoading || loading) {
   disabled:opacity-30
 "
                     >
-                      −
+                      -
                     </button>
 
                     <div className="px-4 text-sm font-semibold">
@@ -415,3 +421,5 @@ style={{
     </main>
   );
 }
+
+

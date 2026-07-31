@@ -1,6 +1,6 @@
-import type {
+﻿import type {
   ProductVariant,
-} from "@/types/product";
+} from "@/types/Product";
 
 import type {
   ProductFormErrors,
@@ -382,3 +382,4 @@ export function validateProductForm(
     ...baseResult,
   };
 }
+

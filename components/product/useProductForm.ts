@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import type {
   ProductPayload,
   ProductVariant,
-} from "@/types/product";
+} from "@/types/Product";
 
 /* =========================================================
    TYPES
@@ -112,7 +112,9 @@ function normalizeInitVariants(
         : price;
 
     return {
-      id: v.id,
+      ...(v.id !== undefined
+        ? { id: v.id }
+        : {}),
 
       option1: v.option1 ?? "",
 
@@ -511,11 +513,11 @@ useEffect(() => {
   }
 
   /*
-   * Khi sản phẩm có variants:
-   * - Tắt sale cấp product.
-   * - Xóa giá/stock sale cấp product.
-   * - KHÔNG xóa sale_start/sale_end vì variant sale
-   *   đang sử dụng thời gian sale chung của product.
+   * Khi sáº£n pháº©m cĂ³ variants:
+   * - Táº¯t sale cáº¥p product.
+   * - XĂ³a giĂ¡/stock sale cáº¥p product.
+   * - KHĂ”NG xĂ³a sale_start/sale_end vĂ¬ variant sale
+   *   Ä‘ang sá»­ dá»¥ng thá»i gian sale chung cá»§a product.
    */
 
   setSale_enabled(false);
@@ -586,3 +588,4 @@ useEffect(() => {
     setDomestic_country_code,
   };
 }
+

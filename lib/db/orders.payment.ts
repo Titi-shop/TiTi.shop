@@ -1,4 +1,4 @@
-
+﻿
 import { withTransaction } from "@/lib/db";
 import { createOrder } from "@/lib/db/orders.create";
 import { getRpcVerificationLog } from "@/lib/db/payments.rpc";
@@ -19,7 +19,6 @@ import {
 import {
   upsertPaymentReceipt,
   linkReceiptSettlement,
-  linkReceiptSettlementByIds,
 } from "@/lib/db/orders.payment.receipt";
 import {
   sendNotification,
@@ -143,12 +142,14 @@ if (!intent) {
         [piPaymentId]
       );
 
-    if (existingOrder.rows.length > 0) {
+    const existingOrderRow = existingOrder.rows[0];
+
+    if (existingOrderRow) {
       return {
         ok: true,
         already: true,
         orderId:
-          existingOrder.rows[0].id,
+          existingOrderRow.id,
         buyerId:
           intent.buyer_id,
         sellerId:
@@ -177,7 +178,7 @@ if (!intent) {
 );
 
     const createdOrder =
-      await createOrder({
+      await createOrder(client, {
         userId:
           intent.buyer_id,
         piPaymentId,
@@ -338,10 +339,10 @@ await markRpcVerified(
   paymentIntentId,
   escrowId
 );
+
 logger.debug("PAYMENT.MARK_PI_VERIFIED");
-await markRpcVerified(
+await markPiVerified(
   client,
-  paymentIntentId,
   escrowId
 );
 logger.debug("PAYMENT.LINK_ORDER");
@@ -363,11 +364,14 @@ logger.debug("PAYMENT.LINK_ORDER");
   }
 );
     logger.debug("PAYMENT.RECEIPT_LINK");
-    await linkReceiptSettlementByIds({
-  paymentIntentId,
-  escrowId,
-  sellerCreditId,
-});
+    await linkReceiptSettlement(
+      client,
+      {
+        paymentIntentId,
+        escrowId,
+        sellerCreditId,
+      }
+    );
     return {
       ok: true,
       already: false,
@@ -400,10 +404,10 @@ logger.debug("PAYMENT.LINK_ORDER");
           "order",
 
         title:
-          "Thanh toán thành công",
+          "Thanh toĂ¡n thĂ nh cĂ´ng",
 
         message:
-          "Đơn hàng của bạn đã được tạo thành công.",
+          "ÄÆ¡n hĂ ng cá»§a báº¡n Ä‘Ă£ Ä‘Æ°á»£c táº¡o thĂ nh cĂ´ng.",
 
         orderId:
           result.orderId,
@@ -422,10 +426,10 @@ await sendNotification({
     "order",
 
   title:
-    "Có đơn hàng mới",
+    "CĂ³ Ä‘Æ¡n hĂ ng má»›i",
 
   message:
-    "Bạn vừa nhận được một đơn hàng mới.",
+    "Báº¡n vá»«a nháº­n Ä‘Æ°á»£c má»™t Ä‘Æ¡n hĂ ng má»›i.",
 
   orderId:
     result.orderId,
@@ -474,3 +478,6 @@ export async function linkReceiptSettlementByIds(input: {
 });
   });
 }
+
+
+

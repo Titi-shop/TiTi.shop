@@ -39,9 +39,18 @@ export async function creditSeller(
     client: PoolClient,
     input: CreditSellerInput
 ): Promise<string> {
+const paymentIntentId =
+  input.paymentIntentId;
+
+if (!paymentIntentId) {
+  throw new Error(
+    "PAYMENT_INTENT_ID_REQUIRED"
+  );
+}
+
 const rpc =
   await getRpcVerificationLog(
-    input.paymentIntentId
+    paymentIntentId
   );
 
 if (!rpc) {
@@ -82,14 +91,17 @@ if (rpc.txStatus !== "SUCCESS") {
         ]
       );
 
-    if (existed.rows.length) {
+    const existingCredit =
+      existed.rows[0];
+
+    if (existingCredit) {
 
       logger.info("SETTLEMENT.CREDIT.EXISTS", {
   escrowId: maskId(input.escrowId),
-  creditId: maskId(existed.rows[0].id),
+  creditId: maskId(existingCredit.id),
 });
 
-      return existed.rows[0].id;
+      return existingCredit.id;
     }
 
     /* ===================================================

@@ -128,8 +128,6 @@ export async function POST(req: Request) {
     await creditWallet({
       userId,
       amount: Number(payment.amount),
-      referenceId: paymentId,
-      referenceType: "deposit",
     });
 
     console.log("🟢 [DEPOSIT][SUCCESS]", {

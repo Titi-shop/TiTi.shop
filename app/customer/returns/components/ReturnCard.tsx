@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -6,7 +6,7 @@ import { apiAuthFetch } from "@/lib/api/apiAuthFetch";
 import { useTranslationClient as useTranslation } from "@/app/lib/i18n/client";
 import { formatPi } from "@/lib/pi";
 import { useState } from "react";
-import type { ReturnRecord } from "../types";
+import type { ReturnRecord } from "../types/returns";
 import { getImage, getStatusConfig } from "../utils";
 
 type Props = {
@@ -167,7 +167,7 @@ const cancelReturn = async () => {
 
           {item.return_tracking_code && (
             <div className="rounded-xl bg-blue-50 px-3 py-2 text-xs text-blue-600">
-              🚚 {item.return_tracking_code}
+              {item.return_tracking_code}
             </div>
           )}
 
@@ -254,10 +254,13 @@ const cancelReturn = async () => {
         {/* DATES */}
         <div className="mt-3 text-[11px] text-muted">
           {item.created_at && (
-            <span>🕒 {new Date(item.created_at).toLocaleString()}</span>
+            <span>{new Date(item.created_at).toLocaleString()}</span>
           )}
         </div>
       </div>
     </div>
   );
               }
+
+
+

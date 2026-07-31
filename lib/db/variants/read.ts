@@ -1,8 +1,8 @@
-import { query } from "@/lib/db";
+﻿import { query } from "@/lib/db";
 
 import type {
   ProductVariantDB,
-} from "@/types/product";
+} from "@/types/Product";
 
 import type {
   VariantRow,
@@ -260,3 +260,4 @@ export async function getVariantsByProductIds(
   return mapped;
 
 }
+

@@ -308,7 +308,7 @@ export async function getZoneByCountry(
 
   const code = rows[0]?.code;
 
-  return isValidRegion(code) ? code : null;
+  return code && isValidRegion(code) ? code : null;
 }
 
 /* =========================================================

@@ -105,6 +105,10 @@ export async function createSupportRoom(
 
   const room = roomResult.rows[0];
 
+  if (!room) {
+    throw new Error("CHAT_ROOM_CREATE_FAILED");
+  }
+
   await query(
 `
 INSERT INTO chat_participants
@@ -270,7 +274,13 @@ export async function createMessage(
     "[CHAT][DB] CREATE_MESSAGE"
   );
 
-  return result.rows[0];
+  const message = result.rows[0];
+
+  if (!message) {
+    throw new Error("CHAT_MESSAGE_CREATE_FAILED");
+  }
+
+  return message;
 }
 
 /* =========================================================
@@ -315,7 +325,7 @@ export async function isParticipant(
     ]
   );
 
-  return result.rowCount > 0;
+  return (result.rowCount ?? 0) > 0;
 }
 /* =========================================================
    GET ADMIN CHAT ROOMS

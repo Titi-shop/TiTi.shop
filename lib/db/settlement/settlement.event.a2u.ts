@@ -26,7 +26,7 @@ type DbClient = {
     params?: unknown[]
   ) => Promise<{
     rows: T[];
-    rowCount?: number;
+    rowCount?: number | null;
   }>;
 };
 
@@ -66,8 +66,22 @@ createWithdrawalSettlementEventOnce(
   client?: DbClient
 ): Promise<void> {
 
-  const db =
-    client ?? { query };
+  const db: DbClient =
+    client ?? {
+      query: async <T>(
+        sql: string,
+        params?: unknown[]
+      ) => {
+        const result =
+          await query(sql, params);
+
+        return {
+          rows: result.rows as T[],
+          rowCount:
+            result.rowCount,
+        };
+      },
+    };
 
   logger.debug(
   "A2U_SETTLEMENT.START"

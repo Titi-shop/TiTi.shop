@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 
 import { requireSeller } from "@/lib/auth/guard";
 
@@ -27,9 +27,9 @@ export async function PATCH(
   {
     params,
   }: {
-    params: {
+    params: Promise<{
       id: string;
-    };
+    }>;
   }
 ) {
   try {
@@ -41,8 +41,7 @@ export async function PATCH(
       return auth.response;
     }
 
-    const orderId =
-      params?.id;
+    const { id: orderId } = await params;
 
     if (
       !isValidId(orderId)
@@ -132,3 +131,4 @@ export async function PATCH(
     );
   }
 }
+

@@ -16,7 +16,7 @@ const DEFAULT_TITLE = "TiTi Shop";
 const DEFAULT_DESCRIPTION =
   "Sàn thương mại điện tử Pi Network";
 
-const DEFAULT_IMAGE = "/logo.png";
+const DEFAULT_IMAGE = "/banners/3D035BE4-0822-403D-9631-6C4CF674A519.png";
 
 function defaultMetadata(): Metadata {
   return {

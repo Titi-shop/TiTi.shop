@@ -11,8 +11,11 @@ import {
 import {
   getProcessingWithdrawals,
   markWithdrawalCompleted,
-  markWithdrawalFailed,
 } from "@/lib/db/wallet";
+
+import {
+  markWithdrawalFailed,
+} from "@/lib/db/wallet/wallet.withdraw.failed";
 
 export const runtime =
   "nodejs";
@@ -120,8 +123,7 @@ vlog(
             ?.txid
         ) {
           await markWithdrawalCompleted(
-            withdrawal.id,
-            payment.transaction.txid
+            withdrawal.id
           );
 
           results.push({
@@ -228,3 +230,4 @@ results.push({
     );
   }
 }
+

@@ -92,10 +92,7 @@ export async function GET() {
       productsRaw.map(
         (p, index) => {
           const row =
-            p as Record<
-              string,
-              unknown
-            >;
+            p as unknown as Record<string, unknown>;
 
           
 
@@ -167,11 +164,12 @@ export async function GET() {
               Boolean(
                 row.is_active
               ),
-
-            min_price:
-  row.min_price != null
-    ? Number(row.min_price)
-    : undefined,
+              ...(row.min_price != null
+                ? {
+                    min_price:
+                      Number(row.min_price),
+                  }
+                : {}),
 
 min_sale_price:
   row.min_sale_price != null
@@ -268,3 +266,4 @@ if (
     );
   }
               }
+

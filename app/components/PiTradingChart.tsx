@@ -5,6 +5,10 @@ import {
   LineSeries,
 } from "lightweight-charts";
 
+  import type {
+    UTCTimestamp,
+  } from "lightweight-charts";
+
 import {
   useEffect,
   useRef,
@@ -87,7 +91,7 @@ export default function PiTradingChart({
       data.map(
         (price, index) => ({
           time:
-            index + 1,
+              (index + 1) as UTCTimestamp,
           value: price,
         })
       )
@@ -128,3 +132,4 @@ export default function PiTradingChart({
     />
   );
 }
+

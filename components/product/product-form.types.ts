@@ -1,7 +1,7 @@
-import type {
+﻿import type {
   Category,
   ProductPayload,
-} from "@/types/product";
+} from "@/types/Product";
 
 /* =========================
    PRODUCT FORM PROPS
@@ -41,3 +41,4 @@ export interface ProductFormErrors {
   sale_start?: boolean;
   sale_end?: boolean;
 }
+

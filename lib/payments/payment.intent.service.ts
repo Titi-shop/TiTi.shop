@@ -99,7 +99,7 @@ function normalizeShipping(
 function normalizeCreateIntentInput({
   userId,
   raw,
-}: RawInput): NormalizedIntentInput {
+}: RawInput): CreateIntentNormalizedInput {
   if (
     !raw ||
     typeof raw !== "object"
@@ -158,7 +158,7 @@ return {
 }
 
 function buildPricingInput(
-  input: NormalizedIntentInput
+  input: CreateIntentNormalizedInput
 ): PricingInput {
   return {
     user_id: input.userId,
@@ -349,11 +349,7 @@ if (!paymentIntentId) {
       payment_intent_id:
         paymentIntentId,
 
-      pi_payment_id:
-        typeof dbResult.pi_payment_id ===
-        "string"
-          ? dbResult.pi_payment_id
-          : "",
+      pi_payment_id: "",
 
       amount:
         Number(

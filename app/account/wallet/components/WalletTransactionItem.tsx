@@ -1,4 +1,4 @@
-// =====================================================
+﻿// =====================================================
 // app/account/wallet/components/WalletTransactionItem.tsx
 // =====================================================
 
@@ -157,3 +157,4 @@ export default function WalletTransactionItem({
   );
 
 }
+

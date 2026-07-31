@@ -9,8 +9,11 @@ import {
 
 import {
   finalizeReservedBalance,
-  markWithdrawalFailed,
 } from "./wallet.balance";
+
+import {
+  markWithdrawalFailed,
+} from "./wallet.withdraw.failed";
 
 import {
   createWalletJournal,
@@ -243,16 +246,14 @@ if (!rpc) {
           [withdrawalId]
         );
 
-      if (
-        withdrawalRs.rowCount !== 1
-      ) {
+      const withdrawal =
+        withdrawalRs.rows[0];
+
+      if (!withdrawal) {
         throw new Error(
           "WITHDRAWAL_NOT_FOUND"
         );
       }
-
-      const withdrawal =
-        withdrawalRs.rows[0];
       logger.debug(
   "WALLET.WITHDRAW.LOADED",
   {

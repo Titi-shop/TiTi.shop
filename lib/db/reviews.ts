@@ -174,6 +174,10 @@ export async function createReview(
 
   const review = insert.rows[0];
 
+  if (!review) {
+    throw new Error("REVIEW_CREATE_FAILED");
+  }
+
   /* ===== UPDATE AVG ===== */
   await query(
     `

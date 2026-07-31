@@ -3,6 +3,7 @@
 // =====================================================
 
 export type WalletRow = {
+  id: string;
   balance: string;
   available_balance?: string;
   pending_balance?: string;

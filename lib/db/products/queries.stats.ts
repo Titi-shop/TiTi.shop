@@ -54,7 +54,7 @@ export async function incrementProductView(
 
     const views =
       safeNumber(
-        result.rows[0].views
+        result.rows[0]!.views
       );
 
     log(

@@ -13,8 +13,25 @@ import type {
 
 function getDb(
   client?: WalletClient
-) {
-  return client ?? { query };
+): WalletClient {
+  if (client) {
+    return client;
+  }
+
+  return {
+    query: async <T>(
+      sql: string,
+      params?: unknown[]
+    ) => {
+      const result =
+        await query(sql, params);
+
+      return {
+        rows: result.rows as T[],
+        rowCount: result.rowCount,
+      };
+    },
+  };
 }
 
 export async function createWalletJournal(

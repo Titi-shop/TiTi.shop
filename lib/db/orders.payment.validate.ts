@@ -5,6 +5,7 @@ import type { PoolClient } from "pg";
 import type {
   RpcPayload,
   ShippingSnapshot,
+  ValidatedShippingSnapshot,
   StrictPaymentValidationInput,
   ValidateFinalizePaymentInput,
   FinalizeValidationResult,
@@ -95,7 +96,7 @@ export async function validateShippingSnapshot(
   paymentIntentId: string,
   shipping: ShippingSnapshot,
   client: PoolClient
-): Promise<void> {
+): Promise<ValidatedShippingSnapshot> {
   if (
     !shipping.name ||
     !shipping.phone ||
@@ -112,6 +113,13 @@ export async function validateShippingSnapshot(
       "INVALID_SHIPPING_SNAPSHOT"
     );
   }
+
+  return {
+    ...shipping,
+    name: shipping.name,
+    phone: shipping.phone,
+    address_line: shipping.address_line,
+  };
 }
 
 /* =========================================================
@@ -137,7 +145,18 @@ export async function validateRpcPayload(
     await auditManualReview(
       paymentIntentId,
       "RPC_NOT_CONFIRMED",
-      rpcPayload,
+      {
+        ok: rpcPayload.ok,
+        amount: rpcPayload.amount ?? null,
+        ledger: rpcPayload.ledger ?? null,
+        chainReference: rpcPayload.chainReference ?? null,
+        stage: rpcPayload.stage ?? null,
+        sender: rpcPayload.sender ?? null,
+        receiver: rpcPayload.receiver ?? null,
+        reason: rpcPayload.reason ?? null,
+        confirmed: rpcPayload.confirmed ?? false,
+        txStatus: rpcPayload.txStatus ?? null,
+      },
       client
     );
 
@@ -158,7 +177,18 @@ export async function validateRpcPayload(
     await auditManualReview(
       paymentIntentId,
       "RPC_TX_FAILED",
-      rpcPayload,
+      {
+        ok: rpcPayload.ok,
+        amount: rpcPayload.amount ?? null,
+        ledger: rpcPayload.ledger ?? null,
+        chainReference: rpcPayload.chainReference ?? null,
+        stage: rpcPayload.stage ?? null,
+        sender: rpcPayload.sender ?? null,
+        receiver: rpcPayload.receiver ?? null,
+        reason: rpcPayload.reason ?? null,
+        confirmed: rpcPayload.confirmed ?? false,
+        txStatus: rpcPayload.txStatus ?? null,
+      },
       client
     );
 
@@ -179,7 +209,18 @@ export async function validateRpcPayload(
     await auditManualReview(
       paymentIntentId,
       "RPC_REASON_FAILED",
-      rpcPayload,
+      {
+        ok: rpcPayload.ok,
+        amount: rpcPayload.amount ?? null,
+        ledger: rpcPayload.ledger ?? null,
+        chainReference: rpcPayload.chainReference ?? null,
+        stage: rpcPayload.stage ?? null,
+        sender: rpcPayload.sender ?? null,
+        receiver: rpcPayload.receiver ?? null,
+        reason: rpcPayload.reason ?? null,
+        confirmed: rpcPayload.confirmed ?? false,
+        txStatus: rpcPayload.txStatus ?? null,
+      },
       client
     );
 
@@ -196,7 +237,18 @@ export async function validateRpcPayload(
     await auditManualReview(
       paymentIntentId,
       "RPC_LEDGER_MISSING",
-      rpcPayload,
+      {
+        ok: rpcPayload.ok,
+        amount: rpcPayload.amount ?? null,
+        ledger: rpcPayload.ledger ?? null,
+        chainReference: rpcPayload.chainReference ?? null,
+        stage: rpcPayload.stage ?? null,
+        sender: rpcPayload.sender ?? null,
+        receiver: rpcPayload.receiver ?? null,
+        reason: rpcPayload.reason ?? null,
+        confirmed: rpcPayload.confirmed ?? false,
+        txStatus: rpcPayload.txStatus ?? null,
+      },
       client
     );
 
@@ -431,11 +483,12 @@ if (!rpcPayload) {
     intent.shipping_snapshot
   );
 
-  await validateShippingSnapshot(
-    paymentIntentId,
-    shipping,
-    client
-  );
+  const validatedShipping =
+    await validateShippingSnapshot(
+      paymentIntentId,
+      shipping,
+      client
+    );
 
   const expectedAmount =
     toNumber(
@@ -491,8 +544,9 @@ if (!rpcPayload) {
 });
 
   return {
-    shipping,
+    shipping: validatedShipping,
     pricing,
     expectedAmount,
   };
 }
+

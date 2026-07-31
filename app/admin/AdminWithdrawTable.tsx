@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
@@ -636,3 +636,4 @@ async function handlePay(
     </div>
   );
 }
+

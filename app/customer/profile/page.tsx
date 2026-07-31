@@ -449,14 +449,14 @@ const res = await apiAuthFetch(
       (c) =>
         c.code ===
         profile.country
-    )?.dialCode ?? "";
+    )?.dial ?? "";
 
   const formDialCode =
     countries.find(
       (c) =>
         c.code ===
         form.country
-    )?.dialCode ?? "";
+    )?.dial ?? "";
 
   /* ================= RENDER ================= */
 
@@ -895,7 +895,7 @@ const res = await apiAuthFetch(
                             >
                               {c.name} (
                               {
-                                c.dialCode
+                                c.dial
                               }
                               )
                             </option>

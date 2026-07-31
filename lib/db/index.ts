@@ -15,7 +15,7 @@ declare global {
 }
 
 const pool =
-  global._pool ||
+  global._pool ??
   new Pool({
     connectionString:
       process.env.DATABASE_URL,
@@ -28,16 +28,15 @@ const pool =
         : false,
 
     max: 10,
-    idleTimeoutMillis: 10000,
+
+    idleTimeoutMillis: 60000,
+
     connectionTimeoutMillis: 5000,
+
+    keepAlive: true,
   });
 
-if (
-  process.env.NODE_ENV !==
-  "production"
-) {
-  global._pool = pool;
-}
+global._pool = pool;
 
 /* =========================================================
    QUERY LAYER
@@ -73,20 +72,32 @@ export async function query<
     return result;
   }
 
-  /*
-   * Query thông thường ngoài transaction:
-   * lấy connection từ pool rồi release sau khi xong.
-   */
   const t1 = Date.now();
 
-  const client =
-    await pool.connect();
+const before = {
+  total: pool.totalCount,
+  idle: pool.idleCount,
+  waiting: pool.waitingCount,
+};
 
-  console.log(
-    "[DB][CONNECT]",
-    Date.now() - t1,
-    "ms"
-  );
+const client =
+  await pool.connect();
+
+const connectMs =
+  Date.now() - t1;
+
+console.log(
+  "[DB][CONNECT]",
+  {
+    ms: connectMs,
+    before,
+    after: {
+      total: pool.totalCount,
+      idle: pool.idleCount,
+      waiting: pool.waitingCount,
+    },
+  }
+);
 
   try {
     const t2 = Date.now();

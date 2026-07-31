@@ -62,7 +62,9 @@ export async function POST(req: Request): Promise<NextResponse> {
       file,
       {
         access: "public",
-        token: process.env.BLOB_READ_WRITE_TOKEN,
+        ...(process.env.BLOB_READ_WRITE_TOKEN !== undefined
+          ? { token: process.env.BLOB_READ_WRITE_TOKEN }
+          : {}),
       }
     );
 

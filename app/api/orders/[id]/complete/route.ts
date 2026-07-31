@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth/guard";
 import { completeOrderByBuyer } from "@/lib/db/orders.buyer";
 
@@ -11,7 +11,7 @@ function isValidId(v: unknown): v is string {
 
 export async function PATCH(
   req: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     /* ================= AUTH ================= */
@@ -21,7 +21,7 @@ export async function PATCH(
     const userId = auth.userId;
 
     /* ================= PARAMS ================= */
-    const orderId = context?.params?.id;
+    const { id: orderId } = await context.params;
 
     if (!isValidId(orderId)) {
       console.warn("[ORDER][COMPLETE][INVALID_ID]", { orderId });
@@ -71,3 +71,4 @@ if (result === "INVALID_STATUS") {
     );
   }
 }
+

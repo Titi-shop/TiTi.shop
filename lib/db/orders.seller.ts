@@ -588,6 +588,10 @@ return {
             }
     );
 
+    if (!result) {
+      return false;
+    }
+
     await sendNotification({
       userId: result.buyerId,
 
@@ -904,6 +908,11 @@ return {
   buyerId: order.buyer_id,
 };
     });
+
+if (!result) {
+  return false;
+}
+
 if (result.ok) {
 
   try {

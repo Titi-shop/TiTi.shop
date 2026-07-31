@@ -41,11 +41,11 @@ export async function getProductService(
       };
     }
 
-    const product =
-  await getProductById(
-    id,
-    userId
-  );
+    const product = await getProductById(
+  id,
+  userId,
+  "PRODUCT_DETAIL_SERVICE"
+);
     if (!product) {
       return {
         error:

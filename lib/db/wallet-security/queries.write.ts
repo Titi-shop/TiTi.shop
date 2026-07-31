@@ -58,8 +58,14 @@ export async function createWalletSecurity(
       ]
     );
 
+  const row = res.rows[0];
+
+  if (!row) {
+    throw new Error("WALLET_SECURITY_CREATE_FAILED");
+  }
+
   return mapWalletSecurity(
-    res.rows[0]
+    row
   );
 
 }

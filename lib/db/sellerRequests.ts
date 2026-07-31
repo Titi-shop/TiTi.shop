@@ -150,11 +150,11 @@ export async function createSellerRequest(
     }
 
     logger.info("[SELLER_REQUEST] CREATE_OK", {
-      requestId: maskId(res.rows[0].id),
+      requestId: maskId(res.rows[0]!.id),
       userId: maskId(userId),
     });
 
-    return res.rows[0] as SellerRequest;
+    return res.rows[0]! as SellerRequest;
 
   } catch (err) {
     logger.error("[SELLER_REQUEST] CREATE_ERROR", {

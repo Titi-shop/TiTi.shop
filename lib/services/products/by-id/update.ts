@@ -1,7 +1,10 @@
 import {
   updateProductBySeller,
-  type UpdateProductInput,
 } from "@/lib/db/products";
+
+import type {
+  UpdateProductInput,
+} from "@/types/Product";
 
 import {
   replaceVariantsByProductId,

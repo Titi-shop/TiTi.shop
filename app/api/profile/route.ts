@@ -43,7 +43,7 @@ function isValidEmail(email: string | null) {
   const parts = email.split("@");
   if (parts.length !== 2) return false;
 
-  const domain = parts[1].toLowerCase();
+  const domain = parts[1]?.toLowerCase() ?? "";
   if (blockedEmailDomains.includes(domain)) return false;
 
   return true;

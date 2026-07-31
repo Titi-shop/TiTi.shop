@@ -342,16 +342,19 @@ export async function getOrderByBuyerId(
 /* =========================================================
    COMPLETE ORDER
 ========================================================= */
-type CompleteOrderResult = {
-  status:
-    | "SUCCESS"
-    | "NOT_FOUND"
-    | "FORBIDDEN"
-    | "INVALID_STATUS";
-  buyerId?: string;
-  sellerId?: string;
-  orderId?: string;
-};
+type CompleteOrderResult =
+  | {
+      status: "SUCCESS";
+      buyerId: string;
+      sellerId: string;
+      orderId: string;
+    }
+  | {
+      status:
+        | "NOT_FOUND"
+        | "FORBIDDEN"
+        | "INVALID_STATUS";
+    };
 export async function completeOrderByBuyer(
   orderId: string,
   userId: string
@@ -364,7 +367,7 @@ export async function completeOrderByBuyer(
 
   const result =
   await withTransaction(
-    async (client) => {
+    async (client): Promise<CompleteOrderResult> => {
 
       /* =====================================================
          1. GET ORDER
@@ -414,7 +417,9 @@ export async function completeOrderByBuyer(
         order.fulfillment_status !==
         "shipped"
       ) {
-        return "INVALID_STATUS";
+        return {
+          status: "INVALID_STATUS",
+        };
       }
 
       /* =====================================================
@@ -561,19 +566,10 @@ export async function cancelOrderByBuyer(
   orderId: string,
   userId: string,
   reason?: string | null
- ): Promise<{
-  status:
-    | "SUCCESS"
-    | "NOT_FOUND"
-    | "FORBIDDEN"
-    | "INVALID_STATUS";
-  buyerId?: string;
-  sellerId?: string;
-  orderId?: string;
-}> {
+ ): Promise<CompleteOrderResult> {
  
   const result =
-  await withTransaction(async (client) => {
+  await withTransaction(async (client): Promise<CompleteOrderResult> => {
     const { rows } = await client.query<{
   buyer_id: string;
   seller_id: string;
@@ -681,5 +677,5 @@ WHERE id = $1
 
 }
 
-return result.status;
+return result;
 }

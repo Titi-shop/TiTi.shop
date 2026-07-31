@@ -3,7 +3,7 @@ import { RefreshCcw } from "lucide-react";
 
 import { useTranslationClient as useTranslation } from "@/app/lib/i18n/client";
 
-import type { ReturnRecord } from "../types";
+import type { ReturnRecord } from "../types/returns";
 import ReturnCard from "./ReturnCard";
 
 type Props = {
@@ -67,7 +67,7 @@ export default function ReturnList({
        <ReturnCard
   key={item.id}
   item={item}
-  onReload={onReload}
+  {...(onReload ? { onReload } : {})}
 />
       ))}
     </div>

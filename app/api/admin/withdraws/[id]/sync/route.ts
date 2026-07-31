@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 
 import {
   requireAdmin,
@@ -129,8 +129,7 @@ export async function POST(
       txid
     ) {
       await markWithdrawalCompleted(
-        withdrawal.id,
-        txid
+        withdrawal.id
       );
 
       vlog(
@@ -193,3 +192,4 @@ export async function POST(
     );
   }
 }
+

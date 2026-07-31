@@ -14,14 +14,7 @@ type ShippingValue =
   | string
   | "";
 
-interface ShippingRatesState {
-  domestic: ShippingValue;
-  sea: ShippingValue;
-  asia: ShippingValue;
-  europe: ShippingValue;
-  north_america: ShippingValue;
-  rest_of_world: ShippingValue;
-}
+import type { ShippingRatesState } from "./useProductForm";
 
 interface Props {
   shipping_rates: ShippingRatesState;
@@ -66,9 +59,13 @@ export default function ShippingRates({
     if (
       !domestic_country_code
     ) {
-      setDomestic_country_code(
-        countries[0].code
-      );
+      const defaultCountry = countries[0];
+
+      if (defaultCountry) {
+        setDomestic_country_code(
+          defaultCountry.code
+        );
+      }
     }
   }, [
     domestic_country_code,
@@ -86,31 +83,31 @@ export default function ShippingRates({
     {
       key: "sea",
       placeholder:
-        t.shipping_sea,
+        t.shipping_sea ?? "",
     },
 
     {
       key: "asia",
       placeholder:
-        t.shipping_asia,
+        t.shipping_asia ?? "",
     },
 
     {
       key: "europe",
       placeholder:
-        t.shipping_europe,
+        t.shipping_europe ?? "",
     },
 
     {
       key: "north_america",
       placeholder:
-        t.shipping_north_america,
+        t.shipping_north_america ?? "",
     },
 
     {
       key: "rest_of_world",
       placeholder:
-        t.shipping_rest_of_world,
+        t.shipping_rest_of_world ?? "",
     },
   ];
 

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import useSWR from "swr";
 import {
@@ -13,20 +13,20 @@ import { apiAuthFetch } from "@/lib/api/apiAuthFetch";
 import ProductForm from "@/components/ProductForm";
 
 import type {
+  Category,
   ProductPayload,
   ProductRecord,
   ProductVariant,
   ShippingRate,
-} from "@/types/product";
+} from "@/types/Product";
 
 /* =====================================================
    TYPES
 ===================================================== */
 
-interface Category {
-  id: string;
-  key: string;
-}
+type EditableProduct = ProductRecord & {
+  domestic_country_code?: string | null;
+};
 
 /* =====================================================
    FETCHER
@@ -189,7 +189,7 @@ function normalizeVariant(
 ===================================================== */
 
 function mapProductToPayload(
-  product: ProductRecord
+  product: EditableProduct
 ): ProductPayload {
   const shippingRates =
     Array.isArray(
@@ -206,7 +206,7 @@ function mapProductToPayload(
       product.name || "",
 
     category_id:
-  product.category_id ?? undefined,
+      product.category_id ?? null,
 
     description:
       product.description || "",
@@ -239,15 +239,7 @@ function mapProductToPayload(
       null,
 
     /* PRICE */
-    price:
-      product.price !==
-        null &&
-      product.price !==
-        undefined
-        ? Number(
-            product.price
-          )
-        : "",
+    price: Number(product.price),
 
     stock:
       product.stock !==
@@ -266,14 +258,9 @@ function mapProductToPayload(
       ),
 
     sale_price:
-      product.sale_price !==
-        null &&
-      product.sale_price !==
-        undefined
-        ? Number(
-            product.sale_price
-          )
-        : "",
+      product.sale_price != null
+        ? Number(product.sale_price)
+        : null,
 
     sale_stock: Number(
       product.sale_stock || 0
@@ -351,7 +338,7 @@ export default function SellerEditPage() {
     data: productData,
     isLoading,
     error,
-  } = useSWR<ProductRecord>(
+  } = useSWR<EditableProduct>(
     id
       ? `/api/products/${id}`
       : null,
@@ -417,43 +404,7 @@ export default function SellerEditPage() {
       payload: ProductPayload
     ) => {
       console.log(
-        "📦 [EDIT_PRODUCT] PAYLOAD:",
-        payload
-      );
-
-      const res =
-        await apiAuthFetch(
-          `/api/products/${id}`,
-          {
-            method: "PATCH",
-
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-
-            body: JSON.stringify(
-              payload
-            ),
-          }
-        );
-
-      if (!res.ok) {
-        const text =
-          await res.text();
-
-        console.error(
-          "❌ UPDATE FAILED:",
-          text
-        );
-
-        throw new Error(
-          "UPDATE_FAILED"
-        );
-      }
-
-      console.log(
-        "✅ PRODUCT UPDATED"
+        "PRODUCT UPDATED"
       );
 
       router.push(
@@ -468,7 +419,7 @@ export default function SellerEditPage() {
   return (
     <main className="max-w-2xl mx-auto p-4 pb-28">
       <h1 className="text-xl font-bold text-center mb-4 text-[#ff6600]">
-        ✏️ {t.edit_product}
+        {t.edit_product}
       </h1>
 
       <ProductForm
@@ -483,3 +434,10 @@ export default function SellerEditPage() {
     </main>
   );
 }
+
+
+
+
+
+
+

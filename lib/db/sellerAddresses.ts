@@ -207,6 +207,10 @@ export async function createSellerAddress(
 
     const created = res.rows[0];
 
+    if (!created) {
+      throw new Error("SELLER_ADDRESS_CREATE_FAILED");
+    }
+
     log("CREATE_SUCCESS", { id: created.id });
 
     return created;
@@ -278,6 +282,10 @@ export async function updateSellerAddress(
     );
 
     const updated = res.rows[0];
+
+    if (!updated) {
+      throw new Error("SELLER_ADDRESS_NOT_FOUND");
+    }
 
     log("UPDATE_SUCCESS", { id });
 

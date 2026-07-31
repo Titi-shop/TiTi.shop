@@ -64,16 +64,14 @@ export async function markWithdrawalFailed(
           ]
         );
 
-      if (
-        withdrawalRs.rowCount !== 1
-      ) {
+      const withdrawal =
+        withdrawalRs.rows[0];
+
+      if (!withdrawal) {
         throw new Error(
           "WITHDRAWAL_NOT_FOUND"
         );
       }
-
-      const withdrawal =
-        withdrawalRs.rows[0];
 
       logger.debug(
   "WALLET_WITHDRAW.LOADED"

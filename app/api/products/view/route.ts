@@ -12,16 +12,16 @@ interface ViewBody {
 
 export async function POST(req: Request) {
   try {
-    /* ================= 1️⃣ OPTIONAL AUTH ================= */
+    /* ================= 1ï¸âƒ£ OPTIONAL AUTH ================= */
 
     let userId: string | null = null;
 
     try {
-      const auth = await getUserFromBearer(req);
+      const auth = await getUserFromBearer();
       userId = auth?.userId ?? null;
     } catch {}
 
-    /* ================= 2️⃣ BODY ================= */
+    /* ================= 2ï¸âƒ£ BODY ================= */
 
     const body: unknown = await req.json();
 
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
 
     const { id } = body as ViewBody;
 
-    /* ================= 3️⃣ VALIDATE ================= */
+    /* ================= 3ï¸âƒ£ VALIDATE ================= */
 
     if (!/^[0-9a-fA-F-]{36}$/.test(id)) {
       return NextResponse.json(
@@ -48,20 +48,20 @@ export async function POST(req: Request) {
       );
     }
 
-    /* ================= 4️⃣ LOG ================= */
+    /* ================= 4ï¸âƒ£ LOG ================= */
 
     const ip =
       req.headers.get("x-forwarded-for") ||
       req.headers.get("x-real-ip") ||
       "unknown";
 
-    console.log("👁 VIEW:", { ip, productId: id, userId });
+    console.log("đŸ‘ VIEW:", { ip, productId: id, userId });
 
-    /* ================= 5️⃣ DB ================= */
+    /* ================= 5ï¸âƒ£ DB ================= */
 
     const views = await incrementProductView(id);
 
-    /* ================= 6️⃣ RESPONSE ================= */
+    /* ================= 6ï¸âƒ£ RESPONSE ================= */
 
     return NextResponse.json({
       success: true,
@@ -69,7 +69,7 @@ export async function POST(req: Request) {
     });
 
   } catch (err) {
-    console.error("❌ VIEW ERROR:", err);
+    console.error("âŒ VIEW ERROR:", err);
 
     return NextResponse.json(
       { success: false },

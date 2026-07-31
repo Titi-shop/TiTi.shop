@@ -400,13 +400,13 @@ const account =
 );
 
 return {
-  txid: String(submitResult.id),
+  txid: String(submitResult.hash),
   ledger:
     submitResult.ledger ?? null,
   memo:
     payment.identifier,
   fee:
-    submitResult.fee_charged ?? null,
+    fee.toString(),
   fromAddress:
     payment.from_address ?? null,
   toAddress:

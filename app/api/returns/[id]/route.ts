@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 
 import { requireAuth } from "@/lib/auth/guard";
 
@@ -69,12 +69,13 @@ export async function GET(
   {
     params,
   }: {
-    params: {
+    params: Promise<{
       id: string;
-    };
+    }>;
   }
 ) {
   try {
+    const { id: returnId } = await params;
     const auth =
       await requireAuth();
 
@@ -84,7 +85,7 @@ export async function GET(
 
     if (
       !isValidUuid(
-        params.id
+        returnId
       )
     ) {
       return errorJson(
@@ -95,7 +96,7 @@ export async function GET(
     const item =
       await getReturnDetail(
         auth.userId,
-        params.id
+        returnId
       );
 
     if (!item) {
@@ -123,12 +124,13 @@ export async function PATCH(
   {
     params,
   }: {
-    params: {
+    params: Promise<{
       id: string;
-    };
+    }>;
   }
 ) {
   try {
+    const { id: returnId } = await params;
     const auth =
       await requireAuth();
 
@@ -138,7 +140,7 @@ export async function PATCH(
 
     if (
       !isValidUuid(
-        params.id
+        returnId
       )
     ) {
       return errorJson(
@@ -151,7 +153,7 @@ export async function PATCH(
 
     await updateReturnStatus(
       auth.userId,
-      params.id,
+      returnId,
       body
     );
 
@@ -163,3 +165,4 @@ export async function PATCH(
     return mapError(error);
   }
 }
+

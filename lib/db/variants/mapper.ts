@@ -1,7 +1,8 @@
 import type {
   ProductVariant,
   ProductVariantDB,
-} from "@/types/product";
+  ProductVariantDBInput,
+} from "@/types/Product";
 
 import {
   safeNumber,
@@ -144,12 +145,11 @@ export function mapVariantToApp(
 /* =========================================================
    MAP APP -> DB
 ========================================================= */
-
 export function mapVariantToDB(
   variant: ProductVariant,
   productId: string,
   sortOrder: number
-): ProductVariantDB {
+): ProductVariantDBInput {
   const price =
     safeNumber(
       variant.price
@@ -187,8 +187,6 @@ const saleStock =
     salePrice < price;
 
   return {
-    id: variant.id,
-
     product_id:
       productId,
 
@@ -265,10 +263,7 @@ sale_stock:
 
     currency: "PI",
 
-    stock:
-      safeNumber(
-        variant.stock
-      ),
+    
 
     is_unlimited:
       Boolean(
@@ -292,13 +287,7 @@ sale_stock:
         variant.sold
       ),
 
-    created_at:
-      undefined,
-
-    updated_at:
-      undefined,
-
-    deleted_at:
-      null,
   };
 }
+
+

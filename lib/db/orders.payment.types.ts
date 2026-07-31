@@ -1,4 +1,4 @@
-import type {
+﻿import type {
   PaymentIntentRow,
   FinalizePaidOrderParams,
   FinalizePaidOrderResult,
@@ -87,6 +87,12 @@ export type ParsedShippingSnapshot = {
   pricing: PricingSnapshot;
 };
 
+export type ValidatedShippingSnapshot = ShippingSnapshot & {
+  name: string;
+  phone: string;
+  address_line: string;
+};
+
 /* =========================================================
    STRICT PAYMENT VALIDATION
 ========================================================= */
@@ -125,7 +131,7 @@ export type ValidateFinalizePaymentInput = {
 };
 
 export type FinalizeValidationResult = {
-  shipping: ShippingSnapshot;
+  shipping: ValidatedShippingSnapshot;
 
   pricing: {
     subtotal: number;
@@ -148,10 +154,7 @@ export type FinalizeValidationResult = {
    FINALIZE INTENT
 ========================================================= */
 
-export type FinalizeIntentInput = {
-  client: PoolClient;
-
-  paymentIntentId: string;
+export type FinalizeIntentInput = {paymentIntentId: string;
   piPaymentId: string;
   txid: string;
 };
@@ -173,10 +176,7 @@ export type FindExistingOrderInput = {
    PAYMENT RECEIPT UPSERT
 ========================================================= */
 
-export type UpsertPaymentReceiptInput = {
-  client: PoolClient;
-
-  paymentIntentId: string;
+export type UpsertPaymentReceiptInput = {paymentIntentId: string;
 
   orderId: string;
   escrowId?: string | null;
@@ -197,10 +197,7 @@ export type UpsertPaymentReceiptInput = {
    PI PAYMENTS UPSERT
 ========================================================= */
 
-export type UpsertPiPaymentInput = {
-  client: PoolClient;
-
-  paymentIntentId: string;
+export type UpsertPiPaymentInput = {paymentIntentId: string;
 
   orderId: string;
 
@@ -235,3 +232,4 @@ export type FinalizedOrderResult = {
 
   amount: number;
 };
+

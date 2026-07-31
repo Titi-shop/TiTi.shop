@@ -62,10 +62,11 @@ export async function updateProductBySeller(
       );
     }
 
-    const current =
-  await getProductById(
-    product_id
-  );
+    const current = await getProductById(
+  product_id,
+  null,
+  "PRODUCT_UPDATE"
+);
 
 if (!current) {
   return null;

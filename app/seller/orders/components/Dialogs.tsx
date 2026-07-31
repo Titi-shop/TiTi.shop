@@ -5,8 +5,8 @@ import { useTranslationClient as useTranslation } from "@/app/lib/i18n/client";
 type BaseProps = {
   open: boolean;
   title: string;
-  loading?: boolean;
-  children: React.ReactNode;
+  loading?: boolean | undefined;
+  children?: React.ReactNode;
   confirmText?: string;
   cancelText?: string;
   confirmColor?: string;

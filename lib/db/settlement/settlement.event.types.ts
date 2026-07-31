@@ -1,4 +1,4 @@
-// =====================================================
+﻿// =====================================================
 // lib/db/settlement/settlement.event.types.ts
 // =====================================================
 
@@ -66,8 +66,7 @@ export const WithdrawalSettlementEvents = {
 
 } as const;
 
-export type
-WithdrawalSettlementEventType =
-typeof WithdrawalSettlementEvents[
-  keyof typeof WithdrawalSettlementEvents
-];
+export type WithdrawalSettlementEventType =
+  (typeof WithdrawalSettlementEvents)[
+    keyof typeof WithdrawalSettlementEvents
+  ];

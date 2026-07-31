@@ -1,4 +1,4 @@
-// =====================================================
+﻿// =====================================================
 // app/account/wallet/components/WalletHero.tsx
 // =====================================================
 
@@ -263,9 +263,9 @@ useEffect(() => {
 
      <WalletActions
   onWithdraw={onWithdraw}
-  onAddresses={onWalletClick}
-  onSecurity={onSecurity}
-  onHistory={onHistory}
+  {...(onWalletClick ? { onAddresses: onWalletClick } : {})}
+  {...(onSecurity ? { onSecurity } : {})}
+  {...(onHistory ? { onHistory } : {})}
 />
 
         </div>
@@ -275,3 +275,6 @@ useEffect(() => {
   );
 
 }
+
+
+

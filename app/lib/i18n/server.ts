@@ -1,4 +1,4 @@
-import { languageFiles } from "./i18n";
+import { languageFiles } from "../i18n";
 
 type TranslationMap = Record<string, string>;
 

@@ -513,6 +513,10 @@ export default function OrderReturnPage() {
       const current =
         updated[index];
 
+      if (!current) {
+        return;
+      }
+
       const merged = [
         ...current.files,
         ...selected,
@@ -526,7 +530,8 @@ export default function OrderReturnPage() {
             1024
         ) {
           setError(
-            t.return_image_limit
+            t.return_image_limit ??
+              "Ảnh vượt quá giới hạn cho phép"
           );
 
           return;
@@ -567,7 +572,8 @@ export default function OrderReturnPage() {
       setItems(updated);
     } catch {
       setError(
-        t.system_error
+        t.system_error ??
+          "Đã xảy ra lỗi hệ thống"
       );
     }
   }
@@ -584,9 +590,15 @@ export default function OrderReturnPage() {
       ...items,
     ];
 
+    const current =
+      updated[itemIndex];
+
+    if (!current) {
+      return;
+    }
+
     const preview =
-      updated[itemIndex]
-        .previews[
+      current.previews[
         imageIndex
       ];
 
@@ -596,16 +608,12 @@ export default function OrderReturnPage() {
       );
     }
 
-    updated[
-      itemIndex
-    ].files.splice(
+    current.files.splice(
       imageIndex,
       1
     );
 
-    updated[
-      itemIndex
-    ].previews.splice(
+    current.previews.splice(
       imageIndex,
       1
     );
@@ -691,7 +699,8 @@ export default function OrderReturnPage() {
       0
     ) {
       setError(
-        t.return_select_item
+        t.return_select_item ??
+          "Vui lòng chọn sản phẩm cần hoàn trả"
       );
 
       return;
@@ -793,7 +802,8 @@ export default function OrderReturnPage() {
       const msg =
         err instanceof Error
           ? err.message
-          : t.system_error;
+          : t.system_error ??
+            "Đã xảy ra lỗi hệ thống";
 
       setError(msg);
     } finally {
@@ -928,9 +938,14 @@ export default function OrderReturnPage() {
                         ...items,
                       ];
 
-                    updated[
-                      index
-                    ].selected =
+                    const current =
+                      updated[index];
+
+                    if (!current) {
+                      return;
+                    }
+
+                    current.selected =
                       e.target.checked;
 
                     setItems(
@@ -976,9 +991,14 @@ export default function OrderReturnPage() {
                           ...items,
                         ];
 
-                      updated[
-                        index
-                      ].reasonValue =
+                      const current =
+                        updated[index];
+
+                      if (!current) {
+                        return;
+                      }
+
+                      current.reasonValue =
                         e.target.value;
 
                       if (
@@ -987,9 +1007,7 @@ export default function OrderReturnPage() {
                           .value !==
                         "other"
                       ) {
-                        updated[
-                          index
-                        ].reasonText =
+                        current.reasonText =
                           "";
                       }
 
@@ -1041,9 +1059,14 @@ export default function OrderReturnPage() {
                             ...items,
                           ];
 
-                        updated[
-                          index
-                        ].reasonText =
+                        const current =
+                          updated[index];
+
+                        if (!current) {
+                          return;
+                        }
+
+                        current.reasonText =
                           e.target.value;
 
                         setItems(

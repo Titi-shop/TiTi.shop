@@ -1,6 +1,4 @@
-import type {
-  ProductVariantRecord,
-} from "@/lib/db/variants";
+import type { ProductVariant } from "@/types/Product";
 
 import type {
   ShippingRateInput,
@@ -57,7 +55,7 @@ export function maskId(
 ===================================================== */
 
 export function calcVariantFinalPrice(
-  variant: ProductVariantRecord
+  variant: ProductVariant
 ): number {
   const saleActive =
     variant.sale_enabled &&
@@ -81,23 +79,40 @@ export function normalizeShippingRates(
   const rates =
     body.shipping_rates ?? [];
 
-  return rates.map((rate) => ({
-    zone: rate.zone,
+  const isValidZone = (
+    zone: string
+  ): zone is ShippingRateInput["zone"] =>
+    zone === "domestic" ||
+    zone === "sea" ||
+    zone === "asia" ||
+    zone === "europe" ||
+    zone === "north_america" ||
+    zone === "rest_of_world";
 
-    price:
-  rate.price === "" ||
-  rate.price === null ||
-  rate.price === undefined
-    ? null
-    : Number(rate.price),
+  return rates.flatMap((rate) => {
+    if (!isValidZone(rate.zone)) {
+      return [];
+    }
 
-    domestic_country_code:
-      rate.zone === "domestic"
-        ? rate.domestic_country_code ??
-          body.primary_shipping_country ??
-          null
-        : null,
-  }));
+    if (
+      rate.price === undefined ||
+      !Number.isFinite(rate.price) ||
+      rate.price < 0
+    ) {
+      return [];
+    }
+
+    return [{
+      zone: rate.zone,
+      price: rate.price,
+      domestic_country_code:
+        rate.zone === "domestic"
+          ? rate.domestic_country_code ??
+            body.primary_shipping_country ??
+            null
+          : null,
+    }];
+  });
 }
 
 /* =====================================================
@@ -105,7 +120,7 @@ export function normalizeShippingRates(
 ===================================================== */
 
 export function calculatePriceSummary(
-  variants: ProductVariantRecord[]
+  variants: ProductVariant[]
 ) {
   const enrichedVariants =
     variants.map((variant) => ({

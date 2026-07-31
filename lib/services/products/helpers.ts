@@ -1,7 +1,11 @@
 import type {
   ProductRequestBody,
-  ShippingRateInput,
 } from "./types";
+
+import type {
+  Region,
+  ShippingRateInput,
+} from "@/lib/db/shipping";
 
 /* =========================================================
    CATEGORY
@@ -24,26 +28,63 @@ export function normalizeShippingRates(
   const rates =
     body.shipping_rates ?? [];
 
-  return rates.map((rate) => ({
-    zone: rate.zone,
+  const validRegions = new Set<Region>([
+    "domestic",
+    "sea",
+    "asia",
+    "europe",
+    "north_america",
+    "rest_of_world",
+  ]);
 
-    price:
-  rate.price === null ||
-  rate.price === undefined
-    ? null
-    : Number(rate.price),
+  return rates.flatMap(
+    (rate): ShippingRateInput[] => {
+      if (
+        !validRegions.has(
+          rate.zone as Region
+        )
+      ) {
+        return [];
+      }
 
-    domestic_country_code:
-      rate.zone === "domestic"
-        ? (
-            rate.domestic_country_code ??
-            primaryCountry ??
-            body.primary_shipping_country ??
-            body.domestic_country_code ??
-            null
-          )
-        : null,
-  }));
+      if (
+        rate.price === null ||
+        rate.price === undefined
+      ) {
+        return [];
+      }
+
+      const price =
+        Number(rate.price);
+
+      if (
+        !Number.isFinite(price) ||
+        price < 0
+      ) {
+        return [];
+      }
+
+      return [
+        {
+          zone:
+            rate.zone as Region,
+
+          price,
+
+          domestic_country_code:
+            rate.zone === "domestic"
+              ? (
+                  rate.domestic_country_code ??
+                  primaryCountry ??
+                  body.primary_shipping_country ??
+                  body.domestic_country_code ??
+                  null
+                )
+              : null,
+        },
+      ];
+    }
+  );
 }
 
 /* =========================================================

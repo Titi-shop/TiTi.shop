@@ -9,6 +9,23 @@ import {
 import {
   toNumberSafe,
 } from "./buyer.helper";
+
+type DbOrder = {
+  id: string;
+  seller_id: string;
+  fulfillment_status: string;
+};
+
+type DbOrderItem = {
+  id: string;
+  product_id: string;
+  variant_id: string | null;
+  product_name: string;
+  product_slug: string;
+  thumbnail: string;
+  unit_price: string;
+  quantity: number;
+};
 export async function createReturn(
   buyerId: string,
   orderId: string,
@@ -158,15 +175,19 @@ export async function createReturn(
           refundAmount,
         ]
       );
+    const createdReturn = result.rows[0];
+
     if (
-  result.rowCount !== 1
-) {
-  error(
-    "FAILED_TO_CREATE_RETURN"
-  );
-}
-const returnId =
-  result.rows[0].id;
+      result.rowCount !== 1 ||
+      !createdReturn
+    ) {
+      error(
+        "FAILED_TO_CREATE_RETURN"
+      );
+    }
+
+    const returnId =
+      createdReturn.id;
     const itemResult =
   await client.query(
       `

@@ -8,6 +8,7 @@
 ========================================================= */
 
 export type OrderStatus =
+  | "pending_fulfillment"
   | "pending"
   | "processing"
   | "shipped"
@@ -318,3 +319,25 @@ export interface Order {
 
   order_items: OrderItem[];
 }
+
+/* =========================================================
+   FILTER / STATS
+========================================================= */
+
+export type OrderFilter = {
+  status: OrderStatus | "all";
+  keyword: string;
+  from: string;
+  to: string;
+};
+
+export type OrderStats = {
+  all: number;
+  pending: number;
+  processing: number;
+  shipped: number;
+  delivered: number;
+  completed: number;
+  cancelled: number;
+  refunded: number;
+};

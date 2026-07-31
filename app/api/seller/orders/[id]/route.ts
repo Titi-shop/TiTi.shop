@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { requireSeller } from "@/lib/auth/guard";
 import { getSellerOrderById } from "@/lib/db/orders.seller";
 
@@ -11,7 +11,7 @@ function isValidId(v: unknown): v is string {
 
 export async function GET(
   _: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     /* ================= AUTH ================= */
@@ -21,7 +21,7 @@ export async function GET(
     const userId = auth.userId;
 
     /* ================= VALIDATION ================= */
-    const orderId = params?.id;
+    const { id: orderId } = await params;
 
     if (!isValidId(orderId)) {
       return NextResponse.json(
@@ -52,3 +52,4 @@ export async function GET(
     );
   }
 }
+

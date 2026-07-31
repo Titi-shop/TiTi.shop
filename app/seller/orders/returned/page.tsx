@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
@@ -48,11 +48,11 @@ interface Order {
 /* ================= HELPERS ================= */
 
 function formatDate(date?: string): string {
-  if (!date) return "—";
+  if (!date) return "-";
 
   const d = new Date(date);
 
-  if (Number.isNaN(d.getTime())) return "—";
+  if (Number.isNaN(d.getTime())) return "-";
 
   return d.toLocaleDateString(undefined, {
     year: "numeric",
@@ -146,7 +146,7 @@ export default function SellerReturnedOrdersPage() {
           </p>
 
           <p className="text-xs opacity-80 mt-1">
-            {t.orders ?? "Orders"}: {orders.length} · π{formatPi(totalPi)}
+            {t.orders ?? "Orders"}: {orders.length} -{formatPi(totalPi)}
           </p>
 
         </div>
@@ -228,11 +228,11 @@ export default function SellerReturnedOrdersPage() {
                     )}
 
                     {order.shipping_country && (
-                      <span> · {order.shipping_country}</span>
+                      <span>{order.shipping_country}</span>
                     )}
 
                     {order.shipping_postal_code && (
-                      <span> · {order.shipping_postal_code}</span>
+                      <span>{order.shipping_postal_code}</span>
                     )}
 
                   </p>
@@ -266,7 +266,7 @@ export default function SellerReturnedOrdersPage() {
                       </p>
 
                       <p className="text-xs text-gray-500 mt-1">
-                        x{item.quantity} · π{formatPi(Number(item.unit_price))}
+                        x{item.quantity} -{formatPi(Number(item.unit_price))}
                       </p>
 
                     </div>
@@ -301,3 +301,6 @@ export default function SellerReturnedOrdersPage() {
     </main>
   );
 }
+
+
+

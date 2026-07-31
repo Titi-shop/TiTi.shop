@@ -1,4 +1,4 @@
-import type {
+﻿import type {
   RpcVerifyStage,
   RpcVerifyReason,
 } from "./rpc.types";
@@ -8,6 +8,7 @@ export type InsertRpcLogInput = {
   piPaymentId: string | null;
 
   rpcReachable: boolean;
+  confirmed: boolean;
 
   parseLayer: string | null;
 
@@ -83,4 +84,52 @@ senderBalanceDelta: number | null;
 receiverBalanceDelta: number | null;
 
 chainAmountConsensus: boolean | null;
+};
+
+
+export type RpcVerificationLogRow = {
+  payment_intent_id: string;
+  pi_payment_id: string | null;
+  txid: string;
+
+  verified: boolean;
+  stage: RpcVerifyStage;
+  reason: RpcVerifyReason | null;
+
+  amount: number | null;
+  expected_amount: number | null;
+
+  sender: string | null;
+  receiver: string | null;
+  expected_receiver: string | null;
+
+  amount_match: boolean;
+  receiver_match: boolean;
+  sender_match: boolean;
+
+  ledger: number | null;
+  tx_status: string | null;
+  chain_reference: string | null;
+
+  rpc_reachable: boolean;
+  confirmed: boolean;
+
+  parse_layer: string | null;
+  has_meta: boolean;
+  has_events: boolean;
+
+  sender_found: boolean;
+  receiver_found: boolean;
+  amount_found: boolean;
+
+  payload: unknown;
+
+  created_at_chain: string | null;
+  memo: string | null;
+
+  verification_hash: string | null;
+
+  verified_at: string | null;
+  created_at: string;
+  updated_at: string;
 };

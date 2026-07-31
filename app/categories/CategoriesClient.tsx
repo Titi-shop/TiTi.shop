@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
@@ -15,7 +15,7 @@ import {
 import { useCart } from "@/app/context/CartContext";
 import { useTranslationClient as useTranslation } from "@/app/lib/i18n/client";
 import { formatPi } from "@/lib/pi";
-import type { Product } from "@/types/product";
+import type { Product } from "@/types/Product";
 import type { Category } from "@/types/category";
 import AppLoading from "@/components/AppLoading";
 /* =========================================================
@@ -225,7 +225,8 @@ const isOutOfStock =
 
 if (isOutOfStock) {
   showMessage(
-    t.out_of_stock
+    t.out_of_stock ??
+      "Out of stock"
   );
 
   return;
@@ -237,17 +238,18 @@ if (isOutOfStock) {
         "Please select variant before adding to cart"
     );
 
-    // ❌ KHÔNG redirect
+// KHONG redirect
     return;
   }
 
   addToCart({
-    id: String(product.id),
     product_id: product.id,
     name: product.name,
+    slug: product.slug,
     price: product.price,
     sale_price:
       product.final_price || product.sale_price,
+    final_price:       product.final_price ??       product.sale_price ??       product.price,
     quantity: 1,
     thumbnail: product.thumbnail,
   });
@@ -652,7 +654,7 @@ style={{
   </span>
 
   <span>
-    👁 {product.views ?? 0}
+    👁️ {product.views ?? 0}
   </span>
 
   <span>
@@ -702,3 +704,7 @@ style={{
     </main>
   );
 }
+
+
+
+

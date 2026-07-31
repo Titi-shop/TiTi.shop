@@ -138,6 +138,10 @@ export async function GET() {
 
     const ticker = json.data[0];
 
+    if (!ticker) {
+      throw new Error("EMPTY_OKX_TICKER");
+    }
+
     const price = safeNumber(ticker.last);
 
     const open24h = safeNumber(ticker.open24h);

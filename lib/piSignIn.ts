@@ -9,20 +9,6 @@ type PiSignInOptions = {
   scopes?: string[];
 };
 
-type PiBrowser = {
-  signIn(options: {
-    clientId: string;
-    redirectUri: string;
-    scopes?: string[];
-    state?: string;
-  }): void;
-};
-
-declare global {
-  interface Window {
-    Pi?: PiBrowser;
-  }
-}
 
 /* =========================================================
    START PI SIGN-IN

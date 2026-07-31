@@ -313,6 +313,8 @@ export async function verifyPiWallet(
     : null;
 
 }
+    const status = getStatusCode(error);
+
     if (
   status === 400 ||
   status === 404

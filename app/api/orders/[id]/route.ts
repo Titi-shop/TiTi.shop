@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth/guard";
 
-/* ✅ BARREL IMPORT */
+/* âœ… BARREL IMPORT */
 import { getOrderByBuyerId } from "@/lib/db/orders.buyer";
 
 export const runtime = "nodejs";
@@ -19,8 +19,10 @@ function isValidId(v: unknown): v is string {
 ===================================================== */
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id: orderId } = await params;
+
   const startedAt = Date.now();
 
   try {
@@ -30,7 +32,7 @@ export async function GET(
     console.log("[ORDER][DETAIL][REQUEST_START]", {
       method: req.method,
       url: req.url,
-      orderId: params?.id ?? null,
+      orderId: orderId ?? null,
       timestamp: new Date().toISOString(),
     });
 
@@ -43,7 +45,7 @@ export async function GET(
 
     if (!auth.ok) {
       console.warn("[ORDER][DETAIL][AUTH][FAILED]", {
-        orderId: params?.id ?? null,
+        orderId: orderId ?? null,
       });
 
       return auth.response;
@@ -58,7 +60,7 @@ export async function GET(
     /* =====================================================
        PARAM
     ===================================================== */
-    const orderId = params?.id;
+    
 
     console.log("[ORDER][DETAIL][PARAMS]", {
       orderId,
@@ -173,7 +175,7 @@ export async function GET(
     console.error("[ORDER][DETAIL][ERROR]", {
       message: err instanceof Error ? err.message : "UNKNOWN_ERROR",
       stack: err instanceof Error ? err.stack : undefined,
-      orderId: params?.id ?? null,
+      orderId: orderId ?? null,
       durationMs: Date.now() - startedAt,
       timestamp: new Date().toISOString(),
     });
@@ -190,9 +192,11 @@ export async function GET(
        REQUEST END
     ===================================================== */
     console.log("[ORDER][DETAIL][REQUEST_END]", {
-      orderId: params?.id ?? null,
+      orderId: orderId ?? null,
       durationMs: Date.now() - startedAt,
       timestamp: new Date().toISOString(),
     });
   }
 }
+
+

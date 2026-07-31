@@ -147,9 +147,13 @@ export async function bindPiPaymentToIntent(
       }
 
       const intent = res.rows[0];
-if (intent.status !== "created") {
-  throw new Error("INVALID_INTENT_STATE");
-}
+
+      if (!intent) {
+        throw new Error(
+          "PAYMENT_INTENT_NOT_FOUND"
+        );
+      }
+
       logger.info(
         "PAYMENTS.BIND.LOCK_OK",
         {
@@ -173,15 +177,23 @@ if (intent.status !== "created") {
       =============================================== */
 
       if (
-  intent.pi_payment_id === piPaymentId &&
-  intent.status === "submitted"
-) {
-    logger.info(
-      "PAYMENTS.BIND.SAME_PAYMENT_REPLAY"
-    );
+        intent.pi_payment_id === piPaymentId &&
+        intent.status === "submitted"
+      ) {
+        logger.info(
+          "PAYMENTS.BIND.SAME_PAYMENT_REPLAY"
+        );
 
-    return;
-}
+        return;
+      }
+
+      /* ===============================================
+         STATE CHECK
+      =============================================== */
+
+      if (intent.status !== "created") {
+        throw new Error("INVALID_INTENT_STATE");
+      }
 
       /* ===============================================
          CONFLICT

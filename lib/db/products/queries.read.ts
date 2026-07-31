@@ -3,8 +3,8 @@ import { query } from "@/lib/db";
 import type {
   ProductRow,
   ProductRecord,
+  RelatedProduct,
 } from "@/types/Product";
-
 import {
   isUUID,
   log,
@@ -77,12 +77,13 @@ LIMIT $1
 
 export async function getProductById(
   productId: string,
-  userId: string | null
+  userId: string | null = null,
+  caller: string = "UNKNOWN"
 ): Promise<ProductRecord | null> {
   log("GET_BY_ID_START", {
     productId: maskId(productId),
+    caller,
   });
-
   try {
     if (!productId || !isUUID(productId)) {
       log("GET_BY_ID_INVALID_ID", {
@@ -424,6 +425,97 @@ LIMIT $2
 
     logError(
       "GET_BY_CATEGORY_ERROR",
+      error
+    );
+
+    throw error;
+  }
+}
+/* =========================================================
+   GET RELATED PRODUCTS BY CATEGORY
+   Lightweight query for product detail page
+========================================================= */
+
+export async function getRelatedProductsByCategory(
+  categoryId: string,
+  excludeProductId: string,
+  limit = 10
+): Promise<ProductRecord[]> {
+  log("GET_RELATED_START", {
+    categoryId: maskId(categoryId),
+    productId: maskId(excludeProductId),
+    limit,
+  });
+
+  try {
+    const result = await query<ProductRow>(
+      `
+      SELECT
+        p.*,
+
+        (
+          SELECT COUNT(*)
+          FROM product_favorites pf
+          WHERE pf.product_id = p.id
+        )::int AS favorite_count,
+
+        CASE
+          WHEN p.has_variants = TRUE
+          THEN (
+            SELECT MIN(
+              CASE
+                WHEN pv.sale_enabled = TRUE
+                  AND pv.sale_price IS NOT NULL
+                  AND pv.sale_price < pv.price
+                THEN pv.sale_price
+                ELSE pv.price
+              END
+            )
+            FROM product_variants pv
+            WHERE pv.product_id = p.id
+              AND pv.deleted_at IS NULL
+          )
+          ELSE
+            CASE
+              WHEN p.sale_enabled = TRUE
+                AND p.sale_price IS NOT NULL
+                AND p.sale_price < p.price
+              THEN p.sale_price
+              ELSE p.price
+            END
+        END AS final_price
+
+      FROM products p
+
+      WHERE p.category_id = $1
+        AND p.id <> $2
+        AND p.deleted_at IS NULL
+        AND p.is_active = TRUE
+
+      ORDER BY
+        p.sold DESC,
+        p.rating_avg DESC,
+        p.created_at DESC
+
+      LIMIT $3
+      `,
+      [
+        categoryId,
+        excludeProductId,
+        limit,
+      ]
+    );
+
+    log("GET_RELATED_SUCCESS", {
+      count: result.rows.length,
+    });
+
+    return result.rows.map(
+      mapRow
+    );
+  } catch (error) {
+    logError(
+      "GET_RELATED_ERROR",
       error
     );
 

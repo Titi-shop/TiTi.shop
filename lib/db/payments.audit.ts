@@ -2,6 +2,7 @@
 import { query } from "@/lib/db";
 import { createHash } from "crypto";
 import type { Pool, PoolClient } from "pg";
+import type { JsonValue } from "@/lib/payments/types/audit.types";
 import type {
   AuditSeverity,
   AuditStage,
@@ -260,10 +261,10 @@ export const auditPiVerified = (
     eventCode: "PI_VERIFIED",
     stage: "PI_VERIFY",
     actorType: "pi_api",
-    source: params.source,
-    actorId: params.actorId,
-    txid: params.txid,
-    piPaymentId: params.piPaymentId,
+    ...(params.source !== undefined ? { source: params.source } : {}),
+    ...(params.actorId !== undefined ? { actorId: params.actorId } : {}),
+    ...(params.txid !== undefined ? { txid: params.txid } : {}),
+    ...(params.piPaymentId !== undefined ? { piPaymentId: params.piPaymentId } : {}),
     newSettlementState: "PI_VERIFIED",
     payload: {
       amount: params.amount,
@@ -282,9 +283,9 @@ export const auditRpcVerified = (
     stage: "RPC_VERIFY",
     actorType: "rpc",
 
-    source: params.source,
-    txid: params.txid,
-    piPaymentId: params.piPaymentId,
+    ...(params.source !== undefined ? { source: params.source } : {}),
+    ...(params.txid !== undefined ? { txid: params.txid } : {}),
+    ...(params.piPaymentId !== undefined ? { piPaymentId: params.piPaymentId } : {}),
 
     newSettlementState: "RPC_VERIFIED",
 
@@ -321,9 +322,9 @@ export const auditPiCompleted = (
     stage: "PI_COMPLETE",
     actorType: "pi_api",
 
-    source: params.source,
-    txid: params.txid,
-    piPaymentId: params.piPaymentId,
+    ...(params.source !== undefined ? { source: params.source } : {}),
+    ...(params.txid !== undefined ? { txid: params.txid } : {}),
+    ...(params.piPaymentId !== undefined ? { piPaymentId: params.piPaymentId } : {}),
 
     newPaymentStatus: "paid",
     newSettlementState: "PI_COMPLETED",
@@ -347,12 +348,12 @@ export const auditFinalizeDone = async (
       stage: "FINALIZE",
       actorType: "system",
 
-      source: params.source,
+      ...(params.source !== undefined ? { source: params.source } : {}),
 
-      orderId: params.orderId,
-      escrowId: params.escrowId,
-      piPaymentId: params.piPaymentId,
-      txid: params.txid,
+      ...(params.orderId !== undefined ? { orderId: params.orderId } : {}),
+      ...(params.escrowId !== undefined ? { escrowId: params.escrowId } : {}),
+      ...(params.piPaymentId !== undefined ? { piPaymentId: params.piPaymentId } : {}),
+      ...(params.txid !== undefined ? { txid: params.txid } : {}),
 
       newPaymentStatus: "paid",
       newSettlementState: "ORDER_FINALIZED",
@@ -371,17 +372,21 @@ export const auditFinalizeDone = async (
 export const auditManualReview = (
   paymentIntentId: string,
   reason: string,
-  payload?: JsonValue
+  payload?: JsonValue,
+  db?: Pool | PoolClient
 ) =>
-  writePaymentAudit({
-    paymentIntentId,
-    eventCode: "MANUAL_REVIEW",
-    stage: "MANUAL",
-    severity: "critical",
-    actorType: "system",
-    note: reason,
-    payload,
-  });
+  writePaymentAudit(
+    {
+      paymentIntentId,
+      eventCode: "MANUAL_REVIEW",
+      stage: "MANUAL",
+      severity: "critical",
+      actorType: "system",
+      note: reason,
+      payload,
+    },
+    db
+  );
 export const auditDuplicateSubmit = (
   paymentIntentId: string,
   payload?: JsonValue
@@ -411,7 +416,7 @@ export const auditPaymentReceiptCreated = async (
       stage: "FINALIZE",
       actorType: "system",
 
-      source: params.source,
+      ...(params.source !== undefined ? { source: params.source } : {}),
 
       orderId: params.orderId,
       piPaymentId: params.piPaymentId,
@@ -445,7 +450,7 @@ export const auditPiPaymentCreated = async (
       stage: "FINALIZE",
       actorType: "system",
 
-      source: params.source,
+      ...(params.source !== undefined ? { source: params.source } : {}),
 
       orderId: params.orderId,
       piPaymentId: params.piPaymentId,
@@ -478,7 +483,7 @@ export const auditPaymentIntentFinalized = async (
       eventCode: "PAYMENT_INTENT_FINALIZED",
       stage: "FINALIZE",
       actorType: "system",
-      source: params.source,
+      ...(params.source !== undefined ? { source: params.source } : {}),
       orderId: params.orderId,
       piPaymentId: params.piPaymentId,
       txid: params.txid,
@@ -494,3 +499,4 @@ export const auditPaymentIntentFinalized = async (
   orderId: maskId(params.orderId),
 });
 };
+

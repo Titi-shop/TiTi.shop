@@ -7,7 +7,7 @@ export function isValidEmailFormat(email: string) {
 }
 
 export function getEmailDomain(email: string) {
-  return email.split("@")[1].toLowerCase();
+  return email.split("@")[1]?.toLowerCase() ?? "";
 }
 
 export function validateEmail(email: string) {

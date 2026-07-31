@@ -47,9 +47,13 @@ export async function createEscrow(
     );
 
   let escrowId: string;
-  if (existed.rows.length) {
+
+  const existingEscrow =
+    existed.rows[0];
+
+  if (existingEscrow) {
     escrowId =
-      existed.rows[0].id;
+      existingEscrow.id;
   } else {
 
     escrowId =
@@ -232,15 +236,17 @@ export async function releaseEscrow(
       [escrowId]
     );
 
-  if (!rs.rows.length) {
+  const escrow =
+    rs.rows[0];
+
+  if (!escrow) {
     throw new Error(
       "ESCROW_NOT_FOUND"
     );
   }
 
   if (
-    rs.rows[0]
-      .release_status ===
+    escrow.release_status ===
     "RELEASED"
   ) {
     return;
@@ -248,7 +254,7 @@ export async function releaseEscrow(
 
   const total =
     Number(
-      rs.rows[0].amount
+      escrow.amount
     );
 
   await query(

@@ -1,6 +1,6 @@
-import type {
+﻿import type {
   ProductVariant,
-} from "@/types/product";
+} from "@/types/Product";
 
 /* =========================================================
    NUMBER
@@ -112,3 +112,4 @@ export function calcFinalPrice(
 
   return price;
 }
+

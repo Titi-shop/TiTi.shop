@@ -5,7 +5,11 @@ import {
 } from "@/lib/db/payments.guard";
 
 import { verifyRpcPaymentForReconcile } from "@/lib/db/payments.rpc";
-import { piCompletePayment } from "@/lib/pi/client";
+import {
+  piCompletePayment,
+  piGetPayment,
+} from "@/lib/pi/client";
+
 import {
   finalizePaidOrderFromIntent,
 } from "@/lib/db/orders.payment";
@@ -25,14 +29,18 @@ import {
 
 function failResult(
   amount: number,
-  rpcAudited: boolean
+  rpcAudited: boolean,
+  source: RunPaymentSettlementInput["source"],
+  already = false
 ): PaymentSettlementResult {
   return {
     ok: false,
+    already,
     orderId: null,
     amount,
     piCompleted: false,
     rpcAudited,
+    source,
   
   };
 }
@@ -40,14 +48,17 @@ function failResult(
 function successResult(
   orderId: string | null,
   amount: number,
-  rpcAudited: boolean
+  rpcAudited: boolean,
+  source: RunPaymentSettlementInput["source"]
 ): PaymentSettlementResult {
   return {
     ok: true,
+    already: false,
     orderId,
     amount,
     piCompleted: true,
     rpcAudited,
+    source,
     
   };
 }
@@ -115,6 +126,7 @@ export async function runPaymentSettlement({
   piPaymentId,
   txid,
   userId,
+  source,
 }: RunPaymentSettlementInput): Promise<PaymentSettlementResult> {
   try {
   logger.info("PAYMENT.SETTLEMENT.START", {
@@ -132,41 +144,41 @@ export async function runPaymentSettlement({
   }
 );
 
-  const guard = await guardPaymentV7(paymentIntentId, userId);
+  const systemMode = source === "WEBHOOK";
+
+  const guard = await guardPaymentV7(
+    paymentIntentId,
+    userId ?? null,
+    systemMode
+  );
 
   logger.info("PAYMENT.SETTLEMENT.GUARD_RESULT", {
     paymentIntentId: maskId(paymentIntentId),
     ok: guard.ok,
-    code: guard.code,
-});
+    ...(!guard.ok ? { code: guard.code } : {}),
+  });
 
-  if (!guard.ok || guard.amount === 0) {
-    if (guard.code === "PAYMENT_ALREADY_PAID") {
-      logger.info(
-  "PAYMENT.SETTLEMENT.ALREADY_PAID",
-  {
-    paymentIntentId: maskId(paymentIntentId),
-    orderId: maskId(
-      guard.orderId ?? ""
-    ),
-  }
-);
-      return successResult(
-        guard.orderId ?? null,
-        guard.amount ?? 0,
-        true
-      );
+  if (!guard.ok) {
+    if (guard.code === "ALREADY_PAID") {
+      logger.info("PAYMENT.SETTLEMENT.ALREADY_PAID", {
+        paymentIntentId: maskId(paymentIntentId),
+      });
+    } else {
+      logger.error("PAYMENT.SETTLEMENT.GUARD_FAILED", {
+        paymentIntentId: maskId(paymentIntentId),
+        code: guard.code,
+      });
     }
 
-    logger.error(
-  "PAYMENT.SETTLEMENT.GUARD_FAILED",
-  {
-    paymentIntentId: maskId(paymentIntentId),
-    code: guard.code,
+    return failResult(0, false, source, guard.code === "ALREADY_PAID");
   }
-);
 
-    return failResult(0, false);
+  if (guard.amount === 0) {
+    logger.error("PAYMENT.SETTLEMENT.ZERO_AMOUNT", {
+      paymentIntentId: maskId(paymentIntentId),
+    });
+
+    return failResult(0, false, source);
   }
 
   /* =====================================================
@@ -197,7 +209,7 @@ export async function runPaymentSettlement({
   }
 );
 
-    return failResult(guard.amount ?? 0, false);
+    return failResult(guard.amount ?? 0, false, source);
   }
 
   /* =====================================================
@@ -252,9 +264,13 @@ const rpcVerified =
     
   return failResult(
     rpcVerified.amount ?? 0,
-    rpcVerified.ok
+    rpcVerified.ok,
+    source
   );
 }
+
+const piPayment =
+  await piGetPayment(piPaymentId);
 
 const finalized =
   await finalizePaidOrderFromIntent({
@@ -265,14 +281,15 @@ const finalized =
       rpcVerified.amount ?? 0,
     receiverWallet:
       rpcVerified.receiver ?? "",
-    piPayload:
-      rpcVerified.payload,
+    piPayload: piPayment,
+    rpcPayload: rpcVerified,
   });
 
 return successResult(
   finalized.orderId,
   finalized.amount,
-  rpcVerified.ok
+  rpcVerified.ok,
+  source
 );
   } catch (e) {
 
@@ -294,7 +311,7 @@ if (
   console.error(e);
 }
 
-  return failResult(0, false);
+  return failResult(0, false, source);
 }
 }
 
@@ -383,5 +400,10 @@ if (!parsed) {
     piPaymentId: parsed.piPaymentId,
     txid: parsed.txid,
     userId: input.userId,
+    source: "RECONCILE_API",
   });
 }
+
+
+
+

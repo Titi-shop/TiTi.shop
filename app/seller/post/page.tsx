@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import useSWR from "swr";
 import { useRouter } from "next/navigation";
 import { useTranslationClient as useTranslation } from "@/app/lib/i18n/client";
@@ -6,18 +6,13 @@ import { useAuth } from "@/context/AuthContext";
 import { apiAuthFetch } from "@/lib/api/apiAuthFetch";
 import ProductForm from "@/components/ProductForm";
 import type {
-  ProductPayload,
-} from "@/types/product";
+    Category,
+    ProductPayload,
+  } from "@/types/Product";
 
 /* =====================================================
    TYPES
 ===================================================== */
-
-interface Category {
-  id: string;
-  key: string;
-}
-
 /* =====================================================
    FETCHER
 ===================================================== */
@@ -80,38 +75,7 @@ export default function SellerPostPage() {
     payload: ProductPayload
   ) => {
     console.log(
-      "📦 [CREATE_PRODUCT] PAYLOAD:",
-      payload
-    );
-
-    const res =
-      await apiAuthFetch(
-        "/api/products",
-        {
-          method: "POST",
-
-          body: JSON.stringify(
-            payload
-          ),
-        }
-      );
-
-    if (!res.ok) {
-      const text =
-        await res.text();
-
-      console.error(
-        "❌ CREATE FAILED:",
-        text
-      );
-
-      throw new Error(
-        "POST_FAILED"
-      );
-    }
-
-    console.log(
-      "✅ PRODUCT CREATED"
+      "PRODUCT CREATED"
     );
 
     router.push(
@@ -164,7 +128,7 @@ export default function SellerPostPage() {
   return (
     <main className="max-w-2xl mx-auto p-4 pb-28">
       <h1 className="text-xl font-bold text-center mb-4 text-[#ff6600]">
-        ➕ {t.post_product}
+        {t.post_product}
       </h1>
 
       {isLoading ? (
@@ -186,3 +150,10 @@ export default function SellerPostPage() {
     </main>
   );
 }
+
+
+
+
+
+
+

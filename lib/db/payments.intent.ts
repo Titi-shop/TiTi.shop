@@ -6,10 +6,16 @@ import type {
 } from "@/lib/payments/pricing.engine";
 
 import type {
+  PaymentIntentStatus,
+  SettlementState,
+} from "@/lib/payments/types/common.types";
+
+import type {
+  CreatePiPaymentIntentInput,
   CreateIntentResult,
   PaymentIntentRow,
   ExpiredPaymentIntentRow,
-} from "@/lib/payments/types/intent.type";
+} from "@/lib/payments/types/intent.types";
 import {
   logger,
   maskId,
@@ -194,11 +200,11 @@ export async function createPiPaymentIntent({
        1. VALIDATE PRICING (SOURCE OF TRUTH)
     ===================================================== */
 
-    if (!pricing.items.length) {
+    const item = pricing.items[0];
+
+    if (!item) {
       throw new Error("INVALID_PRICING");
     }
-
-    const item = pricing.items[0];
 
     if (item.product_id !== productId) {
       throw new Error("PRICING_PRODUCT_MISMATCH");
@@ -237,15 +243,15 @@ FOR SHARE
 [productId]
 );
 
-    if (!ownerRes.rows.length) {
+    const owner =
+      ownerRes.rows[0];
+
+    if (!owner) {
       throw new Error("PRODUCT_NOT_FOUND");
     }
 
-    const owner =
-  ownerRes.rows[0];
-
-  const seller_id =
-  owner.seller_id;
+    const seller_id =
+      owner.seller_id;
 if (!owner.is_active) {
   throw new Error(
     "PRODUCT_INACTIVE"

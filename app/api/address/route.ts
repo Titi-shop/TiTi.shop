@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { getUserFromBearer } from "@/lib/auth/getUserFromBearer";
 
 import {
@@ -27,8 +27,8 @@ interface AddressPayload {
   ward?: string;
 
   address_line: string;
-  postal_code?: string | null;
-  label?: "home" | "office" | "other";
+  postal_code: string | null;
+  label: "home" | "office" | "other";
 }
 
 /* =========================
@@ -51,7 +51,7 @@ function parseBody(body: unknown): AddressPayload | null {
   }
 
   return {
-    id: typeof b.id === "string" ? b.id : undefined,
+    ...(typeof b.id === "string" ? { id: b.id } : {}),
     full_name: b.full_name.trim(),
     phone: b.phone.trim(),
     country: b.country.trim(),
@@ -310,3 +310,5 @@ export async function DELETE(req: Request) {
     );
   }
 }
+
+

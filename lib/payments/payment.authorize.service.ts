@@ -18,6 +18,7 @@ import {
   logger,
   maskId,
 } from "@/lib/logger";
+import type { AuthorizeInput } from "@/lib/payments/types";
 
 /* =========================================================
    HELPERS
@@ -55,7 +56,7 @@ export async function piAuthorizePayment({
   userId,
   authorizationHeader,
   body,
-}: Input): Promise<{
+}: AuthorizeInput): Promise<{
   success: true;
 }> {
   logger.info(

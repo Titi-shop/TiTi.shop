@@ -1,14 +1,9 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { useTranslationClient as useTranslation } from "@/app/lib/i18n/client";
-
-type PageParams = {
-  params: {
-    slug: string;
-  };
-};
 
 type Category = {
   id: number | string;
@@ -26,8 +21,9 @@ type Product = {
   createdAt: string;
 };
 
-export default function CategoryDetailPage({ params }: PageParams) {
+export default function CategoryDetailPage() {
   const { t } = useTranslation();
+  const params = useParams<{ slug: string }>();
   const categoryId = Number(params.slug);
 
   const [products, setProducts] = useState<Product[]>([]);
@@ -67,7 +63,7 @@ export default function CategoryDetailPage({ params }: PageParams) {
 
         setCategory(cate || null);
       } catch (err) {
-        console.error("❌ Lỗi tải danh mục:", err);
+                console.error("❌ Lỗi tải danh mục:", err);
       } finally {
         setLoading(false);
       }
@@ -85,15 +81,15 @@ export default function CategoryDetailPage({ params }: PageParams) {
 
   return (
     <main className="p-4 max-w-6xl mx-auto">
-      {/* 🔙 BACK */}
+      {/* BACK */}
       <Link
         href="/categories"
         className="text-orange-600 font-bold text-lg inline-block mb-4"
       >
-        ←
+        ←
       </Link>
 
-      {/* ⭐ CATEGORY TITLE */}
+      {/* CATEGORY TITLE */}
       <h1 className="text-2xl font-bold mb-4 text-orange-600">
         {categoryName}
       </h1>
@@ -144,3 +140,6 @@ export default function CategoryDetailPage({ params }: PageParams) {
     </main>
   );
 }
+
+
+

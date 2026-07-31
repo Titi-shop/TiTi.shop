@@ -59,15 +59,14 @@ export async function hasWalletPin(
       ]
     );
 
-  if (
-    !res.rows.length
-  ) {
+  const row = res.rows[0];
+
+  if (!row) {
     return false;
   }
 
   return Boolean(
-    res.rows[0]
-      .pin_enabled
+    row.pin_enabled
   );
 
 }
@@ -94,15 +93,14 @@ export async function isWalletLocked(
       ]
     );
 
-  if (
-    !res.rows.length
-  ) {
+  const row = res.rows[0];
+
+  if (!row) {
     return false;
   }
 
   const lockedUntil =
-    res.rows[0]
-      .locked_until;
+    row.locked_until;
 
   if (
     !lockedUntil
@@ -141,15 +139,14 @@ export async function getWalletFailedAttempts(
       ]
     );
 
-  if (
-    !res.rows.length
-  ) {
+  const row = res.rows[0];
+
+  if (!row) {
     return 0;
   }
 
   return Number(
-    res.rows[0]
-      .failed_attempts ??
+    row.failed_attempts ??
       0
   );
 

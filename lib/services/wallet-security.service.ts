@@ -106,6 +106,13 @@ function decodeHash(
     hash,
   ] = value.split(":");
 
+  if (
+    !salt ||
+    !hash
+  ) {
+    return null;
+  }
+
   return {
     salt,
     hash,
@@ -116,10 +123,17 @@ function verifyHash(
   pin: string,
   encoded: string
 ) {
+  const decoded =
+    decodeHash(encoded);
+
+  if (!decoded) {
+    return false;
+  }
+
   const {
     salt,
     hash,
-  } = decodeHash(encoded);
+  } = decoded;
 
   const calculated =
     hashPin(
@@ -127,15 +141,28 @@ function verifyHash(
       salt
     );
 
-  return timingSafeEqual(
+  const calculatedBuffer =
     Buffer.from(
       calculated,
       "hex"
-    ),
+    );
+
+  const storedBuffer =
     Buffer.from(
       hash,
       "hex"
-    )
+    );
+
+  if (
+    calculatedBuffer.length !==
+    storedBuffer.length
+  ) {
+    return false;
+  }
+
+  return timingSafeEqual(
+    calculatedBuffer,
+    storedBuffer
   );
 }
 
@@ -493,23 +520,25 @@ export async function verifyWalletPin(
   =============================================== */
 
   const matched =
-    verifyHash(
-      input.pin,
-      security.pin_hash
-    );
+    security.pin_hash
+      ? verifyHash(
+          input.pin,
+          security.pin_hash
+        )
+      : false;
 
   if (matched) {
 
     await resetWalletFailedAttempts(
-      security.id
+      input.userId
     );
 
     await unlockWalletSecurity(
-      security.id
+      input.userId
     );
 
     await markWalletPinVerified(
-      security.id
+      input.userId
     );
 
     logger.info(
@@ -540,8 +569,22 @@ export async function verifyWalletPin(
 
   const updated =
     await incrementWalletFailedAttempts(
-      security.id
+      input.userId
     );
+
+  if (!updated) {
+
+    logger.error(
+      "WALLET_SECURITY.FAILED_ATTEMPT_UPDATE_FAILED",
+      {
+        userId: maskId(input.userId),
+      }
+    );
+
+    throw new Error(
+      "Failed to update wallet security attempts"
+    );
+  }
 
   const attempts =
     updated.failed_attempts;
@@ -567,7 +610,7 @@ export async function verifyWalletPin(
       );
 
     await lockWalletSecurity(
-      security.id,
+      input.userId,
       lockedUntil
     );
 
@@ -747,12 +790,26 @@ export async function changeWalletPinFlow(
 
     });
 
+  if (!security) {
+
+    logger.error(
+      "WALLET_SECURITY.PIN_UPDATE_FAILED",
+      {
+        userId: maskId(input.userId),
+      }
+    );
+
+    throw new Error(
+      "Failed to change wallet PIN"
+    );
+  }
+
   await resetWalletFailedAttempts(
-    security.id
+    input.userId
   );
 
   await unlockWalletSecurity(
-    security.id
+    input.userId
   );
 
   logger.info(
@@ -802,11 +859,11 @@ export async function resetWalletPinFlow(
   }
 
   await resetWalletFailedAttempts(
-    security.id
+    userId
   );
 
   await unlockWalletSecurity(
-    security.id
+    userId
   );
 
   logger.info(

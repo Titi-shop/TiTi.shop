@@ -220,7 +220,7 @@ export async function createWalletAddressFlow(
           input.userId,
 
         network:
-          "PI",
+          "pi",
 
         address:
           parsed.address,

@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { piGetPayment } from "@/lib/pi/client";
+
 import {
   runPaymentSettlement,
 } from "@/lib/payments/payment.orchestrator";
@@ -63,12 +65,12 @@ export async function POST(req: Request) {
     }
 
     /* =====================================================
-       STEP 1 — FETCH REAL PAYMENT FROM PI PLATFORM
+       STEP 1 â€” FETCH REAL PAYMENT FROM PI PLATFORM
     ===================================================== */
 
     console.log("[PI WEBHOOK] FETCH_PI_PAYMENT");
 
-    const piPayment = await fetchPiPayment(piPaymentId);
+    const piPayment = await piGetPayment(piPaymentId);
 
     if (!piPayment) {
       console.warn("[PI WEBHOOK] PI_PAYMENT_NOT_FOUND");
@@ -106,7 +108,7 @@ export async function POST(req: Request) {
     }
 
     /* =====================================================
-       STEP 2 — RUN SAME CORE SETTLEMENT ENGINE
+       STEP 2 â€” RUN SAME CORE SETTLEMENT ENGINE
     ===================================================== */
 
     console.log("[PI WEBHOOK] RUN_SETTLEMENT");
@@ -116,19 +118,19 @@ export async function POST(req: Request) {
       piPaymentId,
       txid,
       userId: null,
-      source: "webhook",
+      source: "WEBHOOK",
     });
 
     console.log("[PI WEBHOOK] SETTLEMENT_DONE", {
       ok: result.ok,
       orderId: result.orderId,
-      alreadyPaid: result.alreadyPaid,
+      alreadyPaid: result.already,
     });
 
     return NextResponse.json({
       success: true,
       order_id: result.orderId,
-      already_paid: result.alreadyPaid,
+      already_paid: result.already,
     });
   } catch (err) {
     console.error("[PI WEBHOOK] CRASH", err);
@@ -139,3 +141,5 @@ export async function POST(req: Request) {
     );
   }
 }
+
+

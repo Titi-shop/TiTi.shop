@@ -52,8 +52,13 @@ export function calcSalePercent(price: number, finalPrice: number) {
 export function getDistance(touches: TouchList) {
   if (!touches || touches.length < 2) return 0;
 
-  const dx = touches[0].clientX - touches[1].clientX;
-  const dy = touches[0].clientY - touches[1].clientY;
+  const first = touches[0];
+  const second = touches[1];
+
+  if (!first || !second) return 0;
+
+  const dx = first.clientX - second.clientX;
+  const dy = first.clientY - second.clientY;
 
   return Math.sqrt(dx * dx + dy * dy);
 }

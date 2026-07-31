@@ -1,4 +1,4 @@
-import { withTransaction } from "@/lib/db";
+﻿import { withTransaction } from "@/lib/db";
 import {
   logger,
   maskId,
@@ -79,7 +79,7 @@ export async function markPaymentVerifying({
       throw new Error("INTENT_NOT_FOUND");
     }
 
-    const intent = rs.rows[0];
+    const intent = rs.rows[0]!;
 logger.debug("PAYMENT.SUBMIT.CURRENT_STATE", {
   status: intent.status,
   paymentState: intent.payment_state,
@@ -290,3 +290,4 @@ logger.info("PAYMENT.SUBMIT.UPDATE_OK", {
     };
   });
 }
+

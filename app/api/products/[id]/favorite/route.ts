@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { getUserFromBearer } from "@/lib/auth/getUserFromBearer";
 
 import {
@@ -19,9 +19,9 @@ export async function POST(
   {
     params,
   }: {
-    params: {
+    params: Promise<{
       id: string;
-    };
+    }>;
   }
 ) {
   try {
@@ -34,7 +34,7 @@ export async function POST(
       );
     }
 
-    const productId = params.id;
+    const { id: productId } = await params;
 
     if (!productId) {
       return NextResponse.json(
@@ -102,3 +102,6 @@ export async function GET() {
     );
   }
 }
+
+
+

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 
 import {
   requireAdmin,
@@ -185,8 +185,7 @@ vlog(
   );
 
   await markWithdrawalCompleted(
-    withdrawal.id,
-    withdrawal.blockchain_txid
+    withdrawal.id
   );
 
   return NextResponse.json({
@@ -223,17 +222,8 @@ vlog(
     }
 
     await markWithdrawalCompleted(
-  withdrawal.id,
-  txid,
-
-  undefined,
-  undefined,
-  undefined,
-
-  payment.from_address,
-  payment.to_address,
-  payment.network
-);
+      withdrawal.id
+    );
 
     vlog(
       "COMPLETED",
@@ -269,3 +259,4 @@ vlog(
     );
   }
 }
+

@@ -94,10 +94,13 @@ export type EscrowReleaseRow = {
 
 export type ReleaseEscrowFlowInput = {
   client: {
-    query: (
+    query: <T>(
       sql: string,
       params?: unknown[]
-    ) => Promise<unknown>;
+    ) => Promise<{
+      rows: T[];
+      rowCount: number | null;
+    }>;
   };
 
   escrow: EscrowReleaseRow;
@@ -183,6 +186,8 @@ export type RunPaymentSettlementInput = {
 
 export type PaymentSettlementResult = {
   ok: boolean;
+
+  already: boolean;
 
   orderId: string | null;
 

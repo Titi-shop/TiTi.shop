@@ -8,7 +8,7 @@ import {
   XCircle,
 } from "lucide-react";
 
-import type { ReturnStatus } from "./types";
+import type { ReturnStatus } from "./types/returns";
 
 const BASE_STORAGE =
   process.env.NEXT_PUBLIC_SUPABASE_URL +

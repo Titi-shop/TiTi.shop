@@ -62,12 +62,14 @@ if (input.amount <= 0) {
 
   const rs =
     await query<{
+      escrow_id: string;
       available_amount: string;
       withdrawn_amount: string;
       withdraw_count: number;
     }>(
       `
       SELECT
+        escrow_id,
         available_amount,
         withdrawn_amount,
         withdraw_count
@@ -80,18 +82,22 @@ if (input.amount <= 0) {
       ]
     );
 
-  if (!rs.rows.length) {
+  const credit =
+    rs.rows[0];
+
+  if (!credit) {
     throw new Error(
       "SELLER_CREDIT_NOT_FOUND"
     );
   }
+
 logger.debug("SETTLEMENT.WITHDRAW.CREDIT_FOUND", {
   sellerCreditId: maskId(input.sellerCreditId),
 });
+
   const available =
     Number(
-      rs.rows[0]
-        .available_amount
+      credit.available_amount
     );
 
   if (
@@ -310,6 +316,7 @@ createdBy: input.sellerId,
   sellerId: maskId(input.sellerId),
 });
   await createSettlementEventOnce({
+  escrowId: credit.escrow_id,
   type: "SELLER_WITHDRAWN",
   source: "wallet",
   reason: "SELLER_WITHDRAW",

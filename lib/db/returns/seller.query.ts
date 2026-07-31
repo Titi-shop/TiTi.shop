@@ -71,7 +71,20 @@ export async function getReturnByIdForSeller(
   }
 
   const { rows: returnRows } =
-    await query(
+    await query<{
+        id: string;
+        return_number: string;
+        status: ReturnStatus;
+        reason: string;
+        description: string | null;
+        evidence_images: unknown;
+        created_at: string;
+        approved_at: string | null;
+        rejected_at: string | null;
+        shipped_back_at: string | null;
+        received_at: string | null;
+        refunded_at: string | null;
+      }>(
       `
       SELECT
         id,
@@ -144,3 +157,4 @@ export async function getReturnByIdForSeller(
     ),
   };
 }
+

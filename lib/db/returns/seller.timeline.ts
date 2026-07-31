@@ -24,35 +24,35 @@ export function buildTimeline(
       time: ret.created_at,
     },
 
-    ret.approved_at && {
+    ret.approved_at ? {
       key: "approved",
       label: "Seller approved",
       time: ret.approved_at,
-    },
+    } : false,
 
-    ret.rejected_at && {
+    ret.rejected_at ? {
       key: "rejected",
       label: "Rejected",
       time: ret.rejected_at,
-    },
+    } : false,
 
-    ret.shipped_back_at && {
+    ret.shipped_back_at ? {
       key: "shipping_back",
       label: "Buyer shipped back",
       time: ret.shipped_back_at,
-    },
+    } : false,
 
-    ret.received_at && {
+    ret.received_at ? {
       key: "received",
       label: "Seller received",
       time: ret.received_at,
-    },
+    } : false,
 
-    ret.refunded_at && {
+    ret.refunded_at ? {
       key: "refunded",
       label: "Refund completed",
       time: ret.refunded_at,
-    },
+    } : false,
 
   ];
 

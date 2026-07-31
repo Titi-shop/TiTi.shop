@@ -21,14 +21,7 @@ import type {
    TYPES
 ========================================================= */
 
-type OrderTab =
-  | "all"
-  | "pending"
-  | "processing"
-  | "shipped"
-  | "delivered"
-  | "completed"
-  | "cancelled";
+type OrderTab = OrderStatus | "all";
 
 type Props = {
   orders: Order[];
@@ -145,11 +138,14 @@ export default function OrdersList({
   all: orders.length,
 
   pending: 0,
+
+  pending_fulfillment: 0,
   processing: 0,
   shipped: 0,
   delivered: 0,
   completed: 0,
   cancelled: 0,
+  refunded: 0,
 };
 
       for (const order of orders) {

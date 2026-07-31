@@ -127,7 +127,7 @@ export async function cancelReturnByBuyer(
 
           return {
             success:
-              update.rowCount > 0,
+              (update.rowCount ?? 0) > 0,
 
             buyerId,
 

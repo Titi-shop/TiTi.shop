@@ -1,4 +1,4 @@
-// =====================================================
+﻿// =====================================================
 // app/account/wallet/wallet.withdraw.ts
 // =====================================================
 
@@ -134,14 +134,10 @@ export async function createWithdraw(
     ================================================= */
 
     return {
-
       success: true,
-
-      withdrawalId:
-        typeof data.withdrawalId ===
-        "string"
-          ? data.withdrawalId
-          : undefined,
+      ...(typeof data.withdrawalId === "string"
+        ? { withdrawalId: data.withdrawalId }
+        : {}),
     };
 
   } catch {
@@ -155,3 +151,4 @@ export async function createWithdraw(
     };
   }
 }
+

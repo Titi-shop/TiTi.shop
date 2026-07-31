@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 
 import {
   requireSeller,
@@ -24,12 +24,13 @@ export async function PUT(
   {
     params,
   }: {
-    params: {
+    params: Promise<{
       id: string;
-    };
+    }>;
   }
 ) {
   try {
+    const { id: addressId } = await params;
 
     const auth =
       await requireSeller();
@@ -47,7 +48,7 @@ export async function PUT(
 
     const data =
       await updateSellerAddress(
-        params.id,
+        addressId,
         {
           ...body,
           seller_id:
@@ -96,12 +97,13 @@ export async function DELETE(
   {
     params,
   }: {
-    params: {
+    params: Promise<{
       id: string;
-    };
+    }>;
   }
 ) {
   try {
+    const { id: addressId } = await params;
 
     const auth =
       await requireSeller();
@@ -115,7 +117,7 @@ export async function DELETE(
     );
 
     await deleteSellerAddress(
-      params.id
+      addressId
     );
 
     logger.info(
@@ -149,3 +151,4 @@ export async function DELETE(
     );
   }
 }
+

@@ -167,7 +167,13 @@ export async function createNotification(
       ]
     );
 
-  return result.rows[0];
+  const notification = result.rows[0];
+
+  if (!notification) {
+    throw new Error("NOTIFICATION_CREATE_FAILED");
+  }
+
+  return notification;
 
 }
 /* =========================================================

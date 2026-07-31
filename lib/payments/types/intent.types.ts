@@ -35,11 +35,12 @@ export type ShippingSnapshot = {
    CREATE INTENT (SERVICE INPUT)
 ========================================================= */
 
-export type CreatePiPaymentIntentParams = {
+export type CreatePiPaymentIntentInput = {
   userId: string;
   productId: string;
   variantId: string | null;
   quantity: number;
+  shipping: ShippingInput;
   pricing: PricingResult;
 };
 /* =========================================================
@@ -220,6 +221,8 @@ export type PaymentIntentRow = {
 
   payment_state: string;
   provider_status: string;
+
+  pi_payment_id: string | null;
 
   settlement_state: string;
 

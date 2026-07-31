@@ -2,6 +2,7 @@ import {
   getAllProducts,
   getProductsByIds,
   getProductsByCategory,
+  getRelatedProductsByCategory,
 } from "@/lib/db/products";
 
 import {
@@ -39,6 +40,14 @@ export async function listProductsService(
 const categoryId =
   searchParams.get("category_id");
 
+const mode =
+  searchParams.get("mode");
+
+const isRelated =
+  mode === "related";
+
+const excludeId =
+  searchParams.get("exclude_id");
     log(
   "LIST_REQUEST",
   {
@@ -57,19 +66,35 @@ const categoryId =
        LOAD PRODUCTS
     ========================= */
 
-    const products =
-  ids
-    ? await getProductsByIds(
-        ids
-          .split(",")
-          .filter(Boolean)
-      )
-    : categoryId
-      ? await getProductsByCategory(
-          categoryId
-        )
-      : await getAllProducts();
+    let products;
 
+if (
+  isRelated &&
+  categoryId &&
+  excludeId
+) {
+  products =
+    await getRelatedProductsByCategory(
+      categoryId,
+      excludeId,
+      10
+    );
+} else if (ids) {
+  products =
+    await getProductsByIds(
+      ids
+        .split(",")
+        .filter(Boolean)
+    );
+} else if (categoryId) {
+  products =
+    await getProductsByCategory(
+      categoryId
+    );
+} else {
+  products =
+    await getAllProducts();
+}
     log(
       "LIST_SUCCESS",
       {
@@ -77,7 +102,9 @@ const categoryId =
           products.length,
       }
     );
-
+if (isRelated) {
+  return products;
+}
     const productIds =
       products.map(
         (product) =>
@@ -88,15 +115,11 @@ const [
   shippingRows,
 ] = await Promise.all([
   productIds.length > 0
-    ? getVariantsByProductIds(
-        productIds
-      )
+    ? getVariantsByProductIds(productIds)
     : Promise.resolve([]),
 
   productIds.length > 0
-    ? getShippingRatesByProducts(
-        productIds
-      )
+    ? getShippingRatesByProducts(productIds)
     : Promise.resolve([]),
 ]);
     const variantMap =
@@ -106,22 +129,27 @@ const [
   >();
 
 for (const variant of allVariants) {
+  const productId =
+    variant.product_id;
+
+  if (!productId) {
+    continue;
+  }
 
   if (
     !variantMap.has(
-      variant.product_id
+      productId
     )
   ) {
     variantMap.set(
-      variant.product_id,
+      productId,
       []
     );
   }
 
   variantMap
-    .get(variant.product_id)!
+    .get(productId)!
     .push(variant);
-
 }
     /* =========================
        SHIPPING
@@ -161,7 +189,8 @@ for (const variant of allVariants) {
             row.price
           ),
           domestic_country_code:
-            row.domestic_country_code,
+            row.domestic_country_code ??
+            null,
         });
     }
 
@@ -349,12 +378,15 @@ for (const variant of allVariants) {
               ),
 
             variants:
-              enrichedVariants,
-
+  isRelated
+    ? []
+    : enrichedVariants,
             shipping_rates:
-              shippingMap.get(
-                product.id
-              ) ?? [],
+  isRelated
+    ? []
+    : shippingMap.get(
+        product.id
+      ) ?? [],
           };
         });
   } catch (error) {

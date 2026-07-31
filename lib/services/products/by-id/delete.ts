@@ -9,6 +9,7 @@ import {
 
 import {
   log,
+  logError,
   extractProductStoragePaths,
 } from "./helpers";
 
@@ -22,8 +23,10 @@ export async function deleteProductService(
 ) {
   log(
     "PRODUCT.DELETE",
-    "START",
-    { id }
+    {
+      event: "START",
+      id,
+    }
   );
 
   try {
@@ -34,8 +37,11 @@ export async function deleteProductService(
       };
     }
 
-    const product =
-      await getProductById(id);
+    const product = await getProductById(
+  id,
+  null,
+  "PRODUCT_DELETE"
+);
 
     if (!product) {
       return {
@@ -46,8 +52,8 @@ export async function deleteProductService(
 
     log(
       "PRODUCT.DELETE",
-      "FOUND",
       {
+        event: "FOUND",
         id: product.id,
         imageCount:
           product.images
@@ -63,8 +69,8 @@ export async function deleteProductService(
 
     log(
       "PRODUCT.DELETE",
-      "STORAGE_PATHS",
       {
+        event: "STORAGE_PATHS",
         count:
           paths.length,
         paths,
@@ -86,8 +92,10 @@ export async function deleteProductService(
 
     log(
       "PRODUCT.DELETE",
-      "DB_DELETE_SUCCESS",
-      { id }
+      {
+        event: "DB_DELETE_SUCCESS",
+        id,
+      }
     );
 
     /* =========================
@@ -111,8 +119,8 @@ export async function deleteProductService(
       } else {
         log(
           "STORAGE.DELETE",
-          "DONE",
           {
+            event: "DONE",
             count:
               paths.length,
 
@@ -125,17 +133,18 @@ export async function deleteProductService(
 
     log(
       "PRODUCT.DELETE",
-      "SUCCESS",
-      { id }
+      {
+        event: "SUCCESS",
+        id,
+      }
     );
 
     return {
       success: true,
     };
   } catch (error) {
-    log(
-      "PRODUCT.DELETE",
-      "ERROR",
+    logError(
+      "PRODUCT.DELETE.ERROR",
       error
     );
 

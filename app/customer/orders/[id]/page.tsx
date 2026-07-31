@@ -672,7 +672,7 @@ export default function OrderDetailPage() {
              <div className="px-4 pt-4 space-y-3">
 
         {order.fulfillment_status ===
-          "shipping" && (
+          "shipped" && (
           <button
             onClick={() =>
               router.push(

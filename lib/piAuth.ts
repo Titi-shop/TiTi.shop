@@ -26,26 +26,6 @@ type PiIncompletePayment = {
   [key: string]: unknown;
 };
 
-type PiAuthResult = {
-  accessToken: string;
-  user?: {
-    uid: string;
-    username: string;
-  };
-};
-
-type PiBrowser = {
-  authenticate(
-    scopes: string[],
-    onIncompletePaymentFound: (payment: unknown) => void
-  ): Promise<PiAuthResult>;
-};
-
-declare global {
-  interface Window {
-    Pi?: PiBrowser;
-  }
-}
 
 /* =========================================================
    CLIENT: GET PI ACCESS TOKEN

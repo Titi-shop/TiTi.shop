@@ -1,4 +1,4 @@
-// =====================================================
+﻿// =====================================================
 // app/account/wallet/page.tsx
 // =====================================================
 
@@ -185,15 +185,6 @@ export default function WalletPage() {
           }
           defaultWallet={
             defaultWallet
-              ? {
-                  address:
-                    defaultWallet.address,
-                  network:
-                    defaultWallet.network,
-                  is_verified:
-                    defaultWallet.isVerified,
-                }
-              : null
           }
           onRefresh={() => {
             void refresh();
@@ -268,3 +259,4 @@ export default function WalletPage() {
   );
 
 }
+

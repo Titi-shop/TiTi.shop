@@ -1,4 +1,4 @@
-// =====================================================
+﻿// =====================================================
 // app/account/wallet/history/components/WithdrawHistoryCard.tsx
 // =====================================================
 
@@ -334,3 +334,4 @@ export default function WithdrawHistoryCard({
   );
 
 }
+

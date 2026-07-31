@@ -524,10 +524,12 @@ try {
     [escrow.order_id]
   );
 
-  if (orderResult.rows.length) {
+  const buyer = orderResult.rows[0];
+
+  if (buyer) {
 
     await sendNotification({
-      userId: orderResult.rows[0].buyer_id,
+      userId: buyer.buyer_id,
       type: "order_completed",
       category: "order",
       title: "Đơn hàng đã hoàn thành",

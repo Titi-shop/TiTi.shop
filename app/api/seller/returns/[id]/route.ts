@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { requireSeller } from "@/lib/auth/guard";
 import {
   getReturnDetail,
@@ -9,7 +9,7 @@ export const runtime = "nodejs";
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await requireSeller();
 
@@ -17,9 +17,11 @@ export async function GET(
     return auth.response;
   }
 
+  const { id: returnId } = await params;
+
   const data = await getReturnDetail(
     auth.userId,
-    params.id
+    returnId
   );
 
   return NextResponse.json(data);
@@ -27,7 +29,7 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await requireSeller();
 
@@ -35,11 +37,13 @@ export async function PATCH(
     return auth.response;
   }
 
+  const { id: returnId } = await params;
+
   const body = await req.json();
 
   await updateReturnStatus(
     auth.userId,
-    params.id,
+    returnId,
     body.action
   );
 
@@ -47,3 +51,5 @@ export async function PATCH(
     success: true,
   });
 }
+
+

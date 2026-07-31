@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { requireSeller } from "@/lib/auth/guard";
 import { getUserFromBearer } from "@/lib/auth/getUserFromBearer";
 import {
@@ -15,15 +15,17 @@ export const dynamic = "force-dynamic";
 /* ================= GET ================= */
 export async function GET(
   req: NextRequest,
-  ctx: { params: { id: string } }
+  ctx: { params: Promise<{ id: string }> }
 ) {
+  const { id: productId } = await ctx.params;
+
   const start = Date.now();
 
   const auth = await getUserFromBearer();
   const userId = auth?.userId ?? null;
 
   const result = await getProductService(
-    ctx.params.id,
+    productId,
     userId
   );
 
@@ -38,13 +40,15 @@ export async function GET(
 /* ================= PATCH ================= */
 export async function PATCH(
   req: NextRequest,
-  ctx: { params: { id: string } }
+  ctx: { params: Promise<{ id: string }> }
 ) {
+  const { id: productId } = await ctx.params;
+
   const auth = await requireSeller();
   if (!auth.ok) return auth.response;
 
   const result = await updateProductService(
-    ctx.params.id,
+    productId,
     auth.userId,
     await req.json()
   );
@@ -52,7 +56,7 @@ console.log(
   "[API][PRODUCTS][PATCH_DONE]",
   {
     productId:
-      maskId(ctx.params.id),
+      maskId(productId),
   }
 );
   return NextResponse.json(result);
@@ -61,21 +65,25 @@ console.log(
 /* ================= DELETE ================= */
 export async function DELETE(
   _req: NextRequest,
-  ctx: { params: { id: string } }
+  ctx: { params: Promise<{ id: string }> }
 ) {
+  const { id: productId } = await ctx.params;
+
   const auth = await requireSeller();
   if (!auth.ok) return auth.response;
 
   const result = await deleteProductService(
-    ctx.params.id,
+    productId,
     auth.userId
   );
 console.log(
   "[API][PRODUCTS][DELETE_DONE]",
   {
     productId:
-      maskId(ctx.params.id),
+      maskId(productId),
   }
 );
   return NextResponse.json(result);
 }
+
+

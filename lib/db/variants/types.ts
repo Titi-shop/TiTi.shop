@@ -1,6 +1,6 @@
-import type {
+﻿import type {
   ProductVariantDB,
-} from "@/types/product";
+} from "@/types/Product";
 
 /* =========================================================
    TYPES
@@ -23,3 +23,4 @@ export type VariantWithSaleWindow =
     sale_start: string | null;
     sale_end: string | null;
   };
+

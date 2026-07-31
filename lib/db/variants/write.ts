@@ -1,10 +1,10 @@
-import {
+﻿import {
   withTransaction,
 } from "@/lib/db";
 
 import type {
   ProductVariant,
-} from "@/types/product";
+} from "@/types/Product";
 
 import {
   mapVariantToDB,
@@ -19,7 +19,7 @@ function vlog(
   payload?: unknown
 ): void {
   console.log(
-    `🧪 [DB][VARIANTS] ${step}`,
+    `đŸ§ª [DB][VARIANTS] ${step}`,
     payload ?? ""
   );
 }
@@ -198,3 +198,4 @@ if (
     }
   );
 }
+

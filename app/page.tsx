@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 export const dynamic = "force-dynamic";
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
@@ -21,7 +21,7 @@ import PiPriceWidget from "./components/PiPriceWidget";
 import { useCart } from "@/app/context/CartContext";
 import { useTranslationClient as useTranslation } from "@/app/lib/i18n/client";
 import { formatPi } from "@/lib/pi";
-import type { Product } from "@/types/product";
+import type { Product } from "@/types/Product";
 import type { Category } from "@/types/category";
 
 /* =========================================================
@@ -203,7 +203,7 @@ function ProductCard({
   </span>
 
   <span>
-    👁 {product.views ?? 0}
+    👁️ {product.views ?? 0}
   </span>
 
   <span>
@@ -385,7 +385,7 @@ useEffect(() => {
     return;
   }
 
-  // kiểm tra variant trước
+  // kiá»ƒm tra variant trÆ°á»›c
   const hasVariant =
     Boolean(product.has_variants) ||
     (product.variants?.length ?? 0) > 0 ||
@@ -400,7 +400,7 @@ useEffect(() => {
   return;
 }
 
-  // sau đó mới kiểm tra tồn kho
+  // sau Ä‘Ă³ má»›i kiá»ƒm tra tá»“n kho
   const isOutOfStock =
     !product.is_unlimited &&
     (product.stock ?? 0) <= 0;
@@ -413,10 +413,14 @@ useEffect(() => {
   }
 
   addToCart({
-    id: String(product.id),
     product_id: product.id,
     name: product.name,
+    slug: product.slug,
     price: product.price,
+    final_price:
+      product.final_price ??
+      product.sale_price ??
+      product.price,
     sale_price:
       product.final_price ||
       product.sale_price,
@@ -788,3 +792,5 @@ useEffect(() => {
     </main>
   );
                   }
+
+

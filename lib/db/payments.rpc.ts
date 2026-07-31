@@ -1,15 +1,18 @@
-
+﻿
 import crypto from "crypto";
 import { query } from "@/lib/db";
 import { getRpcTransaction } from "@/lib/rpc/client";
 
 import type {
   RpcVerifyResult,
+  RpcVerifyStage,
+  RpcVerifyReason,
   PaymentIntentRow,
 } from "@/lib/payments/types/rpc.types";
 
 import type {
   InsertRpcLogInput,
+  RpcVerificationLogRow,
 } from "@/lib/payments/types/rpc.db.types";
 import {
   logger,
@@ -34,7 +37,7 @@ type VerifyRpcParams = {
 function normalizeRpcAmount(amount: number | null): number | null {
   if (amount === null) return null;
 
-  // Pi RPC trả về stroop (10^7)
+  // Pi RPC tráº£ vá» stroop (10^7)
   if (amount > 1_000_000) {
     return amount / 10_000_000;
   }
@@ -369,7 +372,7 @@ function buildRpcVerifyResult(
 
     payload: rpcLog.payload,
 
-    reason: rpcLog.reason,
+    reason: rpcLog.reason ?? "NONE",
     stage: rpcLog.stage,
 
     createdAt: rpcLog.createdAt,
@@ -391,7 +394,7 @@ export async function verifyRpcPaymentForReconcile({
 });
 
   if (!isUUID(paymentIntentId) || !txid.trim()) {
-    fail("INVALID_INPUT", {
+    logger.error("RPC.INVALID_INPUT", {
   paymentIntentId: maskId(paymentIntentId),
   txid: maskId(txid),
 });
@@ -487,26 +490,26 @@ const hasEvents = rpcTx.debug.hasEvents;
   ===================================================== */
 
   let verified = true;
-  let stage = "RPC_OK";
-  let reason = "NONE";
+  let stage: RpcVerifyStage = "RPC_OK";
+  let reason: RpcVerifyReason = "NONE";
   if (!rpcTx.rpcReachable) {
     verified = false;
     stage = "RPC_UNREACHABLE";
     reason = "RPC_UNREACHABLE";
 
-    warn(stage, reason);
+    logger.warn(stage, { reason });
   } else if (!rpcTx.confirmed) {
     verified = false;
     stage = "RPC_NOT_CONFIRMED";
     reason = "TX_NOT_CONFIRMED";
 
-    warn(stage, reason);
+    logger.warn(stage, { reason });
   } else if (rpcTx.amount === null) {
     verified = false;
     stage = "RPC_AMOUNT_UNREADABLE";
     reason = "AMOUNT_NOT_READABLE";
 
-    warn(stage, {
+    logger.warn(stage, {
       parseLayer: rpcTx.debug.parseLayer,
     });
   } else if (!amountMatch) {
@@ -514,7 +517,7 @@ const hasEvents = rpcTx.debug.hasEvents;
     stage = "RPC_AMOUNT_MISMATCH";
     reason = "AMOUNT_MISMATCH";
 
-    warn(stage,{
+    logger.warn(stage, {
     amountMismatch:true
 });
   } else if (!rpcTx.receiver) {
@@ -522,7 +525,7 @@ const hasEvents = rpcTx.debug.hasEvents;
     stage = "RPC_RECEIVER_UNREADABLE";
     reason = "RECEIVER_NOT_READABLE";
 
-    warn(stage, {
+    logger.warn(stage, {
       parseLayer: rpcTx.debug.parseLayer,
     });
   } else if (!receiverMatch) {
@@ -530,7 +533,7 @@ const hasEvents = rpcTx.debug.hasEvents;
     stage = "RPC_RECEIVER_MISMATCH";
     reason = "RECEIVER_MISMATCH";
 
-    warn(stage,{
+    logger.warn(stage, {
     receiverMismatch:true
 });
   }
@@ -711,7 +714,7 @@ export async function getRpcVerificationLog(
     throw new Error("INVALID_PAYMENT_INTENT_ID");
   }
 
-  const rs = await query(
+  const rs = await query<RpcVerificationLogRow>(
     `
     SELECT
       payment_intent_id,
@@ -781,6 +784,7 @@ export async function getRpcVerificationLog(
   return {
   ...row,
 
+  ok: row.verified,
   txStatus: row.tx_status,
   chainReference: row.chain_reference,
 
@@ -804,3 +808,8 @@ export async function getRpcVerificationLog(
   createdAt: row.created_at_chain,
 };
 }
+
+
+
+
+

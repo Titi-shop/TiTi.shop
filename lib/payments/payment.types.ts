@@ -1,3 +1,4 @@
+import type { PricingResult } from "@/lib/payments/pricing.engine";
 /* =========================================================
    PAYMENT ENGINE V7 MASTER TYPES
    SINGLE SOURCE OF TRUTH
@@ -384,16 +385,7 @@ export type RawInput = {
   raw: unknown;
 };
 
-export type ShippingInput = {
-  name: string;
-  phone: string;
-  address_line: string;
 
-  ward?: string | null;
-  district?: string | null;
-  region?: string | null;
-  postal_code?: string | null;
-};
 
 export type NormalizedIntentInput = {
   userId: string;
@@ -405,14 +397,7 @@ export type NormalizedIntentInput = {
   shipping: ShippingInput;
 };
 
-export type CreateIntentServiceResult = {
-  payment_intent_id: string;
-  pi_payment_id: string;
-  amount: number;
-  memo: string;
-  metadata: Record<string, unknown>;
-  to_address: string;
-};
+
 
 export type CreatePiPaymentIntentParams = {
   userId: string;

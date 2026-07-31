@@ -1,4 +1,4 @@
-import type { PoolClient } from "pg";
+﻿import type { PoolClient } from "pg";
 
 import type {
   ExistingOrderRow,
@@ -38,9 +38,9 @@ export async function findExistingOrder(
       [piPaymentId]
     );
 
-  if (
-    existingOrder.rows.length === 0
-  ) {
+  const existingOrderRow = existingOrder.rows[0];
+
+  if (!existingOrderRow) {
     return null;
   }
 
@@ -49,7 +49,7 @@ export async function findExistingOrder(
     already: true,
 
     orderId:
-      existingOrder.rows[0].id,
+      existingOrderRow.id,
 
     buyerId,
     sellerId,
@@ -120,3 +120,4 @@ export async function finalizePaymentIntent(
 });
 }
 }
+

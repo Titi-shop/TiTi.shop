@@ -80,7 +80,7 @@ const {
   uploadDetailImages,
 } = useProductUpload({
   form,
-  userId: user?.id,
+  ...(user?.id ? { userId: user.id } : {}),
   setErrors,
   t,
 });

@@ -3,8 +3,9 @@ import { toUTCFromInput } from "@/lib/utils/time";
 import type {
   ProductPayload,
   ProductVariant,
-  ShippingRate,
-} from "@/types/product";
+    ShippingRate,
+    ShippingZone,
+} from "@/types/Product";
 
 /* =========================
    TYPES
@@ -115,7 +116,7 @@ export function buildProductPayload(
       })
       .map(([zone, price]) => ({
         zone:
-          zone as ShippingRate["zone"],
+          zone as ShippingZone,
 
         price: Number(price),
 
@@ -179,21 +180,19 @@ export function buildProductPayload(
   ========================= */
 
   const payload: ProductPayload = {
-    id:
-      typeof form.id === "string"
-        ? form.id
-        : undefined,
-
-    name: form.name,
-
-    category_id:
-      form.category_id !== "" &&
-      form.category_id !== null &&
-      form.category_id !== undefined
-        ? Number(form.category_id)
-        : undefined,
-
-    description:
+    ...(typeof form.id === "string"
+      ? { id: form.id }
+      : {}),
+name: form.name,
+    ...(form.category_id !== "" &&
+    form.category_id !== null &&
+    form.category_id !== undefined
+      ? {
+          category_id:
+            Number(form.category_id),
+        }
+      : {}),
+description:
       form.description,
 
     detail:
@@ -217,16 +216,15 @@ export function buildProductPayload(
     domestic_country_code:
       form.domestic_country_code ||
       null,
+      ...(!hasVariants
+        ? {
+            price:
+              Number(form.price),
 
-    price:
-      hasVariants
-        ? undefined
-        : Number(form.price),
-
-    stock:
-      hasVariants
-        ? undefined
-        : Number(form.stock || 0),
+            stock:
+              Number(form.stock || 0),
+          }
+        : {}),
 
     sale_enabled:
       hasVariants
@@ -279,3 +277,5 @@ export function buildProductPayload(
 
   return payload;
 }
+
+

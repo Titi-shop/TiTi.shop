@@ -16,10 +16,7 @@ import { isSaleActive } from "@/lib/utils/sale";
 export function mapRow(
   row: ProductRow
 ): ProductRecord {
-  const price =
-    row.price == null
-      ? null
-      : safeNumber(row.price);
+  const price = safeNumber(row.price);
 
   const salePrice =
     row.sale_price == null
@@ -48,23 +45,19 @@ export function mapRow(
       : null,
 
   final_price:
-    saleActive
+    saleActive && salePrice !== null
       ? salePrice
       : price,
 
   stock:
-    row.stock == null
-      ? null
-      : safeNumber(
-          row.stock
-        ),
+    safeNumber(
+      row.stock
+    ),
 
   sale_stock:
-    row.sale_stock == null
-      ? null
-      : safeNumber(
-          row.sale_stock
-        ),
+    safeNumber(
+      row.sale_stock
+    ),
 
   sale_sold:
     safeNumber(

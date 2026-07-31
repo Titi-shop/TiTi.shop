@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { requireSeller } from "@/lib/auth/guard";
 import { getReturnsBySeller } from "@/lib/services/returns/seller.service";
 
@@ -9,7 +9,7 @@ export const runtime = "nodejs";
 ===================================================== */
 
 export async function GET(req: NextRequest) {
-  console.log("🚀 [SELLER RETURNS API] START");
+  console.log("đŸ€ [SELLER RETURNS API] START");
 
   try {
     /* ================= AUTH ================= */
@@ -21,28 +21,43 @@ export async function GET(req: NextRequest) {
 
     const sellerId = auth.userId;
 
-    console.log("👤 SELLER:", sellerId);
+    console.log("đŸ‘¤ SELLER:", sellerId);
 
     /* ================= QUERY PARAM ================= */
     const url = new URL(req.url);
-    const status = url.searchParams.get("status"); // 👈 CHÍNH LÀ DÒNG BẠN HỎI
+    const rawStatus = url.searchParams.get("status");
 
-    console.log("🔎 FILTER STATUS:", status);
+    const allowedStatuses = [
+      "pending",
+      "approved",
+      "shipping_back",
+      "received",
+      "refunded",
+      "rejected",
+    ] as const;
+
+    const status =
+      rawStatus !== null &&
+      allowedStatuses.some((value) => value === rawStatus)
+        ? (rawStatus as (typeof allowedStatuses)[number])
+        : null;
+
+    console.log("đŸ” FILTER STATUS:", status);
 
     /* ================= DB ================= */
     const items = await getReturnsBySeller(
       sellerId,
-      status // 👈 TRUYỀN XUỐNG DB
+      status // đŸ‘ˆ TRUYá»€N XUá»NG DB
     );
 
-    console.log("📦 RETURNS:", items.length);
+    console.log("đŸ“¦ RETURNS:", items.length);
 
     return NextResponse.json({
       items,
     });
 
   } catch (err) {
-    console.error("💥 API ERROR:", err);
+    console.error("đŸ’¥ API ERROR:", err);
 
     return NextResponse.json(
       { error: "INTERNAL_ERROR" },

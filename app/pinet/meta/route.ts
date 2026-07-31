@@ -55,7 +55,8 @@ export async function GET(
 
       const product =
         await getProductService(
-          id
+          id,
+          null
         );
 
       if (

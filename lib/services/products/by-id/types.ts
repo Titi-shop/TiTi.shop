@@ -1,6 +1,4 @@
-import type {
-  ProductVariantRecord,
-} from "@/lib/db/variants";
+import type { ProductVariantDB } from "@/types/Product";
 
 /* =====================================================
    SHIPPING
@@ -51,5 +49,5 @@ export type ProductRequestBody = {
 
   /* ================= VARIANTS ================= */
 
-  variants?: ProductVariantRecord[];
+  variants?: ProductVariantDB[];
 };

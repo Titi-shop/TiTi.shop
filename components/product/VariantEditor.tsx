@@ -1,8 +1,8 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { useTranslationClient as useTranslation } from "@/app/lib/i18n/client";
-import type { ProductVariant } from "@/types/product";
+import type { ProductVariant } from "@/types/Product";
 interface Props {
   variants: ProductVariant[];
 
@@ -100,7 +100,9 @@ const hydrateVariant = (
   );
 
   return {
-    id: v.id,
+    ...(v.id !== undefined
+      ? { id: v.id }
+      : {}),
     option1: v.option1 ?? "",
     option2:
       v.option2 ?? null,
@@ -696,7 +698,7 @@ export default function VariantEditor({
                           }
                           className="text-red-500"
                         >
-                          ✕
+                          x
                         </button>
                       </td>
                     </tr>
@@ -710,3 +712,5 @@ export default function VariantEditor({
     </div>
   );
 }
+
+

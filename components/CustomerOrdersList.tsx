@@ -18,7 +18,7 @@ import {
   type OrderStatus,
 } from "@/constants/order-status";
 
-import type { Order } from "@/app/customer/orders/types";
+import type { Order } from "@/types/orders";
 
 /* =======================================================
    TYPES
@@ -200,6 +200,7 @@ function Inner({
       completed: 0,
       cancelled: 0,
       refunded: 0,
+      returns: 0,
     };
 
     for (const order of orders) {

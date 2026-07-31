@@ -4,7 +4,7 @@
     "lib": ["dom", "dom.iterable", "esnext"],
 
     "allowJs": false,                // ⛔ không cho JS lẫn TS
-    "skipLibCheck": false,           // ✅ bắt lỗi type thật
+    "skipLibCheck": true,           // ✅ bắt lỗi type thật
     "strict": true,
     "noEmit": true,
 

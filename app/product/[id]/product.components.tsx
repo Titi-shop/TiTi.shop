@@ -9,14 +9,13 @@ import { formatPi } from "@/lib/pi";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
 import { ShoppingCart } from "lucide-react";
-import { prefetchProduct } from "@/lib/prefetch";
 import { apiAuthFetch } from "@/lib/api/apiAuthFetch";
 import ProductReviews, {
   type ProductReview,
 } from "./ProductReviews";
 import type {
   ProductRecord,
-  ProductVariantView,
+  ProductVariant,
   RelatedProduct,
 } from "@/types/Product";
 import {
@@ -52,12 +51,12 @@ type ProductViewProps = {
   setInitialDistance: (v: number) => void;
   initialScale: number;
   setInitialScale: (v: number) => void;
-  selectedVariant: ProductVariantView | null;
+  selectedVariant: ProductVariant | null;
   setSelectedVariant: (
-  v: ProductVariantView | null
+  v: ProductVariant | null
 ) => void;
 
-availableVariants: ProductVariantView[];
+availableVariants: ProductVariant[];
   canBuy: boolean;
   selectedStock: number;
   hasVariants: boolean;
@@ -256,7 +255,8 @@ const toggleFavorite = async () => {
   hasVariants
     ? selectedVariant &&
       selectedVariant.sale_enabled &&
-      selectedVariant.final_price <
+      (selectedVariant.final_price ??
+        selectedVariant.price) <
         selectedVariant.price
     : product.sale_enabled &&
       product.final_price <
@@ -273,7 +273,8 @@ const toggleFavorite = async () => {
     {hasVariants && selectedVariant
       ? calcSalePercent(
           selectedVariant.price,
-          selectedVariant.final_price
+          selectedVariant.final_price ??
+            selectedVariant.price
         )
       : calcSalePercent(
           product.price,
@@ -317,18 +318,24 @@ const toggleFavorite = async () => {
               const now = Date.now();
 
               if (now - lastTap < 300) {
-                setScale((prev: number) => (prev === 1 ? 2 : 1));
+                setScale(scale === 1 ? 2 : 1);
                 setPosition({ x: 0, y: 0 });
               }
 
               setLastTap(now);
+              setDragging(false);
             }}
 
             /* ===== TOUCH START ===== */
             onTouchStart={(e) => {
   if (e.touches.length === 2) {
-    const dx = e.touches[0].clientX - e.touches[1].clientX;
-    const dy = e.touches[0].clientY - e.touches[1].clientY;
+    const firstTouch = e.touches[0];
+    const secondTouch = e.touches[1];
+
+    if (!firstTouch || !secondTouch) return;
+
+    const dx = firstTouch.clientX - secondTouch.clientX;
+    const dy = firstTouch.clientY - secondTouch.clientY;
     const distance = Math.sqrt(dx * dx + dy * dy);
 
     setInitialDistance(distance);
@@ -337,6 +344,9 @@ const toggleFavorite = async () => {
 
   if (e.touches.length === 1) {
     const touch = e.touches[0];
+
+    if (!touch) return;
+
     setDragging(true);
     setStart({
       x: touch.clientX - position.x,
@@ -348,8 +358,13 @@ const toggleFavorite = async () => {
 onTouchMove={(e) => {
   /* PINCH ZOOM */
   if (e.touches.length === 2) {
-    const dx = e.touches[0].clientX - e.touches[1].clientX;
-    const dy = e.touches[0].clientY - e.touches[1].clientY;
+    const firstTouch = e.touches[0];
+    const secondTouch = e.touches[1];
+
+    if (!firstTouch || !secondTouch) return;
+
+    const dx = firstTouch.clientX - secondTouch.clientX;
+    const dy = firstTouch.clientY - secondTouch.clientY;
     const distance = Math.sqrt(dx * dx + dy * dy);
    if (!initialDistance) return;
 
@@ -365,14 +380,13 @@ let newScale =
   if (e.touches.length === 1 && dragging && scale > 1) {
     const touch = e.touches[0];
 
+    if (!touch) return;
+
     setPosition({
       x: touch.clientX - start.x,
       y: touch.clientY - start.y,
     });
   }
-}}
-            onTouchEnd={() => {
-  setDragging(false);
 }}
             style={{
               transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
@@ -415,7 +429,8 @@ let newScale =
         </p>
 
         {(selectedVariant.sale_price ?? 0) > 0 &&
-          selectedVariant.final_price <
+          (selectedVariant.final_price ??
+            selectedVariant.price) <
             selectedVariant.price && (
             <p
               className="text-sm line-through"
@@ -596,15 +611,9 @@ let newScale =
                 if (!isDisabled) {
                   setSelectedVariant(v);
 
-                  if (v.image ?? null) {
-                    setActiveImage(
-                      v.image
-                    );
-                  } else {
-                    setActiveImage(
-                      null
-                    );
-                  }
+                  setActiveImage(
+                    v.image ?? null
+                  );
                 }
               }}
               className="rounded border px-2 py-2 text-sm transition"
@@ -703,11 +712,9 @@ style={{
             {relatedProducts.map((p) => (
               <div
                 key={p.id}
-                onClick={async () => {
-                  await prefetchProduct(p.id);
-                  router.push(`/product/${p.id}`);
-                }}
-                onTouchStart={() => prefetchProduct(p.id)}
+                onClick={() => {
+  router.push(`/product/${p.id}`);
+}}
                 className="min-w-[140px] cursor-pointer"
               >
                 <img

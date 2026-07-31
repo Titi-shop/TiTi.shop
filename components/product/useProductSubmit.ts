@@ -1,3 +1,4 @@
+﻿
 "use client";
 
 import {
@@ -22,14 +23,14 @@ import {
 
 import type {
   ProductPayload,
-} from "@/types/product";
+} from "@/types/Product";
 
 import type {
   ProductFormErrors,
 } from "./product-form.types";
 
 import type {
-  ProductFormState,
+  useProductForm,
 } from "./useProductForm";
 
 /* =========================
@@ -42,7 +43,7 @@ type ProductSubmitTranslations =
   >[1];
 
 interface UseProductSubmitParams {
-  form: ProductFormState;
+  form: ReturnType<typeof useProductForm>;
 
   submitting: boolean;
 
@@ -116,12 +117,12 @@ export function useProductSubmit({
           buildProductPayload(form);
 
         console.log(
-          "🧪 FORM CATEGORY:",
+          "TEGORY:",
           form.category_id
         );
 
         console.log(
-          "📦 PRODUCT PAYLOAD:",
+          " PAYLOAD:",
           payload
         );
 
@@ -132,7 +133,7 @@ export function useProductSubmit({
         await onSubmit(payload);
       } catch (error) {
         console.error(
-          "💥 PRODUCT SUBMIT ERROR:",
+          " SUBMIT ERROR:",
           error
         );
 
@@ -155,3 +156,5 @@ export function useProductSubmit({
     handleSubmit,
   };
 }
+
+

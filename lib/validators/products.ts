@@ -1,6 +1,6 @@
 import type {
   ProductVariant,
-} from "@/types/product";
+} from "@/types/Product";
 
 /* =========================================================
    RAW INPUT TYPE
@@ -220,7 +220,7 @@ export function normalizeVariant(
 
   if (!option1) {
     console.warn(
-      "❌ INVALID_VARIANT_OPTION1",
+      "âŒ INVALID_VARIANT_OPTION1",
       {
         index,
         raw,
@@ -280,12 +280,13 @@ export function normalizeVariant(
 
   const variant: ProductVariant =
     {
-      id:
-        safeNullableString(
-          item.id
-        ) ?? undefined,
-
-      /* OPTIONS */
+      ...(safeNullableString(item.id) !== null
+        ? {
+            id:
+              safeNullableString(item.id)!,
+          }
+        : {}),
+/* OPTIONS */
 
       option1,
 
@@ -541,3 +542,4 @@ if (
 
   return null;
 }
+

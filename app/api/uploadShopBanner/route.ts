@@ -53,7 +53,7 @@ const userId = auth.userId;
         const url = new URL(oldBanner);
         await del(url.pathname);
       } catch (err) {
-        console.warn("⚠️ Failed to delete old banner:", err);
+        console.warn("â ï¸ Failed to delete old banner:", err);
       }
     }
 
@@ -63,7 +63,9 @@ const userId = auth.userId;
       file,
       {
         access: "public",
-        token: process.env.BLOB_READ_WRITE_TOKEN,
+        ...(process.env.BLOB_READ_WRITE_TOKEN !== undefined
+          ? { token: process.env.BLOB_READ_WRITE_TOKEN }
+          : {}),
       }
     );
 
@@ -77,7 +79,7 @@ const userId = auth.userId;
     });
 
   } catch (err) {
-    console.error("❌ UPLOAD SHOP BANNER ERROR:", err);
+    console.error("âŒ UPLOAD SHOP BANNER ERROR:", err);
 
     return NextResponse.json(
       { error: "UPLOAD_FAILED" },

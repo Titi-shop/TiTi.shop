@@ -1,4 +1,4 @@
-import { submitPiPaymentFromRequest } from "./payment.submit.service";
+﻿import { submitPiPaymentFromRequest } from "./payment.submit.service";
 import { runPaymentSettlement } from "@/lib/payments/payment.orchestrator";
 import { getPaymentIntent } from "@/lib/db/payments.intent";
 
@@ -75,8 +75,7 @@ export async function settlePiPayment({
     piPaymentId,
     txid,
     userId,
-    source: "submit-api",
-    intent,
+    source: "CLIENT_SUBMIT",
   });
 
   if (!result.ok) {
@@ -93,3 +92,4 @@ export async function settlePiPayment({
     source: result.source,
   };
 }
+

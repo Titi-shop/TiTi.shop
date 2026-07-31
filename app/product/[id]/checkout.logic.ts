@@ -150,6 +150,13 @@ export function useCheckoutPay(params: UseCheckoutPayParams) {
     if (processingRef.current || processing) return;
     if (!validate()) return;
 
+    if (!item) {
+      showMessage(
+        t.invalid_product ?? "invalid_product"
+      );
+      return;
+    }
+
     processingRef.current = true;
     setProcessing(true);
 showMessage(

@@ -1,4 +1,4 @@
-import { withTransaction } from "@/lib/db";
+import type { PoolClient } from "pg";
 import {
   logger,
   maskId,
@@ -85,7 +85,7 @@ function isUUID(v: string): boolean {
    MAIN
 ========================================================= */
 
-export async function createOrder(input: CreateOrderInput) {
+export async function createOrder(client: PoolClient, input: CreateOrderInput) {
   const { userId, items } = input;
 
   if (!userId) throw new Error("INVALID_USER");
@@ -94,7 +94,7 @@ export async function createOrder(input: CreateOrderInput) {
   const zone = input.zone?.trim().toLowerCase();
   const country = input.country?.trim().toUpperCase();
 
-  return withTransaction(async (client) => {
+
      const existingOrder =
   await client.query<{ id: string }>(
     `
@@ -106,12 +106,14 @@ export async function createOrder(input: CreateOrderInput) {
     [input.idempotencyKey]
   );
 
-if (existingOrder.rows.length) {
+const existing = existingOrder.rows[0];
+
+if (existing) {
   logger.info("ORDER.IDEMPOTENT_HIT", {
-  orderId: maskId(existingOrder.rows[0].id),
-});
+    orderId: maskId(existing.id),
+  });
   return {
-    orderId: existingOrder.rows[0].id,
+    orderId: existing.id,
   };
 }
     logger.info("ORDER.CREATE.START", {
@@ -389,6 +391,12 @@ AND reserved_stock >= $1
 
     logger.debug("ORDER.INSERT");
 
+    const firstOrderItem = orderItems[0];
+
+    if (!firstOrderItem) {
+      throw new Error("INVALID_ORDER_ITEMS");
+    }
+
     const orderRes = await client.query<{ id: string }>(
       `
       INSERT INTO orders (
@@ -458,7 +466,7 @@ AND reserved_stock >= $1
       `,
       [
         userId,
-        orderItems[0].product.seller_id,
+        firstOrderItem.product.seller_id,
 
         input.piPaymentId,
         input.txid,
@@ -486,12 +494,18 @@ AND reserved_stock >= $1
       ]
     );
 
-    const orderId = orderRes.rows[0].id;
+    const createdOrder = orderRes.rows[0];
+
+    if (!createdOrder) {
+      throw new Error("ORDER_CREATE_FAILED");
+    }
+
+    const orderId = createdOrder.id;
 
     logger.info("ORDER.CREATED", {
   orderId: maskId(orderId),
   buyerId: maskId(userId),
-  sellerId: maskId(orderItems[0].product.seller_id),
+  sellerId: maskId(firstOrderItem.product.seller_id),
   total,
 });
 
@@ -539,5 +553,4 @@ AND reserved_stock >= $1
     ========================================================= */
 
     return { orderId };
-  });
-      }
+}

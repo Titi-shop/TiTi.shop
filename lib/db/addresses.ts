@@ -95,6 +95,10 @@ export async function createAddress(
   );
 const address = res.rows[0];
 
+if (!address) {
+  throw new Error("ADDRESS_CREATE_FAILED");
+}
+
 logger.info(
   "ADDRESS.CREATE.SUCCESS",
   {

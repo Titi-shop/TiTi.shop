@@ -1,8 +1,15 @@
-/* =========================================================
+﻿/* =========================================================
    RPC VERIFY
 ========================================================= */
 
 export type RpcVerifyStage =
+  | "RPC_OK"
+  | "RPC_UNREACHABLE"
+  | "RPC_NOT_CONFIRMED"
+  | "RPC_AMOUNT_UNREADABLE"
+  | "RPC_AMOUNT_MISMATCH"
+  | "RPC_RECEIVER_UNREADABLE"
+  | "RPC_RECEIVER_MISMATCH"
   | "RPC_FETCH"
   | "RPC_PARSE"
   | "AMOUNT_CHECK"
@@ -14,6 +21,7 @@ export type RpcVerifyStage =
   | "MANUAL_REVIEW";
 
 export type RpcVerifyReason =
+  | "NONE"
   | "OK"
   | "RPC_UNREACHABLE"
   | "TX_NOT_CONFIRMED"
@@ -138,4 +146,5 @@ export type ParsedRpcTransaction = {
     hasEvents: boolean;
   };
 };
+
 

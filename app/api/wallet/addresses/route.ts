@@ -55,9 +55,7 @@ export async function GET(
   try {
 
     const auth =
-      await requireAuth(
-        request
-      );
+      await requireAuth();
 
     if (!auth.ok) {
 
@@ -129,9 +127,7 @@ export async function POST(
   try {
 
     const auth =
-      await requireAuth(
-        request
-      );
+      await requireAuth();
 
     if (!auth.ok) {
 

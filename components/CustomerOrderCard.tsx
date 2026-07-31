@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { formatPi } from "@/lib/pi";
 import { useTranslationClient as useTranslation } from "@/app/lib/i18n/client";
@@ -11,8 +11,8 @@ import {
 } from "@/constants/order-status";
 
 import type {
-  BuyerOrderRow,
-  BuyerOrderItemRow,
+  Order as BuyerOrderRow,
+  OrderItem as BuyerOrderItemRow,
   ReturnStatus,
 } from "@/types/orders";
 
@@ -116,7 +116,7 @@ function OrderItemRow({
 
         {item.seller_message && (
           <p className="mt-1 text-xs text-[var(--text-muted)]">
-            💌 {item.seller_message}
+            {item.seller_message}
           </p>
         )}
 
@@ -259,11 +259,15 @@ export default function CustomerOrderCard({
           }
           reviewed={reviewed}
           onDetail={onDetail}
-          onCancel={onCancel}
-          onReceived={onReceived}
-          onReview={onReview}
+          {...(onCancel ? { onCancel } : {})}
+          {...(onReceived ? { onReceived } : {})}
+          {...(onReview ? { onReview } : {})}
         />
       </div>
     </div>
   );
 }
+
+
+
+

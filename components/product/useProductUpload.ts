@@ -23,7 +23,7 @@ import type {
 } from "./product-form.types";
 
 import type {
-  ProductFormState,
+  useProductForm,
 } from "./useProductForm";
 
 /* =========================
@@ -35,8 +35,11 @@ type ProductUploadTranslations =
     typeof notifyUploadFailed
   >[0];
 
+type ProductFormController =
+  ReturnType<typeof useProductForm>;
+
 interface UseProductUploadParams {
-  form: ProductFormState;
+  form: ProductFormController;
 
   userId?: string;
 

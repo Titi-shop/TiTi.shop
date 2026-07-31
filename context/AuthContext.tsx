@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   createContext,
@@ -22,6 +22,7 @@ export type PiUser = {
   username: string;
   wallet_address?: string | null;
   role?: string;
+  is_admin: boolean;
 };
 
 type AuthContextType = {
@@ -70,9 +71,9 @@ export function AuthProvider({
     }
 
     /*
-     * Pi Browser SDK có thể được load sau React.
-     * piReady chỉ biểu thị SDK sẵn sàng,
-     * không quyết định OAuth browser có đăng nhập hay không.
+     * Pi Browser SDK cĂ³ thá»ƒ Ä‘Æ°á»£c load sau React.
+     * piReady chá»‰ biá»ƒu thá»‹ SDK sáºµn sĂ ng,
+     * khĂ´ng quyáº¿t Ä‘á»‹nh OAuth browser cĂ³ Ä‘Äƒng nháº­p hay khĂ´ng.
      */
     if (window.Pi) {
       setPiReady(true);
@@ -150,11 +151,11 @@ export function AuthProvider({
     const initAuth = async () => {
       try {
         /*
-         * Không tự bật Pi.authenticate khi người dùng
-         * chưa có phiên đăng nhập.
+         * KhĂ´ng tá»± báº­t Pi.authenticate khi ngÆ°á»i dĂ¹ng
+         * chÆ°a cĂ³ phiĂªn Ä‘Äƒng nháº­p.
          *
-         * Pi Browser mới vẫn phải đăng nhập qua pilogin().
-         * Browser OAuth callback cũng lưu token ở đây.
+         * Pi Browser má»›i váº«n pháº£i Ä‘Äƒng nháº­p qua pilogin().
+         * Browser OAuth callback cÅ©ng lÆ°u token á»Ÿ Ä‘Ă¢y.
          */
         const storedToken =
           localStorage.getItem(
@@ -167,13 +168,13 @@ export function AuthProvider({
         }
 
         /*
-         * getPiAccessToken() sẽ:
+         * getPiAccessToken() sáº½:
          *
          * - Browser OAuth:
          *   verify stored token qua Pi /v2/me.
          *
          * - Pi Browser:
-         *   sử dụng stored token hiện tại.
+         *   sá»­ dá»¥ng stored token hiá»‡n táº¡i.
          */
         const token =
           await getPiAccessToken();
@@ -191,8 +192,8 @@ export function AuthProvider({
         );
       } catch {
         /*
-         * Token cũ/không hợp lệ.
-         * Không gọi logout() vì logout xóa cả cart.
+         * Token cÅ©/khĂ´ng há»£p lá»‡.
+         * KhĂ´ng gá»i logout() vĂ¬ logout xĂ³a cáº£ cart.
          */
         clearPiToken();
 
@@ -213,9 +214,9 @@ export function AuthProvider({
 
   const pilogin = async () => {
     /*
-     * pilogin() này là Pi SDK login.
-     * Browser thường bắt đầu OAuth tại /pilogin/page.tsx,
-     * không đi qua hàm này nếu không có SDK.
+     * pilogin() nĂ y lĂ  Pi SDK login.
+     * Browser thÆ°á»ng báº¯t Ä‘áº§u OAuth táº¡i /pilogin/page.tsx,
+     * khĂ´ng Ä‘i qua hĂ m nĂ y náº¿u khĂ´ng cĂ³ SDK.
      */
     if (!piReady || !window.Pi) {
       return;
@@ -250,11 +251,11 @@ export function AuthProvider({
       );
 
       console.log(
-        "🟢 LOGIN SUCCESS"
+        "đŸŸ¢ LOGIN SUCCESS"
       );
     } catch (err) {
       console.error(
-        "❌ LOGIN ERROR:",
+        "âŒ LOGIN ERROR:",
         err
       );
     } finally {
@@ -266,7 +267,7 @@ export function AuthProvider({
   /* ================= LOGOUT ================= */
 
   const logout = () => {
-    console.log("🔴 LOGOUT");
+    console.log("đŸ”´ LOGOUT");
 
     localStorage.removeItem(
       USER_KEY
@@ -306,3 +307,4 @@ export function AuthProvider({
 
 export const useAuth = () =>
   useContext(AuthContext);
+

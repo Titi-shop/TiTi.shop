@@ -109,7 +109,7 @@ if (!buyerId) {
           );
 
         return {
-  success: res.rowCount > 0,
+  success: (res.rowCount ?? 0) > 0,
   buyerId,
   sellerId,
 };
@@ -241,7 +241,7 @@ export async function rejectReturnBySeller(
             );
 
           return {
-            success: res.rowCount > 0,
+            success: (res.rowCount ?? 0) > 0,
             buyerId: ret.buyer_id,
             sellerId,
           };
@@ -499,7 +499,7 @@ export async function markReturnReceivedBySeller(
 
           return {
             success:
-              updateRes.rowCount > 0,
+              (updateRes.rowCount ?? 0) > 0,
 
             buyerId,
 

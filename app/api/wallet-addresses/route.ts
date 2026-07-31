@@ -57,7 +57,11 @@ export async function GET(
     log("AUTH_START");
 
     const auth =
-      await requireAuth(request);
+      await requireAuth();
+    if (!auth.ok) {
+      return auth.response;
+    }
+
 
     log("AUTH_SUCCESS", {
       userId: auth.userId,
@@ -118,7 +122,11 @@ export async function POST(
     log("AUTH_START");
 
     const auth =
-      await requireAuth(request);
+      await requireAuth();
+    if (!auth.ok) {
+      return auth.response;
+    }
+
 
     log("AUTH_SUCCESS", {
       userId: auth.userId,

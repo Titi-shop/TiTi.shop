@@ -1,16 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth/guard";
 import { cancelOrderByBuyer } from "@/lib/db/orders.buyer";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-/* ================= TYPES ================= */
-type CancelResult =
-  | "SUCCESS"
-  | "NOT_FOUND"
-  | "FORBIDDEN"
-  | "INVALID_STATUS";
 
 /* ================= HELPERS ================= */
 function isValidId(v: unknown): v is string {
@@ -20,7 +13,7 @@ function isValidId(v: unknown): v is string {
 /* ================= HANDLER ================= */
 export async function PATCH(
   req: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     /* ================= AUTH ================= */
@@ -28,7 +21,7 @@ export async function PATCH(
     if (!auth.ok) return auth.response;
 
     const userId: string = auth.userId;
-    const orderId = context?.params?.id;
+    const { id: orderId } = await context.params;
 
     /* ================= VALIDATION ================= */
     if (!isValidId(orderId)) {
@@ -56,7 +49,7 @@ export async function PATCH(
         }
       }
     } catch {
-      // ignore parse error → dùng default
+      // ignore parse error â†’ dĂ¹ng default
     }
 
     /* ================= LOG INPUT ================= */
@@ -71,10 +64,10 @@ export async function PATCH(
       orderId,
       userId,
       reason
-    )) as CancelResult;
+    ));
 
     /* ================= HANDLE RESULT ================= */
-    if (result === "NOT_FOUND") {
+    if (result.status === "NOT_FOUND") {
       console.warn("[ORDER][CANCEL][NOT_FOUND]", { orderId, userId });
 
       return NextResponse.json(
@@ -83,7 +76,7 @@ export async function PATCH(
       );
     }
 
-    if (result === "FORBIDDEN") {
+    if (result.status === "FORBIDDEN") {
       console.warn("[ORDER][CANCEL][FORBIDDEN]", { orderId, userId });
 
       return NextResponse.json(
@@ -92,7 +85,7 @@ export async function PATCH(
       );
     }
 
-    if (result === "INVALID_STATUS") {
+    if (result.status === "INVALID_STATUS") {
       console.warn("[ORDER][CANCEL][INVALID_STATUS]", { orderId });
 
       return NextResponse.json(
@@ -121,3 +114,5 @@ export async function PATCH(
     );
   }
 }
+
+

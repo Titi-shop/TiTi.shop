@@ -3,7 +3,7 @@ import {
   logger,
   maskId,
 } from "@/lib/logger";
-/* ================= MAP PI → UUID ================= */
+/* ================= MAP PI Ă¢â€ â€™ UUID ================= */
 export async function getUserIdByPiUid(
   pi_uid: string
 ): Promise<string | null> {
@@ -45,7 +45,11 @@ export async function upsertUserFromPi(
   role: string | null;
   is_admin: boolean;
 }> {
-  const res = await query(
+  const res = await query<{
+    id: string;
+    role: string | null;
+    is_admin: boolean;
+  }>(
     `
     INSERT INTO users (pi_uid, username)
     VALUES ($1, $2)
@@ -56,7 +60,13 @@ export async function upsertUserFromPi(
     [pi_uid, username]
   );
 
-  return res.rows[0];
+  const user = res.rows[0];
+
+  if (!user) {
+    throw new Error("USER_UPSERT_FAILED");
+  }
+
+  return user;
 }
 export async function getUserAdminFlag(
   userId: string
@@ -98,7 +108,11 @@ export async function getUserById(
   pi_uid: string | null;
   username: string | null;
 } | null> {
-  const res = await query(
+  const res = await query<{
+    id: string;
+    pi_uid: string | null;
+    username: string | null;
+  }>(
     `
     SELECT
       id,

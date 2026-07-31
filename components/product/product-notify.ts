@@ -6,18 +6,8 @@ import type {
    TYPES
 ========================= */
 
-export interface ProductNotifyTranslations {
-  upload_failed: string;
-  submit_failed: string;
-
-  sale_price_less_than_price: string;
-  invalid_sale_time: string;
-  sale_price_required: string;
-
-  sale_date_required?: string;
-
-  sale_stock_exceed: string;
-}
+export type ProductNotifyTranslations =
+  Record<string, string>;
 
 /* =========================
    BASIC NOTIFY

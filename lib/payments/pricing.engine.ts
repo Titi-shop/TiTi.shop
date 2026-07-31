@@ -140,7 +140,11 @@ async function loadProduct(productId: string) {
   }
 );
 
-  const p = await getProductById(productId);
+  const p = await getProductById(
+  productId,
+  null,
+  "PAYMENT_PRICING"
+);
 
   if (!p) throw new Error("PRODUCT_NOT_FOUND");
   if (p.deleted_at) throw new Error("PRODUCT_DELETED");
@@ -173,20 +177,22 @@ async function loadProduct(productId: string) {
   is_unlimited: !!p.is_unlimited,
   is_digital: !!p.is_digital,
 
-  seller_country:
-    p.domestic_country_code ?? null,
+
 };
 
-if (
-  !p.has_variants &&
-  (
-    !Number.isFinite(product.final_price) ||
-    product.final_price <= 0
-  )
-) {
-  throw new Error(
-    "PRODUCT_PRICE_CORRUPTED"
-  );
+if (!p.has_variants) {
+  const finalPrice =
+    product.final_price;
+
+  if (
+    finalPrice === null ||
+    !Number.isFinite(finalPrice) ||
+    finalPrice <= 0
+  ) {
+    throw new Error(
+      "PRODUCT_PRICE_CORRUPTED"
+    );
+  }
 }
 
   logger.debug(
@@ -390,14 +396,7 @@ for (const item of input.items) {
 
     const qty = safeQty(item.quantity);
     const product = await loadProduct(item.product_id);
-    if (product.seller_country) {
-      const sellerCountry = product.seller_country.toUpperCase();
-      if (sellerCountry !== buyerCountry) {
-        throw new Error("COUNTRY_NOT_SUPPORTED_FOR_DOMESTIC");
-      }
-    }
-
-   let price = product.final_price;
+let price = product.final_price;
 if (
   item.variant_id !== null &&
   item.variant_id !== undefined &&
@@ -436,6 +435,7 @@ if (item.variant_id) {
   price = vPrice;
 } else {
   if (
+    price === null ||
     !Number.isFinite(price) ||
     price <= 0
   ) {
@@ -455,7 +455,18 @@ if (item.variant_id) {
   }
 }
 
-const line = price * qty;
+if (
+  price === null ||
+  !Number.isFinite(price) ||
+  price <= 0
+) {
+  throw new Error(
+    "INVALID_ITEM_PRICE"
+  );
+}
+
+const unitPrice = price;
+const line = unitPrice * qty;
     subtotal += line;
 
     if (!product.is_digital) {
@@ -474,7 +485,7 @@ const line = price * qty;
       variant_id: item.variant_id ?? null,
       name: product.name,
       quantity: qty,
-      unit_price: price,
+      unit_price: unitPrice,
       subtotal: line,
     };
 
@@ -495,7 +506,7 @@ const result: PricingResult = {
   total: subtotal + shipping,
   buyer_country: buyerCountry,
   buyer_zone: buyerZone,
-  shipping_zone: shippingZone,
+  shipping_zone: shippingZone ?? "",
 };
 
   logger.info(

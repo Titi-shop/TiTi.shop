@@ -244,7 +244,7 @@ const [
           if (!res.ok) {
             setMessage({
               text:
-                t.load_products_error,
+                t.load_products_error ?? "Failed to load products",
 
               type:
                 "error",
@@ -368,11 +368,13 @@ const [
                       ? p.sale_end
                       : null,
 
-                  min_price:
-                    typeof p.min_price ===
+                  ...(typeof p.min_price ===
                     "number"
-                      ? p.min_price
-                      : undefined,
+                      ? {
+                          min_price:
+                            p.min_price,
+                        }
+                      : {}),
 
                   min_sale_price:
                     typeof p.min_sale_price ===
@@ -418,7 +420,7 @@ const [
         } catch {
           setMessage({
             text:
-              t.load_products_error,
+              t.load_products_error ?? "Failed to load products",
 
             type:
               "error",
@@ -552,7 +554,7 @@ const handleDelete =
 
         setMessage({
           text:
-            t.delete_success,
+            t.delete_success ?? "Product deleted successfully",
 
           type:
             "success",
@@ -564,7 +566,7 @@ const handleDelete =
       } else {
         setMessage({
           text:
-            t.delete_failed,
+            t.delete_failed ?? "Failed to delete product",
 
           type:
             "error",
@@ -573,7 +575,7 @@ const handleDelete =
     } catch {
       setMessage({
         text:
-          t.delete_failed,
+          t.delete_failed ?? "Failed to delete product",
 
         type:
           "error",
@@ -944,7 +946,7 @@ const handleDelete =
                       "var(--foreground)",
                   }}
                 >
-                  {shop.sales ??
+                  {shop.total_sales ??
                     0}
                 </p>
 
