@@ -40,7 +40,7 @@ export async function GET() {
 
     }
 
-    const [
+   const [
   notifications,
   unreadCount,
 ] = await Promise.all([
@@ -51,6 +51,15 @@ export async function GET() {
     user.userId
   ),
 ]);
+
+console.log(
+  "[NOTIFICATIONS]",
+  {
+    userId: user.userId,
+    notificationCount: notifications.length,
+    unreadCount,
+  }
+);
 
 return NextResponse.json({
   notifications,
