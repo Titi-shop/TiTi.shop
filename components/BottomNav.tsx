@@ -6,34 +6,67 @@ import { Home, Grid2X2, Search, Bell, User } from "lucide-react";
 import { useTranslationClient as useTranslation } from "@/app/lib/i18n/client";
 import { useEffect, useState } from "react";
 import { apiAuthFetch } from "@/lib/api/apiAuthFetch";
-
+import { useAuth } from "@/context/AuthContext";
 export default function BottomNav() {
 const pathname = usePathname();
 const { t } = useTranslation();
-
+const {
+  user,
+  loading,
+} = useAuth();
 const [hidden, setHidden] = useState(false);
 const [unreadCount, setUnreadCount] = useState(0);
 
 useEffect(() => {
+
+  if (loading) {
+    return;
+  }
+
+  if (!user) {
+    setUnreadCount(0);
+    return;
+  }
+
   async function loadUnreadCount() {
+
     try {
-      const res = await apiAuthFetch("/api/notifications");
 
-      if (!res.ok) return;
+      const res =
+        await apiAuthFetch(
+          "/api/notifications"
+        );
 
-      const data = await res.json();
+      if (!res.ok) {
+        return;
+      }
+
+      const data =
+        await res.json();
 
       setUnreadCount(
-        Number(data.unreadCount ?? 0)
+        Number(
+          data.unreadCount ?? 0
+        )
       );
+
     } catch (err) {
-      console.error("[BOTTOM_NAV]", err);
+
+      console.error(
+        "[BOTTOM_NAV]",
+        err
+      );
+
     }
+
   }
 
   void loadUnreadCount();
-}, []);
 
+}, [
+  loading,
+  user,
+]);
 useEffect(() => {
   let last = 0;
 
