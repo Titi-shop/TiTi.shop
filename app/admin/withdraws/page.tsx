@@ -51,7 +51,7 @@ export default function AdminWithdrawPage() {
               h-24
               animate-pulse
               rounded-xl
-              bg-gray-200
+              bg-[var(--surface-3)]
             "
           />
         ))}
@@ -72,15 +72,20 @@ export default function AdminWithdrawPage() {
   ===================================================== */
 
   return (
-    <main className="min-h-screen bg-gray-100">
+    <main className="
+      min-h-screen
+      bg-[var(--background)]
+      transition-colors
+      duration-300
+    ">
 
       {/* Header */}
-      <header className="border-b bg-white px-6 py-4 shadow-sm">
+      <header className="border-b border-[var(--border-color)] bg-[var(--card-bg)] px-6 py-4 shadow-sm">
         <h1 className="text-2xl font-bold">
           Withdraw Management
         </h1>
 
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-[var(--text-muted)]">
           Approve, pay and manage withdrawal requests.
         </p>
       </header>

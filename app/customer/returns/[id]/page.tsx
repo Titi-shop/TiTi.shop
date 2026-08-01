@@ -120,7 +120,7 @@ export default function ReturnDetailPage() {
       case "rejected":
         return "bg-red-100 text-red-700";
       default:
-        return "bg-gray-100 text-gray-600";
+        return "bg-[var(--surface-2)] text-[var(--text-muted)]";
     }
   }
 
@@ -166,11 +166,19 @@ export default function ReturnDetailPage() {
   ===================================================== */
 
   return (
-    <main className="min-h-screen bg-gray-100 pb-24 space-y-4">
+    <main className="
+      min-h-screen
+      bg-[var(--background)]
+      pb-24
+      space-y-4
+      text-[var(--text-primary)]
+      transition-colors
+      duration-300
+    ">
 
       {/* HEADER */}
-      <div className="bg-white p-4 border-b space-y-2">
-        <p className="text-sm text-gray-500">
+      <div className="bg-[var(--card-bg)] p-4 border-b border-[var(--border-color)] space-y-2">
+        <p className="text-sm text-[var(--text-muted)]">
           #{data.return_number ?? data.id.slice(0, 8)}
         </p>
 
@@ -197,12 +205,12 @@ export default function ReturnDetailPage() {
       </div>
 
       {/* ITEMS */}
-      <div className="bg-white p-4 space-y-3">
+      <div className="bg-[var(--card-bg)] p-4 space-y-3">
         {(data.items ?? []).map((item, i) => (
           <div key={i} className="flex gap-3">
             <img
               src={item.thumbnail || "/placeholder.png"}
-              className="w-20 h-20 object-cover rounded border"
+              className="w-20 h-20 object-cover rounded border border-[var(--border-color)]"
             />
 
             <div>
@@ -210,7 +218,7 @@ export default function ReturnDetailPage() {
                 {item.product_name}
               </p>
 
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-[var(--text-muted)]">
                 {t.quantity}: {item.quantity}
               </p>
 
@@ -223,17 +231,17 @@ export default function ReturnDetailPage() {
       </div>
 
       {/* REASON */}
-      <div className="bg-white p-4">
+      <div className="bg-[var(--card-bg)] p-4">
         <p className="font-semibold mb-1">
           {t.reason}
         </p>
-        <p className="text-gray-600 text-sm">
+        <p className="text-[var(--text-muted)] text-sm">
           {data.reason}
         </p>
       </div>
 
       {/* IMAGES */}
-      <div className="bg-white p-4">
+      <div className="bg-[var(--card-bg)] p-4">
         <p className="font-semibold mb-2">
           {t.product_and_evidence_images}
         </p>
@@ -244,7 +252,7 @@ export default function ReturnDetailPage() {
               key={i}
               src={src}
               onClick={() => src && setPreview(src)}
-              className="w-full h-24 object-cover rounded-lg border cursor-pointer"
+              className="w-full h-24 object-cover rounded-lg border border-[var(--border-color)] cursor-pointer"
             />
           ))}
         </div>
@@ -252,7 +260,7 @@ export default function ReturnDetailPage() {
 
       {/* TIMELINE */}
       {(data.timeline ?? []).length > 0 && (
-        <div className="bg-white p-4">
+        <div className="bg-[var(--card-bg)] p-4">
           <p className="font-semibold mb-3">
             {t.timeline}
           </p>
@@ -260,12 +268,12 @@ export default function ReturnDetailPage() {
           <div className="space-y-3">
             {(data.timeline ?? []).map((tItem, i) => (
               <div key={i} className="flex gap-3">
-                <div className="mt-1 w-2 h-2 bg-black rounded-full" />
+                <div className="mt-1 w-2 h-2 bg-[var(--text-primary)] rounded-full" />
                 <div>
                   <p className="text-sm">
                     {tItem.label}
                   </p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-[var(--text-muted)]">
                     {tItem.time}
                   </p>
                 </div>

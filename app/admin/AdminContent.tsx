@@ -51,7 +51,7 @@ export default function AdminContent() {
               h-24
               animate-pulse
               rounded-xl
-              bg-gray-200
+              bg-[var(--surface-3)]
             "
           />
         ))}
@@ -72,7 +72,16 @@ export default function AdminContent() {
   ===================================================== */
 
   return (
-    <main className="p-4">
+    <main
+      className="
+        min-h-screen
+        p-4
+        bg-[var(--background)]
+        text-[var(--text-primary)]
+        transition-colors
+        duration-300
+      "
+    >
       <h1 className="mb-6 text-2xl font-bold">
         Admin Dashboard
       </h1>

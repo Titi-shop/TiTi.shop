@@ -111,7 +111,7 @@ function getStatusClass(
       return "bg-teal-100 text-teal-700";
 
     default:
-      return "bg-gray-100 text-gray-600";
+      return "bg-[var(--surface-2)] text-[var(--text-muted)]";
   }
 }
 

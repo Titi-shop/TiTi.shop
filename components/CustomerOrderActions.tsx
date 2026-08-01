@@ -80,7 +80,7 @@ export default function CustomerOrderActions({
       <button
         disabled={loading !== null}
         onClick={handleAction("detail", onDetail)}
-        className={`${base} border bg-white text-gray-700`}
+        className={`${base} border bg-[var(--card-bg)] text-[var(--text-primary)]`}
       >
         {loading === "detail"
           ? t.loading ?? "Loading..."
@@ -107,7 +107,7 @@ export default function CustomerOrderActions({
       {/* PROCESSING */}
       {isProcessing && (
         <span
-          className={`${base} bg-blue-50 text-blue-600`}
+          className={`${base} bg-[var(--color-info)]/10 text-blue-600`}
         >
           {t.processing ?? "Processing"}
         </span>
@@ -142,7 +142,7 @@ export default function CustomerOrderActions({
 {/* DELIVERED - ĐÃ REVIEW */}
 {isDelivered && reviewed && (
   <span
-    className={`${base} bg-green-100 text-green-600`}
+    className={`${base} bg-[var(--color-success)]/10 text-green-600`}
   >
     {t.order_reviewed ?? "Reviewed"}
   </span>
@@ -164,7 +164,7 @@ export default function CustomerOrderActions({
 {/* COMPLETED - ĐÃ REVIEW */}
 {isCompleted && reviewed && (
   <span
-    className={`${base} bg-green-100 text-green-600`}
+    className={`${base} bg-[var(--color-success)]/10 text-green-600`}
   >
     {t.order_reviewed ?? "Reviewed"}
   </span>

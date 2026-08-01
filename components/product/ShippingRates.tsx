@@ -209,7 +209,7 @@ export default function ShippingRates({
       </p>
 
       {/* DOMESTIC */}
-      <div className="border rounded-xl p-3 bg-gray-50 space-y-3">
+      <div className="border rounded-xl p-3 bg-[var(--surface-2)] space-y-3">
         <select
           value={
             domestic_country_code

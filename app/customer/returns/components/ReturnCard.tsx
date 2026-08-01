@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -103,7 +103,7 @@ const cancelReturn = async () => {
         {/* HEADER */}
         <div className="flex gap-4">
 
-          <div className="h-24 w-24 overflow-hidden rounded-2xl border bg-[var(--card-secondary)]">
+          <div className="h-24 w-24 overflow-hidden rounded-2xl border border-[var(--border-color)] bg-[var(--card-secondary)]">
             <img
               src={getImage(item.thumbnail)}
               onError={(e) => (e.currentTarget.src = "/placeholder.png")}
@@ -152,9 +152,9 @@ const cancelReturn = async () => {
 
               return (
                 <div key={s} className="flex flex-1 items-center gap-2">
-                  <div className={`h-2.5 w-2.5 rounded-full ${active ? "bg-orange-500" : "bg-gray-300"}`} />
+                  <div className={`h-2.5 w-2.5 rounded-full ${active ? "bg-orange-500" : "bg-[var(--surface-3)]"}`} />
                   {i < steps.length - 1 && (
-                    <div className={`h-[2px] flex-1 ${active ? "bg-orange-500" : "bg-gray-300"}`} />
+                    <div className={`h-[2px] flex-1 ${active ? "bg-orange-500" : "bg-[var(--surface-3)]"}`} />
                   )}
                 </div>
               );

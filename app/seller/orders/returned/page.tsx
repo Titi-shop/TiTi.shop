@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
@@ -124,7 +124,7 @@ export default function SellerReturnedOrdersPage() {
 
   if (loading) {
     return (
-      <p className="text-center mt-10 text-gray-400">
+      <p className="text-center mt-10 text-[var(--text-muted)]">
         {t.loading ?? "Loading..."}
       </p>
     );
@@ -133,13 +133,13 @@ export default function SellerReturnedOrdersPage() {
   /* ================= UI ================= */
 
   return (
-    <main className="min-h-screen bg-gray-100 pb-24">
+    <main className="min-h-screen bg-[var(--background)] pb-24 text-[var(--text-primary)] transition-colors duration-300">
 
       {/* HEADER */}
 
-      <header className="bg-gray-600 text-white px-4 py-4">
+      <header className="bg-[var(--surface-3)] text-white px-4 py-4">
 
-        <div className="bg-gray-500 rounded-lg p-4">
+        <div className="bg-[var(--surface-2)] rounded-lg p-4">
 
           <p className="text-sm opacity-90">
             {t.returned_orders ?? "Returned orders"}
@@ -158,7 +158,7 @@ export default function SellerReturnedOrdersPage() {
       <section className="mt-6 px-4 space-y-4">
 
         {orders.length === 0 ? (
-          <p className="text-center text-gray-400">
+          <p className="text-center text-[var(--text-muted)]">
             {t.no_returned_orders ?? "No returned orders"}
           </p>
         ) : (
@@ -170,12 +170,12 @@ export default function SellerReturnedOrdersPage() {
               onDoubleClick={() =>
                 router.push(`/seller/orders/${order.id}`)
               }
-              className="bg-white rounded-xl shadow-sm overflow-hidden border"
+              className="bg-[var(--card-bg)] rounded-xl shadow-sm overflow-hidden border border-[var(--border-color)]"
             >
 
               {/* ORDER HEADER */}
 
-              <div className="flex justify-between px-4 py-3 border-b bg-gray-50">
+              <div className="flex justify-between px-4 py-3 border-b border-[var(--border-color)] bg-[var(--surface-2)]">
 
                 <div>
 
@@ -183,7 +183,7 @@ export default function SellerReturnedOrdersPage() {
                     #{order.order_number ?? order.id.slice(0, 8)}
                   </p>
 
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-[var(--text-muted)]">
                     {formatDate(order.created_at)}
                   </p>
 
@@ -197,23 +197,23 @@ export default function SellerReturnedOrdersPage() {
 
               {/* SHIPPING INFO */}
 
-              <div className="px-4 py-3 text-sm space-y-1 border-b">
+              <div className="px-4 py-3 text-sm space-y-1 border-b border-[var(--border-color)]">
 
                 <p>
-                  <span className="text-gray-500">
+                  <span className="text-[var(--text-muted)]">
                     {t.customer ?? "Customer"}:
                   </span>{" "}
                   {order.shipping_name}
                 </p>
 
                 <p>
-                  <span className="text-gray-500">
+                  <span className="text-[var(--text-muted)]">
                     {t.phone ?? "Phone"}:
                   </span>{" "}
                   {order.shipping_phone}
                 </p>
 
-                <p className="text-gray-600 text-xs">
+                <p className="text-[var(--text-secondary)] text-xs">
                   {order.shipping_address}
                 </p>
 
@@ -221,7 +221,7 @@ export default function SellerReturnedOrdersPage() {
                   order.shipping_country ||
                   order.shipping_postal_code) && (
 
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-[var(--text-muted)]">
 
                     {order.shipping_provider && (
                       <span>{order.shipping_provider}</span>
@@ -243,7 +243,7 @@ export default function SellerReturnedOrdersPage() {
 
               {/* PRODUCTS */}
 
-              <div className="divide-y">
+              <div className="divide-y divide-[var(--border-color)]">
 
                 {order.order_items.map((item) => (
 
@@ -256,7 +256,7 @@ export default function SellerReturnedOrdersPage() {
                         "/placeholder.png"
                       }
                       alt={item.product_name}
-                      className="w-14 h-14 rounded-lg object-cover bg-gray-100"
+                      className="w-14 h-14 rounded-lg object-cover bg-[var(--surface-2)]"
                     />
 
                     <div className="flex-1 min-w-0">
@@ -265,7 +265,7 @@ export default function SellerReturnedOrdersPage() {
                         {item.product_name}
                       </p>
 
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-[var(--text-muted)] mt-1">
                         x{item.quantity} -{formatPi(Number(item.unit_price))}
                       </p>
 
@@ -280,7 +280,7 @@ export default function SellerReturnedOrdersPage() {
               {/* FOOTER */}
 
               <div
-                className="px-4 py-3 border-t bg-gray-50"
+                className="px-4 py-3 border-t border-[var(--border-color)] bg-[var(--surface-2)]"
                 onClick={(e) => e.stopPropagation()}
               >
 

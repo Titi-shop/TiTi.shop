@@ -69,7 +69,7 @@ export default function CancelOrderModal({
           text-[var(--foreground)]
         "
       >
-        <div className="mx-auto mb-4 h-1.5 w-14 rounded-full bg-gray-300" />
+        <div className="mx-auto mb-4 h-1.5 w-14 rounded-full bg-[var(--surface-3)]" />
 
         <h3 className="text-center text-lg font-semibold">
           {t.cancel_order ??
@@ -104,7 +104,7 @@ export default function CancelOrderModal({
                         text-[var(--color-primary)]
                       `
                       : `
-                        border-[var(--border)]
+                        border-[var(--border-color)]
                       `
                   }
                 `}
@@ -151,7 +151,7 @@ export default function CancelOrderModal({
             className="
               rounded-xl
               border
-              border-[var(--border)]
+              border-[var(--border-color)]
               py-3
             "
           >

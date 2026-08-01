@@ -872,7 +872,7 @@ export default function OrderReturnPage() {
               "/customer/orders"
             )
           }
-          className="mt-4 rounded-lg bg-black px-4 py-2 text-white"
+          className="mt-4 rounded-lg bg-[var(--text-primary)] px-4 py-2 text-white"
         >
           {t.back}
         </button>
@@ -885,10 +885,22 @@ export default function OrderReturnPage() {
   ===================================================== */
 
   return (
-    <main className="min-h-screen bg-gray-100 p-4 space-y-4">
+    <main className="
+      min-h-screen
+      bg-[var(--background)]
+      p-4
+      space-y-4
+      text-[var(--text-primary)]
+      transition-colors
+      duration-300
+    ">
       {/* TITLE */}
 
-      <div className="rounded-xl bg-white p-4 shadow">
+      <div className="rounded-xl
+        bg-[var(--card-bg)]
+        p-4
+        text-[var(--text-primary)]
+        shadow">
         <h1 className="text-lg font-semibold">
           🔄{" "}
           {
@@ -916,7 +928,14 @@ export default function OrderReturnPage() {
               key={
                 item.id
               }
-              className={`rounded-xl border bg-white p-4 shadow space-y-3 ${
+              className={`rounded-xl
+              border
+              border-[var(--border-color)]
+              bg-[var(--card-bg)]
+              p-4
+              text-[var(--text-primary)]
+              shadow
+              space-y-3 ${
                 state.selected
                   ? "border-orange-500"
                   : "border-transparent"
@@ -1015,7 +1034,7 @@ export default function OrderReturnPage() {
                         updated
                       );
                     }}
-                    className="w-full rounded-lg border p-3 text-sm"
+                    className="w-full rounded-lg border border-[var(--border-color)] bg-[var(--card-bg)] text-[var(--text-primary)] p-3 text-sm transition-colors"
                   >
                     <option value="">
                       {
@@ -1076,7 +1095,7 @@ export default function OrderReturnPage() {
                       placeholder={
                         t.return_reason_placeholder
                       }
-                      className="w-full rounded-lg border p-3 text-sm"
+                      className="w-full rounded-lg border border-[var(--border-color)] bg-[var(--card-bg)] text-[var(--text-primary)] p-3 text-sm transition-colors"
                     />
                   )}
 
@@ -1110,7 +1129,7 @@ export default function OrderReturnPage() {
                                 imageIndex
                               )
                             }
-                            className="absolute -right-2 -top-2 h-5 w-5 rounded-full bg-black text-xs text-white"
+                            className="absolute -right-2 -top-2 h-5 w-5 rounded-full bg-[var(--text-primary)] text-xs text-white"
                           >
                             ×
                           </button>
@@ -1121,7 +1140,7 @@ export default function OrderReturnPage() {
                     {state.files
                       .length <
                       3 && (
-                      <label className="flex h-20 cursor-pointer items-center justify-center rounded border text-gray-400">
+                      <label className="flex h-20 cursor-pointer items-center justify-center rounded border border-[var(--border-color)] text-[var(--text-muted)]">
                         +
 
                         <input
@@ -1142,7 +1161,7 @@ export default function OrderReturnPage() {
                     )}
                   </div>
 
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-[var(--text-muted)]">
                     {
                       t.return_max_3_images
                     }
@@ -1178,7 +1197,7 @@ export default function OrderReturnPage() {
         disabled={
           submitting
         }
-        className="w-full rounded-xl bg-black py-4 font-semibold text-white disabled:opacity-50"
+        className="w-full rounded-xl bg-[var(--text-primary)] py-4 font-semibold text-white disabled:opacity-50"
       >
         {submitting
           ? t.return_submitting

@@ -167,13 +167,12 @@ export default function WithdrawStatusBadge({
             items-center
             gap-1.5
             rounded-full
-            bg-gray-500/10
+            bg-[var(--surface-2)]
             px-2.5
             py-1
             text-xs
             font-medium
-            text-gray-600
-            dark:text-gray-400
+            text-[var(--text-muted)]
           "
         >
 

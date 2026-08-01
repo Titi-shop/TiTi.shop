@@ -136,7 +136,7 @@ useEffect(() => {
               h-24
               animate-pulse
               rounded-xl
-              bg-gray-200
+              bg-[var(--surface-3)]
             "
           />
         ))}
@@ -157,19 +157,24 @@ useEffect(() => {
   ===================================================== */
 
   return (
-  <main className="min-h-screen bg-gray-100">
+  <main className="
+      min-h-screen
+      bg-[var(--background)]
+      transition-colors
+      duration-300
+    ">
 
-    <header className="border-b bg-white p-4">
+    <header className="border-b border-[var(--border-color)] bg-[var(--card-bg)] p-4">
       <h1 className="text-xl font-bold">
         Chat Support
       </h1>
     </header>
 
-    <section className="bg-white">
+    <section className="bg-[var(--card-bg)]">
 
   {rooms.length === 0 && (
 
-    <div className="p-8 text-center text-gray-400">
+    <div className="p-8 text-center text-[var(--text-muted)]">
 
       Chưa có cuộc trò chuyện.
 
@@ -192,11 +197,11 @@ useEffect(() => {
         w-full
         items-center
         justify-between
-        border-b
+        border-b border-[var(--border-color)]
         px-4
         py-4
         transition
-        hover:bg-gray-50
+        hover:bg-[var(--surface-2)]
       "
     >
 
@@ -213,7 +218,7 @@ useEffect(() => {
             mt-1
             truncate
             text-sm
-            text-gray-500
+            text-[var(--text-muted)]
           "
         >
 
@@ -236,7 +241,7 @@ useEffect(() => {
         <div
           className="
             text-xs
-            text-gray-400
+            text-[var(--text-muted)]
           "
         >
 

@@ -94,7 +94,7 @@ export default function Timeline({
                       ? "bg-[var(--color-info)] scale-125"
                       : active
                       ? "bg-[var(--color-success)]"
-                      : "bg-gray-300"
+                      : "bg-[var(--surface-3)]"
                   }
                 `}
               />

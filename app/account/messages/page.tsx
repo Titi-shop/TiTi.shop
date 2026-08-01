@@ -249,14 +249,14 @@ setMessages((prev) =>
 }
   
   return (
-    <main className="flex min-h-[100dvh] flex-col bg-gray-100">
+    <main className="flex min-h-[100dvh] flex-col bg-[var(--background)]">
       {/* Header */}
-      <header className="sticky top-0 border-b bg-white px-4 py-4">
+      <header className="sticky top-0 border-b border-[var(--border-color)] bg-[var(--card-bg)] px-4 py-4">
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => history.back()}
-            className="text-xl"
+            className="text-xl text-[var(--text-primary)]"
           >
             ←
           </button>
@@ -281,8 +281,6 @@ setMessages((prev) =>
 
       const isUser =
         message.sender_id === user?.id;
-const isSystem =
-  message.sender_id === null;
       return (
         <div
           key={message.id}
@@ -296,7 +294,7 @@ const isSystem =
             className={`max-w-[80%] rounded-2xl px-4 py-3 shadow-sm ${
               isUser
                 ? "bg-blue-600 text-white"
-                : "bg-white text-gray-900"
+                : "bg-[var(--card-bg)] text-[var(--text-primary)]"
             }`}
           >
             <p className="mb-2 whitespace-pre-wrap text-sm">
@@ -307,7 +305,7 @@ const isSystem =
               className={`text-xs ${
                 isUser
                   ? "text-blue-100"
-                  : "text-gray-500"
+                  : "text-[var(--text-muted)]"
               }`}
             >
               {new Date(
@@ -331,8 +329,8 @@ const isSystem =
     left-0
     right-0
     z-50
-    border-t
-    bg-white
+    border-t border-[var(--border-color)]
+    bg-[var(--card-bg)]
     p-4
     pb-[max(env(safe-area-inset-bottom),16px)]
   "
@@ -348,7 +346,7 @@ const isSystem =
                 handleSend();
               }
             }}
-            className="flex-1 rounded-full border border-gray-300 px-4 py-3 outline-none focus:border-blue-500"
+            className="flex-1 rounded-full border border-[var(--border-color)] bg-[var(--background)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] px-4 py-3 outline-none transition-colors focus:border-blue-500"
           />
 
           <button

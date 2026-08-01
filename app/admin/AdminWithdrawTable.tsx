@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
@@ -453,7 +453,10 @@ async function handlePay(
           className="
             rounded-xl
             border
+            border-[var(--border-color)]
+            bg-[var(--card-bg)]
             p-4
+            text-[var(--text-primary)]
             shadow-sm
           "
         >
@@ -509,9 +512,13 @@ async function handlePay(
   className="
     rounded-lg
     border
+    border-[var(--border-color)]
+    bg-[var(--surface-1)]
+    text-[var(--text-primary)]
     px-3
     py-2
     text-sm
+    transition-colors
   "
 >
   Approve
@@ -530,9 +537,13 @@ async function handlePay(
   className="
     rounded-lg
     border
+    border-[var(--border-color)]
+    bg-[var(--surface-1)]
+    text-[var(--text-primary)]
     px-3
     py-2
     text-sm
+    transition-colors
   "
 >
   Pay
@@ -550,9 +561,13 @@ async function handlePay(
   className="
     rounded-lg
     border
+    border-[var(--border-color)]
+    bg-[var(--surface-1)]
+    text-[var(--text-primary)]
     px-3
     py-2
     text-sm
+    transition-colors
   "
 >
   Retry
@@ -572,9 +587,13 @@ async function handlePay(
   className="
     rounded-lg
     border
+    border-[var(--border-color)]
+    bg-[var(--surface-1)]
+    text-[var(--text-primary)]
     px-3
     py-2
     text-sm
+    transition-colors
   "
 >
   Sync
@@ -592,9 +611,13 @@ async function handlePay(
   className="
     rounded-lg
     border
+    border-[var(--border-color)]
+    bg-[var(--surface-1)]
+    text-[var(--text-primary)]
     px-3
     py-2
     text-sm
+    transition-colors
   "
 >
   Resume
@@ -612,9 +635,13 @@ async function handlePay(
   className="
     rounded-lg
     border
+    border-[var(--border-color)]
+    bg-[var(--surface-1)]
+    text-[var(--text-primary)]
     px-3
     py-2
     text-sm
+    transition-colors
   "
 >
   Complete
@@ -622,10 +649,14 @@ async function handlePay(
             <button
               className="
                 rounded-lg
-                border
-                px-3
-                py-2
-                text-sm
+    border
+    border-[var(--border-color)]
+    bg-[var(--surface-1)]
+    text-[var(--text-primary)]
+    px-3
+    py-2
+    text-sm
+    transition-colors
               "
             >
               Reject

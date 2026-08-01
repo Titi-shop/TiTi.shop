@@ -54,14 +54,14 @@ export default function ReviewOrderModal({
           max-h-[88vh]
           overflow-y-auto
           rounded-t-3xl
-          border-t border-[var(--border)]
+          border-t border-[var(--border-color)]
           bg-[var(--card-bg)]
           p-5
           pb-[calc(env(safe-area-inset-bottom)+80px)]
           text-[var(--foreground)]
         "
       >
-        <div className="mx-auto mb-4 h-1.5 w-14 rounded-full bg-gray-300" />
+        <div className="mx-auto mb-4 h-1.5 w-14 rounded-full bg-[var(--surface-3)]" />
 
         <h3 className="text-center text-lg font-semibold">
           {t.review_orders ??
@@ -80,7 +80,7 @@ export default function ReviewOrderModal({
                 className={
                   star <= rating
                     ? "text-3xl text-yellow-500"
-                    : "text-3xl text-gray-400"
+                    : "text-3xl text-[var(--text-muted)]"
                 }
               >
                 ★

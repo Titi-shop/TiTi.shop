@@ -201,3 +201,40 @@ export async function getNotificationsByUserId(
   return result.rows;
 
 }
+export async function getUnreadNotificationCount(
+  userId: string
+): Promise<number> {
+  const result = await query<{ count: string }>(
+    `
+    SELECT COUNT(*) AS count
+    FROM notifications
+    WHERE
+      user_id = $1
+      AND deleted_at IS NULL
+      AND is_read = FALSE
+    `,
+    [userId]
+  );
+
+  return Number(result.rows[0]?.count ?? 0);
+}
+export async function markAllNotificationsRead(
+  userId: string
+): Promise<void> {
+  await query(
+    `
+    UPDATE notifications
+    SET
+      is_read = TRUE,
+      read_at = NOW(),
+      is_seen = TRUE,
+      seen_at = NOW(),
+      updated_at = NOW()
+    WHERE
+      user_id = $1
+      AND deleted_at IS NULL
+      AND is_read = FALSE
+    `,
+    [userId]
+  );
+}

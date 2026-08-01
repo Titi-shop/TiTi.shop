@@ -1,4 +1,4 @@
-
+﻿
 import "./globals.css";
 import Script from "next/script";
 import PiRootClient from "./PiRootClient";
@@ -74,7 +74,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="theme-light">
+    <html
+  lang="en"
+  suppressHydrationWarning
+>
       <head>
         <link rel="preload" as="image" href="/avatar.png" />
         <link rel="preload" as="image" href="/banners/default-shop.png" />
@@ -84,13 +87,27 @@ export default function RootLayout({
           strategy="afterInteractive"
         />
 
-        {/* 🔥 FIX: tránh FOUC (nháy theme khi load) */}
+        {/* đŸ”¥ FIX: trĂ¡nh FOUC (nhĂ¡y theme khi load) */}
         <Script id="theme-init" strategy="beforeInteractive">
           {`
             (function () {
               try {
-                const theme = localStorage.getItem("theme") || "theme-light";
-                document.documentElement.className = theme;
+                const mode =
+              localStorage.getItem("theme-mode") || "light";
+
+              const root =
+              document.documentElement;
+
+              root.classList.remove(
+                "theme-light",
+                "theme-dark"
+              );
+
+              root.classList.add(
+                mode === "dark"
+                  ? "theme-dark"
+                  : "theme-light"
+              );
               } catch (e) {}
             })();
           `}
@@ -116,3 +133,7 @@ export default function RootLayout({
     </html>
   );
 }
+
+
+
+

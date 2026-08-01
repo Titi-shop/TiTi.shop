@@ -754,7 +754,7 @@ const handleDelete =
     rounded-full
     border-4
     shadow-2xl
-            bg-white
+            bg-[var(--card-bg)]
              "
                 style={{
                   borderColor:
@@ -1174,7 +1174,7 @@ const handleDelete =
                             top-2
                             z-10
                             rounded-full
-                            bg-gray-500
+                            bg-[var(--text-muted)]
                             px-2
                             py-1
                             text-[10px]
@@ -1459,7 +1459,7 @@ const handleDelete =
                 h-1.5
                 w-14
                 rounded-full
-                bg-gray-300
+                bg-[var(--surface-3)]
               "
             />
 

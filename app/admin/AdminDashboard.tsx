@@ -94,9 +94,11 @@ export default function AdminDashboard() {
           className={`
             rounded-2xl
             border
-            bg-white
+            border-[var(--border-color)]
+            bg-[var(--card-bg)]
             p-5
             text-left
+            text-[var(--text-primary)]
             shadow-sm
             transition-all
             ${
@@ -114,7 +116,7 @@ export default function AdminDashboard() {
             {module.title}
           </h2>
 
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-[var(--text-muted)]">
             {module.description}
           </p>
         </button>

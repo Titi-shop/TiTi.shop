@@ -336,7 +336,7 @@ export default function SellerReturnsPage() {
         return "bg-red-100 text-red-700";
 
       default:
-        return "bg-gray-100 text-gray-600";
+        return "bg-[var(--surface-2)] text-[var(--text-secondary)]";
     }
   }
 
@@ -363,7 +363,7 @@ export default function SellerReturnsPage() {
   ===================================================== */
 
   return (
-    <main className="min-h-screen bg-gray-100 pb-24">
+    <main className="min-h-screen bg-[var(--background)] pb-24 text-[var(--text-primary)] transition-colors duration-300">
 
       {/* HEADER */}
       <div className="bg-primary text-white px-4 py-4 font-semibold shadow">
@@ -371,7 +371,7 @@ export default function SellerReturnsPage() {
       </div>
 
       {/* TABS */}
-      <div className="bg-white border-b overflow-x-auto">
+      <div className="bg-[var(--card-bg)] border-b border-[var(--border-color)] overflow-x-auto">
         <div className="flex gap-2 px-3 py-2 min-w-max">
 
           {tabs.map(
@@ -386,7 +386,7 @@ export default function SellerReturnsPage() {
                 className={`px-3 py-1 text-sm rounded-full transition ${
                   tab === tabKey
                     ? "bg-primary text-white"
-                    : "bg-gray-100 text-gray-600"
+                    : "bg-[var(--surface-2)] text-[var(--text-secondary)]"
                 }`}
               >
                 {t[
@@ -403,14 +403,14 @@ export default function SellerReturnsPage() {
       <div className="p-3 space-y-3">
 
         {loading && (
-          <p className="text-center text-sm text-gray-500">
+          <p className="text-center text-sm text-[var(--text-muted)]">
             Loading...
           </p>
         )}
 
         {!loading &&
           items.length === 0 && (
-            <div className="bg-white rounded-xl p-6 text-center text-sm text-gray-500">
+            <div className="bg-[var(--card-bg)] rounded-xl p-6 text-center text-sm text-[var(--text-muted)]">
               No returns found
             </div>
           )}
@@ -425,7 +425,7 @@ export default function SellerReturnsPage() {
                   item.id
                 )
               }
-              className="w-full bg-white rounded-xl p-3 flex gap-3 shadow-sm text-left"
+              className="w-full bg-[var(--card-bg)] rounded-xl p-3 flex gap-3 shadow-sm text-left"
             >
 
               <img
@@ -436,7 +436,7 @@ export default function SellerReturnsPage() {
                 alt={
                   item.product_name
                 }
-                className="w-20 h-20 rounded object-cover bg-gray-100"
+                className="w-20 h-20 rounded object-cover bg-[var(--surface-2)]"
               />
 
               <div className="flex-1 min-w-0">
@@ -447,7 +447,7 @@ export default function SellerReturnsPage() {
                   }
                 </p>
 
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-[var(--text-muted)] mt-1">
                   Qty:{" "}
                   {
                     item.quantity
@@ -466,7 +466,7 @@ export default function SellerReturnsPage() {
                     )}
                   </span>
 
-                  <span className="text-xs text-gray-400 whitespace-nowrap">
+                  <span className="text-xs text-[var(--text-muted)] whitespace-nowrap">
                     {item.created_at
                       ? new Date(
                           item.created_at
@@ -499,13 +499,13 @@ export default function SellerReturnsPage() {
           />
 
           {/* SHEET */}
-          <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl p-4 animate-slideUp max-h-[80vh] overflow-auto">
+          <div className="absolute bottom-0 left-0 right-0 bg-[var(--card-bg)] rounded-t-2xl p-4 animate-slideUp max-h-[80vh] overflow-auto">
 
             {/* HANDLE */}
-            <div className="w-10 h-1 bg-gray-300 rounded mx-auto mb-3" />
+            <div className="w-10 h-1 bg-[var(--surface-3)] rounded mx-auto mb-3" />
 
             {loadingDetail && (
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-[var(--text-muted)]">
                 Loading...
               </p>
             )}
@@ -539,7 +539,7 @@ export default function SellerReturnsPage() {
                     {t.reason}
                   </p>
 
-                  <p className="text-sm text-gray-600 mt-1 whitespace-pre-wrap">
+                  <p className="text-sm text-[var(--text-secondary)] mt-1 whitespace-pre-wrap">
                     {
                       detail.reason
                     }
@@ -564,7 +564,7 @@ export default function SellerReturnsPage() {
                             image
                           }
                           alt={`evidence-${index}`}
-                          className="w-20 h-20 rounded object-cover bg-gray-100"
+                          className="w-20 h-20 rounded object-cover bg-[var(--surface-2)]"
                         />
                       )
                     )}

@@ -108,7 +108,7 @@ export function getStatusConfig(
           t.cancelled ??
           "Cancelled",
         className:
-          "border-gray-500/20 bg-gray-500/10 text-gray-500",
+          "border-[var(--border-color)] bg-[var(--surface-2)] text-[var(--text-muted)]",
       };
 
     default:
@@ -116,7 +116,7 @@ export function getStatusConfig(
         icon: Clock3,
         text: status,
         className:
-          "border-[var(--border)] bg-[var(--card-secondary)] text-[var(--text-muted)]",
+          "border-[var(--border-color)] bg-[var(--card-secondary)] text-[var(--text-muted)]",
       };
   }
 }

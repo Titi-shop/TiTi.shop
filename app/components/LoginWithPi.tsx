@@ -5,12 +5,12 @@ export default function LoginWithPi() {
   const { user, piReady, pilogin, logout, loading } = useAuth();
 
   if (loading) {
-    return <p className="text-gray-400 text-center mt-4">⏳ Đang kiểm tra phiên...</p>;
+    return <p className="text-[var(--text-muted)] text-center mt-4">⏳ Đang kiểm tra phiên...</p>;
   }
 
   if (!piReady) {
     return (
-      <div className="text-center text-gray-500 mt-4">
+      <div className="text-center text-[var(--text-muted)] mt-4">
         ⏳ Đang tải Pi SDK...<br /> (Vui lòng mở trong Pi Browser)
       </div>
     );

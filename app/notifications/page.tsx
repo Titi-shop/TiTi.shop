@@ -87,20 +87,27 @@ export default function NotificationsPage() {
           );
         }
 
-        const data =
-          (await res.json()) as unknown;
+        const data = await res.json();
 
-        if (!Array.isArray(data)) {
-          throw new Error(
-            "INVALID_RESPONSE"
-          );
-        }
+if (
+  !data ||
+  !Array.isArray(data.notifications)
+) {
+  throw new Error(
+    "INVALID_RESPONSE"
+  );
+}
 
-        if (!mounted) return;
+setNotifications(
+  data.notifications
+);
 
-        setNotifications(
-          data as NotificationItem[]
-        );
+await apiAuthFetch(
+  "/api/notifications",
+  {
+    method: "POST",
+  }
+);
       } catch (err) {
         console.error(
           "❌ Notifications fetch error:",

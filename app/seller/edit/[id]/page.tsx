@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import useSWR from "swr";
 import {
@@ -364,7 +364,7 @@ export default function SellerEditPage() {
 
   if (loading || isLoading) {
     return (
-      <div className="p-8 text-center text-gray-400">
+      <div className="p-8 text-center text-[var(--text-muted)]">
         {t.loading ||
           "Loading..."}
       </div>
@@ -376,7 +376,7 @@ export default function SellerEditPage() {
     !isSeller
   ) {
     return (
-      <div className="p-8 text-center text-gray-400">
+      <div className="p-8 text-center text-[var(--text-muted)]">
         {t.no_permission ||
           "No permission"}
       </div>
@@ -388,7 +388,7 @@ export default function SellerEditPage() {
     !initialData
   ) {
     return (
-      <div className="p-8 text-center text-gray-400">
+      <div className="p-8 text-center text-[var(--text-muted)]">
         {t.not_found ||
           "Product not found"}
       </div>

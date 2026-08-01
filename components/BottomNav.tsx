@@ -5,31 +5,68 @@ import { usePathname } from "next/navigation";
 import { Home, Grid2X2, Search, Bell, User } from "lucide-react";
 import { useTranslationClient as useTranslation } from "@/app/lib/i18n/client";
 import { useEffect, useState } from "react";
+import { apiAuthFetch } from "@/lib/api/apiAuthFetch";
 
 export default function BottomNav() {
 const pathname = usePathname();
 const { t } = useTranslation();
 
 const [hidden, setHidden] = useState(false);
-const [lastScroll, setLastScroll] = useState(0);
+const [unreadCount, setUnreadCount] = useState(0);
 
 useEffect(() => {
-const onScroll = () => {
-const current = window.scrollY;
-setHidden(current > lastScroll && current > 80);
-setLastScroll(current);
-};
+  async function loadUnreadCount() {
+    try {
+      const res = await apiAuthFetch("/api/notifications");
 
-window.addEventListener("scroll", onScroll);  
-return () => window.removeEventListener("scroll", onScroll);
+      if (!res.ok) return;
 
-}, [lastScroll]);
+      const data = await res.json();
+
+      setUnreadCount(
+        Number(data.unreadCount ?? 0)
+      );
+    } catch (err) {
+      console.error("[BOTTOM_NAV]", err);
+    }
+  }
+
+  void loadUnreadCount();
+}, []);
+
+useEffect(() => {
+  let last = 0;
+
+  const onScroll = () => {
+    const current = window.scrollY;
+
+    setHidden(
+      current > last && current > 80
+    );
+
+    last = current;
+  };
+
+  window.addEventListener(
+    "scroll",
+    onScroll
+  );
+
+  return () =>
+    window.removeEventListener(
+      "scroll",
+      onScroll
+    );
+}, []);
 
 const navItems = [
 { href: "/", label: t.home || "Home", icon: Home },
 { href: "/categories", label: t.categories || "Categories", icon: Grid2X2 },
 { href: "/search", label: t.search || "Search", icon: Search, center: true },
-{ href: "/notifications", label: t.notifications || "Notifications", icon: Bell, badge: 2 },
+{ href: "/notifications", label: t.notifications || "Notifications", icon: Bell, badge:
+  unreadCount > 0
+    ? unreadCount
+    : undefined, },
 { href: "/account", label: t.me || "Me", icon: User },
 ];
 

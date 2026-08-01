@@ -1,11 +1,12 @@
-import {
+﻿import {
   NextRequest,
   NextResponse,
 } from "next/server";
 
 import {
-  getProductService,
-} from "@/lib/services/products/by-id";
+  getProductMetadata,
+} from "@/lib/db/products";
+
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -54,15 +55,9 @@ export async function GET(
       }
 
       const product =
-        await getProductService(
-          id,
-          null
-        );
+        await getProductMetadata(id);
 
-      if (
-        !product ||
-        "error" in product
-      ) {
+      if (!product) {
         return NextResponse.json(
           {
             title:
@@ -146,7 +141,7 @@ export async function GET(
         images: [
           {
             url:
-              "https://app.titi.onl/logo.png",
+              "/banners/3D035BE4-0822-403D-9631-6C4CF674A519.png",
           },
         ],
       },
@@ -163,3 +158,5 @@ export async function GET(
     );
   }
 }
+
+

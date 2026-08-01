@@ -103,7 +103,7 @@ export default function AccountPage() {
               h-24
               rounded-2xl
               animate-pulse
-              bg-gray-200
+              bg-[var(--surface-3)]
             "
           />
 
@@ -136,11 +136,10 @@ export default function AccountPage() {
         min-h-screen
         pb-28
         space-y-4
+        bg-[var(--background)]
+        transition-colors
+        duration-300
       "
-      style={{
-        backgroundColor:
-          "var(--background)",
-      }}
     >
 
       <AccountHeader />

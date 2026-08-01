@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { useTranslationClient as useTranslation } from "@/app/lib/i18n/client";
@@ -367,7 +367,7 @@ export default function VariantEditor({
       </h2>
 
       {/* GENERATOR */}
-      <div className="border p-3 rounded bg-gray-50 space-y-2">
+      <div className="border p-3 rounded bg-[var(--surface-2)] space-y-2">
         <div className="grid grid-cols-2 gap-2">
           <input
             value={label1}
@@ -423,7 +423,7 @@ export default function VariantEditor({
           onClick={
             generateVariants
           }
-          className="w-full bg-blue-500 text-white py-2 rounded"
+          className="w-full bg-[var(--color-info)] text-white py-2 rounded"
         >
           {t.generate_variants}
         </button>
@@ -491,7 +491,7 @@ export default function VariantEditor({
           <div className="overflow-x-auto">
             <table className="w-full text-sm border">
               <thead>
-                <tr className="bg-gray-100">
+                <tr className="bg-[var(--surface-2)]">
                   <th className="p-2">
                     {t.variant}
                   </th>

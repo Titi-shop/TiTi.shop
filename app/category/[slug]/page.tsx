@@ -80,7 +80,18 @@ export default function CategoryDetailPage() {
     "Category";
 
   return (
-    <main className="p-4 max-w-6xl mx-auto">
+    <main
+  className="
+    p-4
+    max-w-6xl
+    mx-auto
+    min-h-screen
+    bg-[var(--background)]
+    text-[var(--text-primary)]
+    transition-colors
+    duration-300
+  "
+>
       {/* BACK */}
       <Link
         href="/categories"
@@ -95,11 +106,11 @@ export default function CategoryDetailPage() {
       </h1>
 
       {loading ? (
-        <p className="text-gray-600">
+        <p className="text-[var(--text-secondary)]">
           {t["loading"] || "Loading..."}
         </p>
       ) : products.length === 0 ? (
-        <p className="text-gray-500">
+        <p className="text-[var(--text-muted)]">
           {t["no_product"] || "No products available."}
         </p>
       ) : (
@@ -124,7 +135,7 @@ export default function CategoryDetailPage() {
                   <p className="text-red-600 font-bold">
                     {p.finalPrice.toLocaleString()} π
                   </p>
-                  <p className="text-xs line-through text-gray-400">
+                  <p className="text-xs line-through text-[var(--text-muted)]">
                     {p.price.toLocaleString()} π
                   </p>
                 </>

@@ -354,7 +354,16 @@ export default function AdminChatRoomPage() {
     !piReady
   ) {
     return (
-      <main className="p-6">
+      <main
+  className="
+    min-h-screen
+    p-6
+    bg-[var(--background)]
+    text-[var(--text-primary)]
+    transition-colors
+    duration-300
+  "
+>
         Loading...
       </main>
     );
@@ -371,11 +380,18 @@ export default function AdminChatRoomPage() {
   ===================================================== */
 
   return (
-    <main className="flex min-h-[100dvh] flex-col bg-gray-100">
+    <main className="
+      flex
+      min-h-[100dvh]
+      flex-col
+      bg-[var(--background)]
+      transition-colors
+      duration-300
+    ">
 
       {/* Header */}
 
-      <header className="sticky top-0 border-b bg-white px-4 py-4">
+      <header className="sticky top-0 border-b border-[var(--border-color)] bg-[var(--card-bg)] px-4 py-4">
 
         <div className="flex items-center gap-3">
 
@@ -384,7 +400,7 @@ export default function AdminChatRoomPage() {
             onClick={() =>
               router.back()
             }
-            className="text-xl"
+            className="text-xl text-[var(--text-primary)]"
           >
             ←
           </button>
@@ -442,8 +458,8 @@ export default function AdminChatRoomPage() {
                       isAdmin
                         ? "bg-blue-600 text-white"
                         : isSystem
-                        ? "bg-yellow-50 border border-yellow-200 text-gray-900"
-                        : "bg-white text-gray-900"
+                        ? "bg-yellow-50 border border-yellow-200 text-[var(--text-primary)]"
+                        : "bg-[var(--card-bg)] text-[var(--text-primary)]"
                     }`}
                   >
 
@@ -455,7 +471,7 @@ export default function AdminChatRoomPage() {
                       className={`text-xs ${
                         isAdmin
                           ? "text-blue-100"
-                          : "text-gray-500"
+                          : "text-[var(--text-muted)]"
                       }`}
                     >
 
@@ -491,8 +507,8 @@ export default function AdminChatRoomPage() {
           left-0
           right-0
           z-50
-          border-t
-          bg-white
+          border-t border-[var(--border-color)]
+          bg-[var(--card-bg)]
           p-4
           pb-[max(env(safe-area-inset-bottom),16px)]
         "
@@ -520,7 +536,20 @@ export default function AdminChatRoomPage() {
 
             }}
             placeholder="Nhập tin nhắn..."
-            className="flex-1 rounded-full border border-gray-300 px-4 py-3 outline-none focus:border-blue-500"
+            className="
+flex-1
+rounded-full
+border
+border-[var(--border-color)]
+bg-[var(--background)]
+text-[var(--text-primary)]
+placeholder:text-[var(--text-muted)]
+px-4
+py-3
+outline-none
+transition-colors
+focus:border-blue-500
+"
           />
 
           <button

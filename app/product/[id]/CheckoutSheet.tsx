@@ -366,13 +366,13 @@ useEffect(() => {
   {shipping ? (
     <>
       <p className="font-medium">{shipping.name}</p>
-      <p className="text-sm text-gray-500">{shipping.phone}</p>
+      <p className="text-sm text-[var(--text-muted)]">{shipping.phone}</p>
       <p className="text-sm" style={{ color: "var(--text-muted)",
   }}
 >
         {shipping.address_line}
       </p>
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-[var(--text-muted)]">
         {[shipping.ward, shipping.district, shipping.region]
           .filter(Boolean)
           .join(", ")}{" "}

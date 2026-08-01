@@ -176,7 +176,7 @@ return (
     borderColor: "var(--nav-border)",
   }}
 > 
-      <h2 className="text-xs font-semibold text-gray-700 tracking-wide">  
+      <h2 className="text-xs font-semibold text-[var(--text-primary)] tracking-wide">  
         {t.order_status ?? "ORDER STATUS"}  
       </h2>  
     </div>  

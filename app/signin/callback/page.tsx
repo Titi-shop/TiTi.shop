@@ -152,7 +152,7 @@ export default function PiSigninCallbackPage() {
           Pi Sign-In
         </h1>
 
-        <p className="mt-4 text-gray-500">
+        <p className="mt-4 text-[var(--text-muted)]">
           {status}
         </p>
 

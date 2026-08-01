@@ -1,4 +1,5 @@
 ﻿
+
 import { withTransaction } from "@/lib/db";
 import { createOrder } from "@/lib/db/orders.create";
 import { getRpcVerificationLog } from "@/lib/db/payments.rpc";
@@ -402,13 +403,11 @@ logger.debug("PAYMENT.LINK_ORDER");
 
         category:
           "order",
+title:
+  "Thanh toán thành công",
 
-        title:
-          "Thanh toĂ¡n thĂ nh cĂ´ng",
-
-        message:
-          "ÄÆ¡n hĂ ng cá»§a báº¡n Ä‘Ă£ Ä‘Æ°á»£c táº¡o thĂ nh cĂ´ng.",
-
+message:
+  "Đơn hàng của bạn đã được tạo thành công.",
         orderId:
           result.orderId,
 
@@ -426,11 +425,10 @@ await sendNotification({
     "order",
 
   title:
-    "CĂ³ Ä‘Æ¡n hĂ ng má»›i",
+  "Có đơn hàng mới",
 
-  message:
-    "Báº¡n vá»«a nháº­n Ä‘Æ°á»£c má»™t Ä‘Æ¡n hĂ ng má»›i.",
-
+message:
+  "Bạn vừa nhận được một đơn hàng mới.",
   orderId:
     result.orderId,
 
@@ -478,6 +476,5 @@ export async function linkReceiptSettlementByIds(input: {
 });
   });
 }
-
 
 

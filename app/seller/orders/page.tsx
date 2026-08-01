@@ -472,12 +472,12 @@ export default function SellerOrdersPage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen bg-gray-100 dark:bg-zinc-950">
+        <main className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] transition-colors duration-300">
           <div className="space-y-4 p-4">
             {Array.from({ length: 6 }).map((_, index) => (
               <div
                 key={index}
-                className="h-36 animate-pulse rounded-2xl bg-white dark:bg-zinc-900"
+                className="h-36 animate-pulse rounded-2xl bg-[var(--card-bg)]"
               />
             ))}
           </div>

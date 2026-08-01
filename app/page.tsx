@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 export const dynamic = "force-dynamic";
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
@@ -223,7 +223,7 @@ function ProductCard({
     </p>
 
     {product.sale_price && (
-      <p className="text-[10px] text-gray-400 line-through">
+      <p className="text-[10px] text-[var(--text-muted)] line-through">
         {formatPi(product.price)} π
       </p>
     )}
@@ -644,7 +644,7 @@ useEffect(() => {
       </h2>
     </div>
 
-    <button className="text-[10px] text-gray-500">
+    <button className="text-[10px] text-[var(--text-muted)]">
       {t.view_all || "View"}
     </button>
   </div>
@@ -765,7 +765,7 @@ useEffect(() => {
     <h2 className="text-2xl font-black">
       {t.discover_products || "Discover Products"}
     </h2>
-    <p className="mt-1 text-sm text-gray-500">
+    <p className="mt-1 text-sm text-[var(--text-muted)]">
       {t.curated_products_for_you || "Curated products for you"}
     </p>
   </div>

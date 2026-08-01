@@ -100,9 +100,14 @@ const [tab, setTab] =
   }
 
   return (
-  <main className="min-h-screen bg-[var(--background)]">
+  <main className="
+    min-h-screen
+    bg-[var(--background)]
+    transition-colors
+    duration-300
+  ">
 
-    <div className="sticky top-0 z-20 border-b border-[var(--border)] bg-[var(--background)] overflow-x-auto">
+    <div className="sticky top-0 z-20 border-b border-[var(--border-color)] bg-[var(--background)] overflow-x-auto">
       <div className="flex min-w-max gap-2 p-4">
 
         {tabs.map((value) => (

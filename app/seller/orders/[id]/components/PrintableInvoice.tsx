@@ -98,7 +98,7 @@ export default function PrintableInvoice({
 
         <thead>
 
-          <tr className="bg-gray-100">
+          <tr className="bg-[var(--surface-2)]">
 
             <th className="border px-2 py-2">
               #
@@ -152,7 +152,7 @@ export default function PrintableInvoice({
       </div>
 
       {(item.variant_name || item.variant_value) && (
-        <div className="text-xs text-gray-500">
+        <div className="text-xs text-[var(--text-muted)]">
           {item.variant_name}
           {item.variant_name && item.variant_value ? ": " : ""}
           {item.variant_value}

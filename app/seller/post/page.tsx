@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import useSWR from "swr";
 import { useRouter } from "next/navigation";
 import { useTranslationClient as useTranslation } from "@/app/lib/i18n/client";
@@ -89,7 +89,7 @@ export default function SellerPostPage() {
 
   if (loading) {
     return (
-      <div className="p-8 text-center text-gray-400">
+      <div className="p-8 text-center text-[var(--text-muted)]">
         {t.loading ??
           "Loading..."}
       </div>
@@ -102,7 +102,7 @@ export default function SellerPostPage() {
 
   if (!user || !isSeller) {
     return (
-      <div className="p-8 text-center text-gray-400">
+      <div className="p-8 text-center text-[var(--text-muted)]">
         {t.no_permission ??
           "No permission"}
       </div>
@@ -133,11 +133,11 @@ export default function SellerPostPage() {
 
       {isLoading ? (
         <div className="space-y-4 animate-pulse">
-          <div className="h-10 bg-gray-200 rounded" />
+          <div className="h-10 bg-[var(--surface-3)] rounded" />
 
-          <div className="h-10 bg-gray-200 rounded" />
+          <div className="h-10 bg-[var(--surface-3)] rounded" />
 
-          <div className="h-40 bg-gray-200 rounded" />
+          <div className="h-40 bg-[var(--surface-3)] rounded" />
         </div>
       ) : (
         <ProductForm
