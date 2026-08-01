@@ -204,6 +204,12 @@ export async function getNotificationsByUserId(
 export async function getUnreadNotificationCount(
   userId: string
 ): Promise<number> {
+
+  console.log(
+    "[NOTIFICATION] userId =",
+    userId
+  );
+
   const result = await query<{ count: string }>(
     `
     SELECT COUNT(*) AS count
@@ -214,6 +220,11 @@ export async function getUnreadNotificationCount(
       AND is_read = FALSE
     `,
     [userId]
+  );
+
+  console.log(
+    "[NOTIFICATION] unread =",
+    result.rows[0]
   );
 
   return Number(result.rows[0]?.count ?? 0);
