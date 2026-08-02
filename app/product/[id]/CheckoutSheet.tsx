@@ -69,16 +69,10 @@ export default function CheckoutSheet({
   const [processing, setProcessing] = useState(false);
 /* ================= WORKFLOW ================= */
 
-const [pendingCheckout, setPendingCheckout] =
-  useState(false);
-
 const [loadingAddress, setLoadingAddress] =
   useState(false);
 
 const [addressLoaded, setAddressLoaded] =
-  useState(false);
-
-const [needAddress, setNeedAddress] =
   useState(false);
 
 const [autoPayAfterLogin, setAutoPayAfterLogin] =
@@ -141,7 +135,6 @@ useEffect(() => {
       if (def) {
         setShipping(def);
 
-        setNeedAddress(false);
         showMessage(
     t.address_loaded ??
   "Shipping address loaded.",
@@ -149,7 +142,6 @@ useEffect(() => {
     );
       } else {
         setShipping(null);
-        setNeedAddress(true);
         showMessage(
     t.please_add_shipping_address ??
   "Please add a shipping address.",
@@ -206,7 +198,7 @@ useEffect(() => {
     ];
   }, [open, shipping, quantity, item, product]);
 
-  const { data: preview, isLoading, isValidating } = useSWR(
+  const { data: preview } = useSWR(
     previewKey,
     previewFetcher,
     {
@@ -293,7 +285,6 @@ useEffect(() => {
   if (processingRef.current) return;
   if (autoPayRef.current) return;
   autoPayRef.current = true;
-  setPendingCheckout(false);
   setAutoPayAfterLogin(false);
   showMessage(
   t.continue_payment ??
@@ -362,9 +353,9 @@ useEffect(() => {
   shipping={shipping}
   loading={loadingAddress}
   t={t}
-  onSaved={(address) => {
-    setShipping(address);
-  }}
+  onAdd={() => {}}
+  onEdit={() => {}}
+  onChange={() => {}}
 />
           {/* SHIPPING ZONE */}
           <div
@@ -521,4 +512,3 @@ style={{
     </div>
   );
 }
-
