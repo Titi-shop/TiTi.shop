@@ -1,5 +1,6 @@
 "use client";
 
+import { countries } from "@/data/countries";
 import type { ShippingInfo } from "@/types/checkout";
 
 type AddressSectionProps = {
@@ -22,17 +23,17 @@ export default function AddressSection({
     return (
       <div
         className="
+          animate-pulse
           rounded-2xl
           border
           border-[var(--border-color)]
           bg-[var(--card-bg)]
           p-4
-          animate-pulse
         "
       >
-        <div className="h-4 w-36 rounded bg-[var(--surface-3)]" />
-        <div className="mt-3 h-3 w-52 rounded bg-[var(--surface-3)]" />
-        <div className="mt-2 h-3 w-full rounded bg-[var(--surface-3)]" />
+        <div className="h-4 w-40 rounded bg-gray-200/60" />
+        <div className="mt-3 h-3 w-56 rounded bg-gray-200/60" />
+        <div className="mt-2 h-3 w-full rounded bg-gray-200/60" />
       </div>
     );
   }
@@ -57,16 +58,16 @@ export default function AddressSection({
             type="button"
             onClick={onAdd}
             className="
-              rounded-lg
+              rounded-xl
               bg-[var(--color-primary)]
               px-3
-              py-1.5
-              text-xs
+              py-2
+              text-sm
               font-medium
               text-white
             "
           >
-            {t.add ?? "Add"}
+            {t.add_address ?? "Add"}
           </button>
         </div>
 
@@ -78,12 +79,16 @@ export default function AddressSection({
     );
   }
 
+  const country =
+    countries.find(
+      (c) => c.code === shipping.country
+    );
+
   const fullAddress = [
     shipping.address_line,
     shipping.ward,
     shipping.district,
     shipping.region,
-    shipping.country,
   ]
     .filter(Boolean)
     .join(", ");
@@ -98,58 +103,27 @@ export default function AddressSection({
         p-4
       "
     >
-      <div className="flex items-start justify-between gap-3">
+      {/* Header */}
 
-        <div className="flex min-w-0 flex-1 gap-3">
+      <div className="flex items-center justify-between">
 
-          <div className="text-lg">
+        <div className="flex items-center gap-2">
+
+          <span className="text-lg">
             📍
-          </div>
+          </span>
 
-          <div className="min-w-0 flex-1">
+          <span className="font-semibold">
+            {t.shipping_address ??
+              "Shipping address"}
+          </span>
 
-            <div
-              className="
-                flex
-                flex-wrap
-                items-center
-                gap-x-2
-                gap-y-1
-              "
-            >
-              <span className="font-semibold">
-                {shipping.name}
-              </span>
-
-              <span className="text-xs opacity-40">
-                •
-              </span>
-
-              <span className="text-sm text-[var(--text-muted)]">
-                {shipping.phone}
-              </span>
-            </div>
-
-            <div
-              className="
-                mt-1
-                text-sm
-                leading-5
-                text-[var(--text-muted)]
-                break-words
-              "
-            >
-              {fullAddress}
-            </div>
-
-          </div>
         </div>
 
         <button
           type="button"
           onClick={onChange}
           className="
-            shrink-0
             text-sm
             font-medium
             text-[var(--color-primary)]
@@ -159,6 +133,71 @@ export default function AddressSection({
         </button>
 
       </div>
+
+      {/* Name */}
+
+      <div
+        className="
+          mt-3
+          flex
+          flex-wrap
+          items-center
+          gap-2
+        "
+      >
+        <span className="font-semibold">
+          {shipping.name}
+        </span>
+
+        <span className="opacity-40">
+          •
+        </span>
+
+        <span className="text-sm">
+          {shipping.phone}
+        </span>
+      </div>
+
+      {/* Address */}
+
+      <div
+        className="
+          mt-2
+          text-sm
+          leading-5
+          text-[var(--text-muted)]
+        "
+      >
+        {fullAddress}
+      </div>
+
+      {/* Country + ZIP */}
+
+      <div
+        className="
+          mt-2
+          flex
+          flex-wrap
+          items-center
+          gap-x-4
+          gap-y-1
+          text-xs
+          text-[var(--text-muted)]
+        "
+      >
+        <span>
+          {country?.flag ?? "🌍"}{" "}
+          {country?.name ??
+            shipping.country}
+        </span>
+
+        {shipping.postal_code && (
+          <span>
+            ZIP: {shipping.postal_code}
+          </span>
+        )}
+      </div>
+
     </div>
   );
 }
