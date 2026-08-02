@@ -130,23 +130,49 @@ export async function fetchDefaultAddress(): Promise<ShippingAddress | null> {
      return null;
      }
 
-    return {
-      id: def.id,
-      name: def.full_name,
-      phone: def.phone,
-      address_line: def.address_line,
-      region: def.region,
-      district: def.district ?? "",
-      ward: def.ward ?? "",
-      country: def.country ?? "",
-      postal_code: def.postal_code ?? null,
-    };
+    return mapAddress(def);
   } catch (error) {
     console.error("[ADDRESS LOAD ERROR]", error);
     return null;
   }
 }
+ /* =========================================================
+ALL ADDRESSES
+========================================================= */
 
+export async function fetchAddresses(): Promise<AddressItem[]> {
+  const res = await apiAuthFetch("/api/address");
+
+  if (!res.ok) {
+    throw new Error("ADDRESS_LOAD_FAILED");
+  }
+
+  const data: AddressResponse =
+    await res.json();
+
+  return Array.isArray(data.items)
+    ? data.items
+    : [];
+}
+  /* =========================================================
+MAP ADDRESS
+========================================================= */
+
+export function mapAddress(
+  item: AddressItem
+): ShippingAddress {
+  return {
+    id: item.id,
+    name: item.full_name,
+    phone: item.phone,
+    address_line: item.address_line,
+    region: item.region,
+    district: item.district ?? "",
+    ward: item.ward ?? "",
+    country: item.country ?? "",
+    postal_code: item.postal_code ?? null,
+  };
+}
 /* =========================================================
 COUNTRY DISPLAY
 ========================================================= */
