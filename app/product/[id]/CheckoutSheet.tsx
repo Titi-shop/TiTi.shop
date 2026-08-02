@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
-
+import AddressSection from "./components/AddressSection";
 import { useAuth } from "@/context/AuthContext";
 import { useTranslationClient as useTranslation } from "@/app/lib/i18n/client";
 import { formatPi } from "@/lib/pi";
@@ -356,43 +356,22 @@ useEffect(() => {
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
 
          {/* ADDRESS */}
-<div
-  className="border rounded-xl p-3 cursor-pointer transition"
-  onClick={() => router.push("/customer/address")}
-  style={{
-    borderColor: "var(--nav-border)",
-  }}
->
-  {shipping ? (
-    <>
-      <p className="font-medium">{shipping.name}</p>
-      <p className="text-sm text-[var(--text-muted)]">{shipping.phone}</p>
-      <p className="text-sm" style={{ color: "var(--text-muted)",
-  }}
->
-        {shipping.address_line}
-      </p>
-      <p className="text-sm text-[var(--text-muted)]">
-        {[shipping.ward, shipping.district, shipping.region]
-          .filter(Boolean)
-          .join(", ")}{" "}
-        – {getCountryDisplay(shipping.country)}
-      </p>
+{/* ADDRESS */}
 
-      <p className="text-xs mt-2 text-orange-500 font-medium">
-        {t.change_address ?? "Tap to change address"}
-      </p>
-    </>
-  ) : (
-    <p
-  style={{
-    color: "var(--text-muted)",
+<AddressSection
+  shipping={shipping}
+  loading={loadingAddress}
+  t={t}
+  onAdd={() => {
+    router.push("/customer/address");
   }}
->
-      ➕ {t.add_shipping}
-    </p>
-  )}
-</div>
+  onEdit={() => {
+    router.push("/customer/address");
+  }}
+  onChange={() => {
+    router.push("/customer/address");
+  }}
+/>
           {/* SHIPPING ZONE */}
           <div
   className="rounded-xl p-3"
