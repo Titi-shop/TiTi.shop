@@ -1,14 +1,18 @@
 "use client";
 
 import type { ShippingInfo } from "@/types/checkout";
-
+import { useState } from "react";
+import AddressForm, {
+  type AddressFormData,
+} from "@/components/address/AddressForm";
 type AddressSectionProps = {
   shipping: ShippingInfo | null;
   loading: boolean;
   t: Record<string, string>;
-  onAdd: () => void;
-  onEdit: () => void;
-  onChange: () => void;
+
+  onSaved: (
+    address: ShippingInfo
+  ) => void;
 };
 
 export default function AddressSection({
