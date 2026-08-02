@@ -1,18 +1,13 @@
 "use client";
 
 import type { ShippingInfo } from "@/types/checkout";
-import { useState } from "react";
-import AddressForm, {
-  type AddressFormData,
-} from "@/components/address/AddressForm";
 type AddressSectionProps = {
   shipping: ShippingInfo | null;
   loading: boolean;
   t: Record<string, string>;
 
-  onSaved: (
-    address: ShippingInfo
-  ) => void;
+  onAdd: () => void;
+  onChange: () => void;
 };
 
 export default function AddressSection({
@@ -56,42 +51,62 @@ export default function AddressSection({
   }
 
   return (
-    <div className="rounded-xl border p-4">
-      <div className="flex items-center justify-between">
-        <div className="font-semibold">
-          {t.shipping_address ?? "Shipping address"}
-        </div>
+ <div className="rounded-2xl border border-[var(--border-color)] bg-[var(--card-bg)] p-4">
 
-        <button
-          type="button"
-          onClick={onChange}
-          className="text-sm text-blue-600"
-        >
-          {t.change ?? "Change"}
-        </button>
-      </div>
+  <div className="flex items-center justify-between">
 
-      <div className="mt-3 space-y-1 text-sm">
-        <div className="font-medium">
-          {shipping.name}
-        </div>
+    <div className="flex items-center gap-2">
+      <span>📍</span>
 
-        <div>{shipping.phone}</div>
+      <span className="text-sm font-semibold">
+        {t.shipping_address ?? "Shipping address"}
+      </span>
+    </div>
 
-        <div>{shipping.address_line}</div>
+    <button
+      type="button"
+      onClick={onChange}
+      className="
+        text-xs
+        font-medium
+        text-[var(--color-primary)]
+      "
+    >
+      {t.change ?? "Change"}
+    </button>
 
-        <div>
-          {[shipping.ward, shipping.district, shipping.region]
-            .filter(Boolean)
-            .join(", ")}
-        </div>
+  </div>
 
-        <div>{shipping.country}</div>
+  <div className="mt-3">
 
-        {shipping.postal_code && (
-          <div>{shipping.postal_code}</div>
-        )}
-      </div>
+    <div className="text-sm font-medium">
+      {shipping.name}
+      <span className="mx-2 opacity-40">•</span>
+      {shipping.phone}
+    </div>
+
+    <div
+      className="
+        mt-1
+        text-xs
+        leading-5
+        text-[var(--text-muted)]
+      "
+    >
+      {[
+        shipping.address_line,
+        shipping.ward,
+        shipping.district,
+        shipping.region,
+        shipping.country,
+      ]
+        .filter(Boolean)
+        .join(", ")}
+    </div>
+
+  </div>
+
+</div>
 
       <button
         type="button"
