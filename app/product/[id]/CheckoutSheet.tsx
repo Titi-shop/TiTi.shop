@@ -528,22 +528,22 @@ style={{
            </div>
 
       <AddressSelectorSheet
-        open={selectorOpen}
-        selectedId={shipping?.id}
-        onClose={() => {
-          setSelectorOpen(false);
-        }}
-        onSelect={(address) => {
-          setShipping(address);
-          setSelectorOpen(false);
-        }}
-        onAdd={() => {
-          console.log("ADD ADDRESS");
-        }}
-        onEdit={(address) => {
-          console.log("EDIT ADDRESS", address);
-        }}
-      />
+  open={selectorOpen}
+  selectedId={shipping ? shipping.id : null}
+  onClose={() => {
+    setSelectorOpen(false);
+  }}
+  onSelect={(address) => {
+    setShipping(address);
+    setSelectorOpen(false);
+  }}
+  onAdd={() => {
+    // bước sau sẽ mở AddressFormSheet
+  }}
+  onEdit={(address) => {
+    // bước sau sẽ mở AddressFormSheet
+  }}
+/>
     </div>
   );
 }
