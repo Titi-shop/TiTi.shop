@@ -7,19 +7,16 @@ import AddressForm, {
 } from "@/components/address/AddressForm";
 
 import type {
-  ShippingAddress,
-} from "../checkout.api";
+  ShippingInfo,
+} from "@/types/checkout";
 
 type AddressEditorProps = {
-  shipping: ShippingAddress | null;
-
+  shipping: ShippingInfo | null;
   t: Record<string, string>;
-
   onCancel: () => void;
-
   onSaved: (
-    address: ShippingAddress
-  ) => void;
+    address: ShippingInfo
+) => void;
 };
 
 export default function AddressEditor({
