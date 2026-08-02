@@ -44,16 +44,15 @@ export default function AddressEditor({
     }
 
     setForm({
-      full_name: shipping.name,
-      phone: shipping.phone,
-      country: shipping.country,
-      region: shipping.region,
-      district: shipping.district,
-      ward: shipping.ward,
-      address_line: shipping.address_line,
-      postal_code:
-        shipping.postal_code ?? "",
-    });
+  full_name: shipping.name,
+  phone: shipping.phone,
+  country: shipping.country,
+  region: shipping.region,
+  district: shipping.district ?? "",
+  ward: shipping.ward ?? "",
+  address_line: shipping.address_line,
+  postal_code: shipping.postal_code ?? "",
+});
   }, [shipping]);
 
   const handleSubmit = async () => {
