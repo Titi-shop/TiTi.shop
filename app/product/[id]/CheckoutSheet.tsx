@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import AddressSection from "./components/AddressSection";
+import AddressEditor from "./components/AddressEditor";
 import { useAuth } from "@/context/AuthContext";
 import { useTranslationClient as useTranslation } from "@/app/lib/i18n/client";
 import { formatPi } from "@/lib/pi";
@@ -45,6 +46,8 @@ export default function CheckoutSheet({
   /* ================= STATE ================= */
 
   const [shipping, setShipping] = useState<ShippingInfo | null>(null);
+  const [editingAddress, setEditingAddress] =
+  useState(false);
   const [qty, setQty] = useState("1");
   const [message, setMessage] = useState<Message | null>(null);
   const showMessage = (
@@ -349,14 +352,34 @@ useEffect(() => {
          {/* ADDRESS */}
 {/* ADDRESS */}
 
-<AddressSection
-  shipping={shipping}
-  loading={loadingAddress}
-  t={t}
-  onAdd={() => {}}
-  onEdit={() => {}}
-  onChange={() => {}}
-/>
+{editingAddress ? (
+  <AddressEditor
+    shipping={shipping}
+    t={t}
+    onCancel={() => {
+      setEditingAddress(false);
+    }}
+    onSaved={(address) => {
+      setShipping(address);
+      setEditingAddress(false);
+    }}
+  />
+) : (
+  <AddressSection
+    shipping={shipping}
+    loading={loadingAddress}
+    t={t}
+    onAdd={() => {
+      setEditingAddress(true);
+    }}
+    onEdit={() => {
+      setEditingAddress(true);
+    }}
+    onChange={() => {
+      setEditingAddress(true);
+    }}
+  />
+)}
           {/* SHIPPING ZONE */}
           <div
   className="rounded-xl p-3"
