@@ -7,7 +7,7 @@ import AddressSection from "./components/AddressSection";
 import { useAuth } from "@/context/AuthContext";
 import { useTranslationClient as useTranslation } from "@/app/lib/i18n/client";
 import { formatPi } from "@/lib/pi";
-
+import AddressSelectorSheet from "./components/AddressSelectorSheet";
 import type { ShippingRate } from "@/types/Product";
 import type {
   CheckoutProps as Props,
@@ -83,6 +83,8 @@ const [needAddress, setNeedAddress] =
   useState(false);
 
 const [autoPayAfterLogin, setAutoPayAfterLogin] =
+  useState(false);
+  const [selectorOpen, setSelectorOpen] =
   useState(false);
   /* ================= ITEM ================= */
 
@@ -363,13 +365,13 @@ useEffect(() => {
   loading={loadingAddress}
   t={t}
   onAdd={() => {
-    router.push("/customer/address");
+    setSelectorOpen(true);
   }}
   onEdit={() => {
-    router.push("/customer/address");
+    setSelectorOpen(true);
   }}
   onChange={() => {
-    router.push("/customer/address");
+    setSelectorOpen(true);
   }}
 />
           {/* SHIPPING ZONE */}
@@ -523,7 +525,26 @@ style={{
     {processing ? t.processing : t.pay_now}
   </button>
 </div>
-      </div>
+           </div>
+
+      <AddressSelectorSheet
+        open={selectorOpen}
+        selectedId={shipping?.id}
+        onClose={() => {
+          setSelectorOpen(false);
+        }}
+        onSelect={(address) => {
+          setShipping(address);
+          setSelectorOpen(false);
+        }}
+        onAdd={() => {
+          console.log("ADD ADDRESS");
+        }}
+        onEdit={(address) => {
+          console.log("EDIT ADDRESS", address);
+        }}
+      />
     </div>
   );
 }
+
