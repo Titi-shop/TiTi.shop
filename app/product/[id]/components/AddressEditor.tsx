@@ -9,7 +9,11 @@ import AddressForm, {
 import type {
   ShippingInfo,
 } from "@/types/checkout";
-
+import {
+  createAddress,
+  updateAddress,
+  setDefaultAddress,
+} from "../checkout.api";
 type AddressEditorProps = {
   shipping: ShippingInfo | null;
   t: Record<string, string>;
@@ -22,6 +26,7 @@ type AddressEditorProps = {
 export default function AddressEditor({
   shipping,
   onCancel,
+  onSaved,
 }: AddressEditorProps) {
   const [saving, setSaving] =
     useState(false);
@@ -56,20 +61,50 @@ export default function AddressEditor({
   }, [shipping]);
 
   const handleSubmit = async () => {
-    setSaving(true);
+  setSaving(true);
 
-    try {
-      /**
-       * TODO
-       * createAddress()
-       * updateAddress()
-       * fetchDefaultAddress()
-       */
+  try {
+    const payload = {
+      ...(shipping?.id
+        ? { id: shipping.id }
+        : {}),
 
-    } finally {
-      setSaving(false);
+      full_name: form.full_name,
+      phone: form.phone,
+
+      country: form.country,
+
+      region: form.region,
+      district: form.district,
+      ward: form.ward,
+
+      address_line: form.address_line,
+
+      postal_code:
+        form.postal_code || null,
+
+      label: "home" as const,
+    };
+
+    const saved = shipping?.id
+      ? await updateAddress(payload)
+      : await createAddress(payload);
+
+    if (!shipping?.id) {
+      await setDefaultAddress(saved.id);
     }
-  };
+
+    onSaved(saved);
+
+  } catch (err) {
+    console.error(
+      "[ADDRESS SAVE]",
+      err
+    );
+  } finally {
+    setSaving(false);
+  }
+};
 
   return (
     <div
