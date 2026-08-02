@@ -1,7 +1,7 @@
 "use client";
 
 import { apiAuthFetch } from "@/lib/api/apiAuthFetch";
-
+import type { ShippingInfo } from "@/types/checkout";
 /* =========================================================
 TYPES
 ========================================================= */
@@ -38,18 +38,6 @@ export interface AddressItem {
 
 export interface AddressResponse {
   items: AddressItem[];
-}
-
-export interface ShippingAddress {
-  id: string;
-  name: string;
-  phone: string;
-  address_line: string;
-  region: string;
-  district: string;
-  ward: string;
-  country: string;
-  postal_code: string | null;
 }
 
 /* =========================================================
@@ -105,7 +93,7 @@ export async function previewFetcher(
 DEFAULT ADDRESS
 ========================================================= */
 
-export async function fetchDefaultAddress(): Promise<ShippingAddress | null> {
+export async function fetchDefaultAddress(): Promise<ShippingInfo | null> {
   try {
     const res = await apiAuthFetch("/api/address");
 
@@ -160,7 +148,7 @@ MAP ADDRESS
 
 export function mapAddress(
   item: AddressItem
-): ShippingAddress {
+): ShippingInfo {
   return {
     id: item.id,
     name: item.full_name,
