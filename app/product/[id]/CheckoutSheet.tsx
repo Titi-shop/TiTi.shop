@@ -7,7 +7,6 @@ import AddressSection from "./components/AddressSection";
 import { useAuth } from "@/context/AuthContext";
 import { useTranslationClient as useTranslation } from "@/app/lib/i18n/client";
 import { formatPi } from "@/lib/pi";
-import AddressSelectorSheet from "./components/AddressSelectorSheet";
 import type { ShippingRate } from "@/types/Product";
 import type {
   CheckoutProps as Props,
@@ -84,8 +83,7 @@ const [needAddress, setNeedAddress] =
 
 const [autoPayAfterLogin, setAutoPayAfterLogin] =
   useState(false);
-  const [selectorOpen, setSelectorOpen] =
-  useState(false);
+  
   /* ================= ITEM ================= */
 
   const item = useMemo(() => {
@@ -364,14 +362,8 @@ useEffect(() => {
   shipping={shipping}
   loading={loadingAddress}
   t={t}
-  onAdd={() => {
-    setSelectorOpen(true);
-  }}
-  onEdit={() => {
-    setSelectorOpen(true);
-  }}
-  onChange={() => {
-    setSelectorOpen(true);
+  onSaved={(address) => {
+    setShipping(address);
   }}
 />
           {/* SHIPPING ZONE */}
@@ -526,24 +518,6 @@ style={{
   </button>
 </div>
            </div>
-
-      <AddressSelectorSheet
-  open={selectorOpen}
-  selectedId={shipping ? shipping.id : null}
-  onClose={() => {
-    setSelectorOpen(false);
-  }}
-  onSelect={(address) => {
-    setShipping(address);
-    setSelectorOpen(false);
-  }}
-  onAdd={() => {
-    // bước sau sẽ mở AddressFormSheet
-  }}
-  onEdit={(address) => {
-    // bước sau sẽ mở AddressFormSheet
-  }}
-/>
     </div>
   );
 }
