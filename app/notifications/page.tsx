@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useTranslationClient as useTranslation } from "@/app/lib/i18n/client";
 import AppLoading from "@/components/AppLoading";
 import { apiAuthFetch } from "@/lib/api/apiAuthFetch";
-
+import { useAuth } from "@/context/AuthContext";
 /* ======================================================
    TYPES
 ====================================================== */
@@ -46,7 +46,10 @@ function formatDate(
 
 export default function NotificationsPage() {
   const { t } = useTranslation();
-
+  const {
+  user,
+  loading: authLoading,
+  } = useAuth();
   const router = useRouter();
 
   /* ======================================================
@@ -67,9 +70,19 @@ export default function NotificationsPage() {
   ====================================================== */
 
   useEffect(() => {
-    let mounted = true;
 
-    async function fetchNotifications() {
+  if (authLoading) {
+    return;
+  }
+
+  if (!user) {
+    setLoading(false);
+    return;
+  }
+
+  let mounted = true;
+
+  async function fetchNotifications() {
       try {
         setLoading(true);
         setError("");
@@ -132,7 +145,11 @@ await apiAuthFetch(
     return () => {
       mounted = false;
     };
-  }, [t]);
+  }, [
+  authLoading,
+  user,
+  t,
+]);
 
   /* ======================================================
      SORT
