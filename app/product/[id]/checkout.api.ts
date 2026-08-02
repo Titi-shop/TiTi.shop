@@ -1,7 +1,7 @@
 "use client";
 
 import { apiAuthFetch } from "@/lib/api/apiAuthFetch";
-import type { ShippingInfo } from "@/types/checkout";
+
 /* =========================================================
 TYPES
 ========================================================= */
@@ -39,6 +39,29 @@ export interface AddressItem {
 export interface AddressResponse {
   items: AddressItem[];
 }
+export interface SaveAddressPayload {
+  id?: string;
+  full_name: string;
+  phone: string;
+  country: string;
+  region: string;
+  district: string;
+  ward: string;
+  address_line: string;
+  postal_code: string | null;
+  label: "home" | "office" | "other";
+}
+export interface ShippingAddress {
+  id: string;
+  name: string;
+  phone: string;
+  address_line: string;
+  region: string;
+  district: string;
+  ward: string;
+  country: string;
+  postal_code: string | null;
+}
 
 /* =========================================================
 PREVIEW FETCHER
@@ -63,7 +86,7 @@ export async function previewFetcher(
     variant_id,
   });
 }
-
+  
   const res = await apiAuthFetch(url, {
     method: "POST",
     body: JSON.stringify({
@@ -88,12 +111,30 @@ export async function previewFetcher(
 
   return data;
 }
+/* =========================================================
+MAP ADDRESS
+========================================================= */
 
+export function mapAddress(
+  item: AddressItem
+): ShippingAddress {
+  return {
+    id: item.id,
+    name: item.full_name,
+    phone: item.phone,
+    address_line: item.address_line,
+    region: item.region,
+    district: item.district ?? "",
+    ward: item.ward ?? "",
+    country: item.country ?? "",
+    postal_code: item.postal_code ?? null,
+  };
+}
 /* =========================================================
 DEFAULT ADDRESS
 ========================================================= */
 
-export async function fetchDefaultAddress(): Promise<ShippingInfo | null> {
+export async function fetchDefaultAddress(): Promise<ShippingAddress | null> {
   try {
     const res = await apiAuthFetch("/api/address");
 
@@ -102,7 +143,6 @@ export async function fetchDefaultAddress(): Promise<ShippingInfo | null> {
     }
 
     const data: AddressResponse = await res.json();
-
     const items = Array.isArray(data.items)
       ? data.items
       : [];
@@ -142,25 +182,85 @@ export async function fetchAddresses(): Promise<AddressItem[]> {
     ? data.items
     : [];
 }
-  /* =========================================================
-MAP ADDRESS
-========================================================= */
 
-export function mapAddress(
-  item: AddressItem
-): ShippingInfo {
-  return {
-    id: item.id,
-    name: item.full_name,
-    phone: item.phone,
-    address_line: item.address_line,
-    region: item.region,
-    district: item.district ?? "",
-    ward: item.ward ?? "",
-    country: item.country ?? "",
-    postal_code: item.postal_code ?? null,
-  };
+export async function createAddress(
+  payload: SaveAddressPayload
+): Promise<ShippingAddress> {
+  const res = await apiAuthFetch(
+    "/api/address",
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("CREATE_ADDRESS_FAILED");
+  }
+
+  const data: {
+  address: AddressItem;
+} = await res.json();
+
+return mapAddress(data.address);
 }
+
+export async function updateAddress(
+  payload: SaveAddressPayload
+): Promise<ShippingAddress> {
+  const res = await apiAuthFetch(
+    "/api/address",
+    {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("UPDATE_ADDRESS_FAILED");
+  }
+
+ const data: {
+  address: AddressItem;
+} = await res.json();
+
+return mapAddress(data.address);
+}
+
+export async function setDefaultAddress(
+  id: string
+): Promise<void> {
+  const res = await apiAuthFetch(
+    "/api/address",
+    {
+      method: "PUT",
+      body: JSON.stringify({
+        id,
+      }),
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error(
+      "SET_DEFAULT_ADDRESS_FAILED"
+    );
+  }
+}
+export async function removeAddress(
+  id: string
+): Promise<void> {
+  const res = await apiAuthFetch(
+    `/api/address?id=${id}`,
+    {
+      method: "DELETE",
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("DELETE_ADDRESS_FAILED");
+  }
+}
+
 /* =========================================================
 COUNTRY DISPLAY
 ========================================================= */
