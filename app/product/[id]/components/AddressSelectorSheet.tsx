@@ -10,21 +10,16 @@ import type { ShippingInfo } from "@/types/checkout";
 type Props = {
   open: boolean;
 
-  selectedId?: string;
+  selectedId: string | null;
 
   onClose: () => void;
 
-  onSelect: (
-    address: ShippingInfo
-  ) => void;
+  onSelect: (address: ShippingInfo) => void;
 
   onAdd: () => void;
 
-  onEdit: (
-    address: ShippingInfo
-  ) => void;
+  onEdit: (address: ShippingInfo) => void;
 };
-
 export default function AddressSelectorSheet({
   open,
   selectedId,
