@@ -2,23 +2,29 @@
 
 import useSWR from "swr";
 import { ChangeEvent } from "react";
+
 import { countries } from "@/data/countries";
 import { useTranslationClient as useTranslation } from "@/app/lib/i18n/client";
+
 /* ======================================================
    TYPES
 ====================================================== */
 
 export interface AddressFormData {
   full_name: string;
+
   phone: string;
 
   country: string;
 
   region: string;
+
   district: string;
+
   ward: string;
 
   address_line: string;
+
   postal_code: string;
 }
 
@@ -29,9 +35,13 @@ interface Province {
 
 interface Props {
   form: AddressFormData;
-  setForm: (v: AddressFormData) => void;
+
+  setForm: (
+    value: AddressFormData
+  ) => void;
 
   onSubmit: () => void;
+
   saving: boolean;
 }
 
@@ -45,7 +55,9 @@ const fetcher = async (
   const res = await fetch(url);
 
   if (!res.ok) {
-    throw new Error("FETCH_PROVINCES_FAILED");
+    throw new Error(
+      "FETCH_PROVINCES_FAILED"
+    );
   }
 
   return res.json();
@@ -63,60 +75,116 @@ export default function AddressForm({
 }: Props) {
   const { t } = useTranslation();
 
-  const isVN = form.country === "VN";
-
   /* ======================================================
-     SWR
+     COUNTRY
   ====================================================== */
 
-  const { data: provinces } = useSWR<Province[]>(
-    isVN
-      ? "https://provinces.open-api.vn/api/p/"
-      : null,
-    fetcher,
-    {
-      revalidateOnFocus: false,
-    }
-  );
+  const selectedCountry =
+    countries.find(
+      (c) => c.code === form.country
+    );
+
+  const isVN =
+    form.country === "VN";
+
+  /*
+    Chỉ hiện ZIP với quốc gia ngoài VN.
+    Sau này có thể đổi thành:
+
+    selectedCountry?.requiresPostalCode
+  */
+
+  const showPostalCode =
+    !isVN;
 
   /* ======================================================
-     HANDLERS
+     PROVINCES
+  ====================================================== */
+
+  const { data: provinces } =
+    useSWR<Province[]>(
+      isVN
+        ? "https://provinces.open-api.vn/api/p/"
+        : null,
+      fetcher,
+      {
+        revalidateOnFocus: false,
+      }
+    );
+
+  /* ======================================================
+     UPDATE FORM
+  ====================================================== */
+
+  const updateField = <
+    K extends keyof AddressFormData
+  >(
+    key: K,
+    value: AddressFormData[K]
+  ) => {
+    setForm({
+      ...form,
+      [key]: value,
+    });
+  };
+
+  /* ======================================================
+     INPUT HANDLER
   ====================================================== */
 
   const handleChange =
-    (key: keyof AddressFormData) =>
+    (
+      key: keyof AddressFormData
+    ) =>
     (
       e:
         | ChangeEvent<HTMLInputElement>
         | ChangeEvent<HTMLTextAreaElement>
     ) => {
-      setForm({
-        ...form,
-        [key]: e.target.value,
-      });
+      updateField(
+        key,
+        e.target.value
+      );
     };
+
+  /* ======================================================
+     COUNTRY CHANGE
+  ====================================================== */
 
   const handleCountryChange = (
     e: ChangeEvent<HTMLSelectElement>
   ) => {
+    updateField(
+      "country",
+      e.target.value
+    );
+
     setForm({
       ...form,
 
       country: e.target.value,
 
       region: "",
+
       district: "",
+
       ward: "",
+
+      postal_code: "",
     });
   };
+
+  /* ======================================================
+     REGION CHANGE
+  ====================================================== */
 
   const handleRegionChange = (
     e: ChangeEvent<HTMLSelectElement>
   ) => {
-    setForm({
-      ...form,
-      region: e.target.value,
-    });
+    updateField(
+      "region",
+      e.target.value
+    );
   };
 
   /* ======================================================
@@ -124,62 +192,70 @@ export default function AddressForm({
   ====================================================== */
 
   const isValid =
-    form.full_name.trim() &&
-    form.phone.trim() &&
-    form.country.trim() &&
-    form.address_line.trim() &&
-    (!isVN || form.region.trim());
+    form.full_name.trim() !== "" &&
+    form.phone.trim() !== "" &&
+    form.country.trim() !== "" &&
+    form.address_line.trim() !== "" &&
+    form.region.trim() !== "" &&
+    (
+      !showPostalCode ||
+      form.postal_code.trim() !== ""
+    );
 
   /* ======================================================
-     INPUT CLASS
+     INPUT STYLE
   ====================================================== */
 
   const inputClassName = `
-    w-full rounded-2xl
-    border border-orange-500/20
+    w-full
+    rounded-xl
+    border
+    border-[var(--border-color)]
     bg-[var(--card-bg)]
-    px-4 py-3
-    text-sm text-[var(--foreground)]
+    px-4
+    py-3
+    text-sm
+    text-[var(--foreground)]
     outline-none
-    transition-colors duration-200
+    transition
 
     placeholder:text-[var(--text-muted)]
 
     focus:border-[var(--color-primary)]
-    focus:ring-2 focus:ring-orange-500/10
+    focus:ring-2
+    focus:ring-[var(--color-primary)]/10
   `;
 
   /* ======================================================
-     UI
+     JSX (PHẦN 2)
   ====================================================== */
 
-  return (
-    <div className="flex h-full flex-col bg-[var(--background)] text-[var(--foreground)]">
+         return (
+    <div className="flex h-full flex-col bg-[var(--background)]">
 
-      {/* ======================================================
+      {/* =========================================
           HEADER
-      ====================================================== */}
+      ========================================== */}
 
       <div
         className="
-          sticky top-0 z-20
-          flex items-center justify-between
-          border-b border-orange-500/10
+          sticky
+          top-0
+          z-20
+          flex
+          items-center
+          justify-between
+          border-b
+          border-[var(--border-color)]
           bg-[var(--card-bg)]
-          px-4 py-4
-          backdrop-blur
+          px-4
+          py-3
         "
       >
-        <div>
-          <h2 className="text-base font-semibold">
-            {t.add_address ?? "Add Address"}
-          </h2>
-
-          <p className="mt-1 text-xs text-[var(--text-muted)]">
-            {t.shipping_address ??
-              "Shipping Address"}
-          </p>
-        </div>
+        <h2 className="text-base font-semibold">
+          {t.shipping_address ??
+            "Shipping Address"}
+        </h2>
 
         <button
           type="button"
@@ -188,11 +264,11 @@ export default function AddressForm({
           className="
             rounded-xl
             bg-[var(--color-primary)]
-            px-4 py-2
-            text-sm font-semibold text-white
-            transition-all duration-200
-
-            active:scale-95
+            px-4
+            py-2
+            text-sm
+            font-semibold
+            text-white
 
             disabled:cursor-not-allowed
             disabled:opacity-50
@@ -204,53 +280,79 @@ export default function AddressForm({
         </button>
       </div>
 
-      {/* ======================================================
+      {/* =========================================
           FORM
-      ====================================================== */}
+      ========================================== */}
 
-      <div className="flex-1 space-y-4 overflow-y-auto px-4 py-4 pb-32">
+      <div
+        className="
+          flex-1
+          space-y-5
+          overflow-y-auto
+          p-4
+          pb-28
+        "
+      >
 
-        {/* FULL NAME */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium">
-            {t.full_name ?? "Full Name"}
-          </label>
+        {/* =====================================
+            NAME + PHONE
+        ====================================== */}
 
-          <input
-            value={form.full_name}
-            onChange={handleChange("full_name")}
-            placeholder={
-              t.full_name ?? "Full Name"
-            }
-            className={inputClassName}
-          />
+        <div className="grid grid-cols-2 gap-3">
+
+          <div>
+            <label className="mb-2 block text-sm font-medium">
+              {t.full_name ??
+                "Full name"}
+            </label>
+
+            <input
+              value={form.full_name}
+              onChange={handleChange(
+                "full_name"
+              )}
+              placeholder={
+                t.full_name ??
+                "Full name"
+              }
+              className={inputClassName}
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium">
+              {t.phone_number ??
+                "Phone"}
+            </label>
+
+            <input
+              value={form.phone}
+              onChange={handleChange(
+                "phone"
+              )}
+              placeholder="+84 912345678"
+              className={inputClassName}
+            />
+          </div>
+
         </div>
 
-        {/* PHONE */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium">
-            {t.phone_number ?? "Phone"}
-          </label>
+        {/* =====================================
+            COUNTRY
+        ====================================== */}
 
-          <input
-            value={form.phone}
-            onChange={handleChange("phone")}
-            placeholder={
-              t.phone_number ?? "Phone"
-            }
-            className={inputClassName}
-          />
-        </div>
+        <div>
 
-        {/* COUNTRY */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium">
-            {t.select_country ?? "Country"}
+          <label className="mb-2 block text-sm font-medium">
+            {t.select_country ??
+              "Country"}
           </label>
 
           <select
             value={form.country}
-            onChange={handleCountryChange}
+            onChange={
+              handleCountryChange
+            }
             className={inputClassName}
           >
             <option value="">
@@ -258,31 +360,43 @@ export default function AddressForm({
                 "Select Country"}
             </option>
 
-            {countries.map((country) => (
-              <option
-                key={country.code}
-                value={country.code}
-              >
-                {country.flag} {country.name}
-              </option>
-            ))}
+            {countries.map(
+              (country) => (
+                <option
+                  key={country.code}
+                  value={country.code}
+                >
+                  {country.flag}{" "}
+                  {country.name}
+                </option>
+              )
+            )}
           </select>
+
         </div>
 
-        {/* REGION */}
-        <div className="space-y-2">
+        {/* =====================================
+            REGION
+        ====================================== */}
 
-          <label className="text-sm font-medium">
+        <div>
+
+          <label className="mb-2 block text-sm font-medium">
+
             {isVN
               ? t.province_city ??
                 "Province / City"
-              : t.region ?? "Region"}
+              : t.region ??
+                "State / Region"}
+
           </label>
 
           {isVN ? (
             <select
               value={form.region}
-              onChange={handleRegionChange}
+              onChange={
+                handleRegionChange
+              }
               className={inputClassName}
             >
               <option value="">
@@ -290,98 +404,145 @@ export default function AddressForm({
                   "Province / City"}
               </option>
 
-              {provinces?.map((province) => (
-                <option
-                  key={province.code}
-                  value={province.name}
-                >
-                  {province.name}
-                </option>
-              ))}
+              {provinces?.map(
+                (province) => (
+                  <option
+                    key={province.code}
+                    value={province.name}
+                  >
+                    {province.name}
+                  </option>
+                )
+              )}
             </select>
           ) : (
             <input
               value={form.region}
-              onChange={handleChange("region")}
+              onChange={handleChange(
+                "region"
+              )}
               placeholder={
-                t.province_city ??
-                "Province / City"
+                t.region ??
+                "State / Region"
               }
               className={inputClassName}
             />
           )}
+
         </div>
 
-        {/* DISTRICT */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium">
-            {t.district ?? "District"}
-          </label>
+        {/* =====================================
+            DISTRICT
+        ====================================== */}
 
-          <input
-            value={form.district}
-            onChange={handleChange("district")}
-            placeholder={
-              t.district ?? "District"
-            }
-            className={inputClassName}
-          />
-        </div>
+        {isVN && (
 
-        {/* WARD */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium">
-            {t.ward ?? "Ward"}
-          </label>
+          <div>
 
-          <input
-            value={form.ward}
-            onChange={handleChange("ward")}
-            placeholder={t.ward ?? "Ward"}
-            className={inputClassName}
-          />
-        </div>
+            <label className="mb-2 block text-sm font-medium">
+              {t.district ??
+                "District"}
+            </label>
 
-        {/* ADDRESS */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium">
-            {t.address ?? "Address"}
+            <input
+              value={form.district}
+              onChange={handleChange(
+                "district"
+              )}
+              placeholder={
+                t.district ??
+                "District"
+              }
+              className={inputClassName}
+            />
+
+          </div>
+
+        )}
+
+        {/* =====================================
+            WARD
+        ====================================== */}
+
+        {isVN && (
+
+          <div>
+
+            <label className="mb-2 block text-sm font-medium">
+              {t.ward ??
+                "Ward"}
+            </label>
+
+            <input
+              value={form.ward}
+              onChange={handleChange(
+                "ward"
+              )}
+              placeholder={
+                t.ward ??
+                "Ward"
+              }
+              className={inputClassName}
+            />
+
+          </div>
+
+        )}
+
+        {/* =====================================
+            ADDRESS
+        ====================================== */}
+
+        <div>
+
+          <label className="mb-2 block text-sm font-medium">
+            {t.address ??
+              "Street Address"}
           </label>
 
           <textarea
-            rows={4}
+            rows={3}
             value={form.address_line}
             onChange={handleChange(
               "address_line"
             )}
             placeholder={
-              t.address ?? "Address"
+              t.address ??
+              "Street Address"
             }
             className={inputClassName}
           />
+
         </div>
 
-        {/* POSTAL */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium">
-            {t.postal_code_optional ??
-              "Postal Code"}
-          </label>
+        {/* =====================================
+            POSTAL CODE
+        ====================================== */}
 
-          <input
-            value={form.postal_code}
-            onChange={handleChange(
-              "postal_code"
-            )}
-            placeholder={
-              t.postal_code_optional ??
-              "Postal Code"
-            }
-            className={inputClassName}
-          />
-        </div>
+        {showPostalCode && (
+
+          <div>
+
+            <label className="mb-2 block text-sm font-medium">
+              {t.postal_code ??
+                "Postal Code"}
+            </label>
+
+            <input
+              value={form.postal_code}
+              onChange={handleChange(
+                "postal_code"
+              )}
+              placeholder="ZIP / Postal Code"
+              className={inputClassName}
+            />
+
+          </div>
+
+        )}
 
       </div>
+
     </div>
   );
 }
