@@ -156,15 +156,10 @@ export default function AddressForm({
 
     setForm({
       ...form,
-
       country: e.target.value,
-
       region: "",
-
       district: "",
-
       ward: "",
-
       postal_code: "",
     });
   };
@@ -380,8 +375,7 @@ export default function AddressForm({
                   key={country.code}
                   value={country.code}
                 >
-                  {country.flag}{" "}
-                  {country.name}
+                 {country.flag} {country.name} ({country.dial})
                 </option>
               )
             )}
