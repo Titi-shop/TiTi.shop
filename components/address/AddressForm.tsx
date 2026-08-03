@@ -99,7 +99,7 @@ export default function AddressForm({
   const { data: provinces } =
     useSWR<Province[]>(
       isVN
-        ? "https://provinces.open-api.vn/api/p/"
+        ? "/api/location/provinces"
         : null,
       fetcher,
       {
@@ -198,12 +198,12 @@ export default function AddressForm({
 
   const inputClassName = `
     w-full
-    rounded-xl
+    rounded-lg
     border
     border-[var(--border-color)]
     bg-[var(--card-bg)]
-    px-4
-    py-3
+    px-3
+    py-2.5
     text-sm
     text-[var(--foreground)]
     outline-none
@@ -238,8 +238,8 @@ export default function AddressForm({
           border-b
           border-[var(--border-color)]
           bg-[var(--card-bg)]
-          px-4
-          py-3
+          px-3
+          py-2.5
         "
       >
         <h2 className="text-base font-semibold">
@@ -252,9 +252,9 @@ export default function AddressForm({
           onClick={onSubmit}
           disabled={!isValid || saving}
           className="
-            rounded-xl
+            rounded-lg
             bg-[var(--color-primary)]
-            px-4
+            px-3
             py-2
             text-sm
             font-semibold
@@ -277,7 +277,7 @@ export default function AddressForm({
       <div
         className="
           flex-1
-          space-y-5
+          space-y-4
           overflow-y-auto
           p-4
           pb-28
@@ -509,7 +509,7 @@ export default function AddressForm({
           </label>
 
           <textarea
-            rows={3}
+            rows={2}
             value={form.address_line}
             onChange={handleChange(
               "address_line"
