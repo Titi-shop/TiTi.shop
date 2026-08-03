@@ -16,15 +16,10 @@ export interface AddressFormData {
   phone: string;
 
   country: string;
-
   region: string;
-
   district: string;
-
   ward: string;
-
   address_line: string;
-
   postal_code: string;
 }
 
@@ -325,14 +320,33 @@ export default function AddressForm({
                 "Phone"}
             </label>
 
-            <input
-              value={form.phone}
-              onChange={handleChange(
-                "phone"
-              )}
-              placeholder="+84 912345678"
-              className={inputClassName}
-            />
+           <div className="flex">
+
+  <div
+    className="
+      flex
+      items-center
+      rounded-l-lg
+      border
+      border-r-0
+      border-[var(--border-color)]
+      bg-[var(--card-bg)]
+      px-3
+      text-sm
+      text-[var(--text-muted)]
+    "
+  >
+    {selectedCountry?.dial ?? "+"}
+  </div>
+
+  <input
+    value={form.phone}
+    onChange={handleChange("phone")}
+    placeholder={t.phone_number ?? "Phone"}
+    className={`${inputClassName} rounded-l-none`}
+  />
+
+</div>
           </div>
 
         </div>
