@@ -191,33 +191,7 @@ const locationLine = [
   )}
 </div>
 
-      {/* Country + ZIP */}
-
-      <div
-        className="
-          mt-2
-          flex
-          flex-wrap
-          items-center
-          gap-x-4
-          gap-y-1
-          text-xs
-          text-[var(--text-muted)]
-        "
-      >
-        <span>
-          {country?.flag ?? "🌍"}{" "}
-          {country?.name ??
-            shipping.country}
-        </span>
-
-        {shipping.postal_code && (
-          <span>
-            ZIP: {shipping.postal_code}
-          </span>
-        )}
-      </div>
-
+  
     </div>
   );
 }
