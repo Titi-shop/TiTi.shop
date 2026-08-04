@@ -46,7 +46,7 @@ export default function ChatWindow({
      <ChatMessages />
 
      <ChatInput />
-      </div>
+  
     </aside>
   );
 }
