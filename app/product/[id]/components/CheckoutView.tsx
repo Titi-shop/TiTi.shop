@@ -4,7 +4,7 @@ import AddressCard from "../cards/AddressCard";
 import ShippingCard from "../cards/ShippingCard";
 import ProductCard from "../cards/ProductCard";
 import SummaryCard from "../cards/SummaryCard";
-import CheckoutFooter from "../footer/CheckoutFooter";
+import CheckoutFooter from "./CheckoutFooter";
 
 import type { ShippingRate } from "@/types/Product";
 
