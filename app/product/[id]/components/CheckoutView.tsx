@@ -116,13 +116,13 @@ export default function CheckoutView({
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
 
         <AddressSection
-          shipping={shipping}
-          loading={loadingAddress}
-          t={t}
-          onAdd={onEditAddress}
-          onChange={onEditAddress}
-        />
-
+  shipping={shipping}
+  loading={loadingAddress}
+  t={t}
+  onAdd={onEditAddress}
+  onEdit={onEditAddress}
+  onChange={onEditAddress}
+/>
         <div
           className="rounded-xl p-3"
           style={{
