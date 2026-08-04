@@ -7,7 +7,7 @@ import AlertProvider from "@/app/components/AlertProvider";
 import { SWRConfig } from "swr";
 import ThemeProvider from "@/components/ThemeProvider";
 import type { Metadata } from "next";
-
+import ChatButton from "@/components/chat/ChatButton";
 export const metadata: Metadata = {
   metadataBase: new URL(
     "https://muasam.titi.onl"
@@ -115,21 +115,26 @@ export default function RootLayout({
       </head>
 
       <body>
-        <SWRConfig
-          value={{
-            revalidateOnFocus: false,
-            dedupingInterval: 5000,
-            shouldRetryOnError: false,
-          }}
-        >
-          <AlertProvider />
-          <AuthProvider>
-            <ThemeProvider>
-              <PiRootClient>{children}</PiRootClient>
-            </ThemeProvider>
-          </AuthProvider>
-        </SWRConfig>
-      </body>
+  <SWRConfig
+    value={{
+      revalidateOnFocus: false,
+      dedupingInterval: 5000,
+      shouldRetryOnError: false,
+    }}
+  >
+    <AlertProvider />
+
+    <AuthProvider>
+      <ThemeProvider>
+        <PiRootClient>
+          {children}
+        </PiRootClient>
+
+        <ChatButton />
+      </ThemeProvider>
+    </AuthProvider>
+  </SWRConfig>
+</body>
     </html>
   );
 }
