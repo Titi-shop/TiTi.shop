@@ -43,7 +43,9 @@ export default function ChatWindow({
   onClose={onClose}
 />
 
-     <ChatMessages />
+     <ChatMessages
+  messages={[]}
+/>
 
      <ChatInput />
   
