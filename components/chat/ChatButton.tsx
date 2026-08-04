@@ -16,7 +16,7 @@ export default function ChatButton({
       aria-label="Chat"
       className="
         fixed
-        bottom-24
+        bottom-20
         right-5
         z-[999]
         flex
