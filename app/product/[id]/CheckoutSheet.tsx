@@ -324,12 +324,54 @@ useEffect(() => {
   if (!user) return;
   if (!autoOpenAddressAfterLogin) return;
 
-  setAutoOpenAddressAfterLogin(false);
-  setView("address");
+  let cancelled = false;
+
+  const load = async () => {
+    setLoadingAddress(true);
+
+    try {
+      const def = await fetchDefaultAddress();
+
+      if (cancelled) return;
+
+      if (def) {
+        setShipping(def);
+        setView("checkout");
+
+        showMessage(
+          t.address_loaded ??
+            "Shipping address loaded.",
+          "success"
+        );
+      } else {
+        setShipping(null);
+        setView("address");
+
+        showMessage(
+          t.please_add_shipping_address ??
+            "Please add a shipping address.",
+          "info"
+        );
+      }
+    } finally {
+      if (!cancelled) {
+        setLoadingAddress(false);
+        setAddressLoaded(true);
+        setAutoOpenAddressAfterLogin(false);
+      }
+    }
+  };
+
+  void load();
+
+  return () => {
+    cancelled = true;
+  };
 }, [
   open,
   user,
   autoOpenAddressAfterLogin,
+  t,
 ]);
   /* ================= GUARD ================= */
 
