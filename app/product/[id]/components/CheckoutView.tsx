@@ -1,18 +1,14 @@
 "use client";
 
 import Image from "next/image";
-
 import AddressSection from "./AddressSection";
-
+import CheckoutFooter from "./CheckoutFooter";
 import { formatPi } from "@/lib/pi";
-
 import { getCountryDisplay } from "../checkout.api";
-
 import type { ShippingRate } from "@/types/Product";
 
 import type {
   CheckoutItem,
-  Message,
   ShippingInfo,
 } from "@/types/checkout";
 
@@ -20,7 +16,7 @@ export interface PreviewData {
   buyer_zone?: string;
   shipping_zone?: string;
   shipping_fee?: number;
-};
+}
 
 export interface CheckoutViewProps {
   t: Record<string, string>;
@@ -281,69 +277,15 @@ export default function CheckoutView({
 
       </div>
 
-      <div
-        className="p-4"
-        style={{
-          borderTop:
-            "1px solid var(--nav-border)",
-          background:
-            "var(--card-bg)",
-        }}
-      >
-
-        {message && (
-          <div
-  role="alert"
-  className="mb-3 rounded-xl px-4 py-3 text-sm"
-            style={{
-              background:
-                message.type ===
-                "success"
-                  ? "rgba(34,197,94,.15)"
-                  : message.type ===
-                    "info"
-                  ? "rgba(59,130,246,.15)"
-                  : "rgba(239,68,68,.15)",
-
-              color:
-                message.type ===
-                "success"
-                  ? "var(--success)"
-                  : message.type ===
-                    "info"
-                  ? "var(--info)"
-                  : "var(--danger)",
-            }}
-          >
-            {message.text}
-          </div>
-        )}
-
-        <button
-          type="button"
-          onClick={onCheckout}
-          disabled={processing || !shipping}
-          className="
-            w-full
-            rounded-xl
-            py-3
-            font-bold
-            text-white
-            transition-all
-            disabled:opacity-50
-          "
-          style={{
-            background:
-              "var(--color-primary)",
-          }}
-        >
-          {processing
-            ? t.processing
-            : t.pay_now}
-        </button>
-
-      </div>
-
+           <CheckoutFooter
+        t={t}
+        message={message}
+        processing={processing}
+        shipping={shipping}
+        onCheckout={onCheckout}
+      />
     </>
   );
 }
+
+
