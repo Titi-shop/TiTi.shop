@@ -23,15 +23,14 @@ export default function ChatButton({
       : unreadCount;
 
   return (
-    <>
+  <>
+    {!open && (
       <button
         type="button"
         aria-label="Open chat"
         title="Chat"
         disabled={disabled}
-        onClick={() =>
-          setOpen(true)
-        }
+        onClick={() => setOpen(true)}
         className="
           fixed
           bottom-20
@@ -84,14 +83,13 @@ export default function ChatButton({
           </span>
         )}
       </button>
+    )}
 
-      {open && (
-        <ChatWindow
-          onClose={() =>
-            setOpen(false)
-          }
-        />
-      )}
-    </>
-  );
+    {open && (
+      <ChatWindow
+        onClose={() => setOpen(false)}
+      />
+    )}
+  </>
+);
 }
