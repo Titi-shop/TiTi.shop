@@ -73,7 +73,8 @@ const [addressLoaded, setAddressLoaded] =
 
 const [autoPayAfterLogin, setAutoPayAfterLogin] =
   useState(false);
-  
+  const [autoOpenAddressAfterLogin, setAutoOpenAddressAfterLogin] =
+  useState(false);
   /* ================= ITEM ================= */
 
   const item = useMemo(() => {
@@ -271,6 +272,22 @@ const startCheckout = () => {
 
   handlePay();
 };
+  const openAddressEditor = () => {
+  if (!user) {
+    setAutoOpenAddressAfterLogin(true);
+
+    showMessage(
+      t.logging_in_pi ??
+        "Connecting to Pi account...",
+      "info"
+    );
+
+    pilogin?.();
+    return;
+  }
+
+  setView("address");
+};
   /* ================= AUTO PAY AFTER LOGIN ================= */
 
 useEffect(() => {
@@ -301,6 +318,18 @@ useEffect(() => {
   autoPayAfterLogin,
   handlePay,
   t,
+]);
+  useEffect(() => {
+  if (!open) return;
+  if (!user) return;
+  if (!autoOpenAddressAfterLogin) return;
+
+  setAutoOpenAddressAfterLogin(false);
+  setView("address");
+}, [
+  open,
+  user,
+  autoOpenAddressAfterLogin,
 ]);
   /* ================= GUARD ================= */
 
@@ -378,9 +407,7 @@ useEffect(() => {
               )
             }
             onCheckout={startCheckout}
-            onEditAddress={() => {
-              setView("address");
-            }}
+            onEditAddress={openAddressEditor}
           />
         )}
       </div>
