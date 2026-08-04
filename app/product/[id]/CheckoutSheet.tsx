@@ -1,14 +1,9 @@
 "use client";
-import Image from "next/image";
 import { useEffect, useMemo, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
-import AddressSection from "./components/AddressSection";
-import AddressEditor from "./components/AddressEditor";
 import { useAuth } from "@/context/AuthContext";
 import { useTranslationClient as useTranslation } from "@/app/lib/i18n/client";
-import { formatPi } from "@/lib/pi";
-import type { ShippingRate } from "@/types/Product";
 import type {
   CheckoutProps as Props,
   ShippingInfo,
@@ -18,14 +13,14 @@ import type {
 import {
   previewFetcher,
   fetchDefaultAddress,
-  getCountryDisplay,
 } from "./checkout.api";
 
 import {
   validateBeforePay,
   useCheckoutPay,
 } from "./checkout.logic";
-
+import CheckoutView from "./components/CheckoutView";
+import AddressEditView from "./components/AddressEditView";
 /* =========================================================
 COMPONENT
 ========================================================= */
@@ -313,21 +308,6 @@ useEffect(() => {
   if (!open || !item) return null;
 
   /* =========================================================
-  UI LABELS (i18n ONLY)
-  ========================================================= */
-
-  const zoneLabel = (r: ShippingRate) => {
-  if (r.zone === "domestic") {
-    return `${t.domestic_country ?? "Domestic"} (${r.domestic_country_code ?? "—"})`;
-  }
-
-  return (
-    t[`shipping_${r.zone}` as keyof typeof t] ??
-    r.zone
-  );
-};
-
-  /* =========================================================
   RENDER
   ========================================================= */
 
@@ -347,10 +327,8 @@ useEffect(() => {
   }}
 >
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-
-        {view === "address" ? (
-  <AddressEditor
+     {view === "address" ? (
+  <AddressEditView
     shipping={shipping}
     t={t}
     onCancel={() => {
@@ -362,22 +340,46 @@ useEffect(() => {
     }}
   />
 ) : (
-  <>
-
-    <AddressSection
-      shipping={shipping}
-      loading={loadingAddress}
-      t={t}
-      onAdd={() => {
-        setView("address");
-      }}
-      onEdit={() => {
-        setView("address");
-      }}
-      onChange={() => {
-        setView("address");
-      }}
-    />
+  <CheckoutView
+    t={t}
+    shipping={shipping}
+    loadingAddress={loadingAddress}
+    preview={preview}
+    resolvedRegion={resolvedRegion}
+    item={item}
+    qty={qty}
+    quantity={quantity}
+    maxStock={maxStock}
+    total={total}
+    message={message}
+    processing={processing}
+    onQtyChange={setQty}
+    onIncrease={() =>
+      setQty(
+        String(
+          Math.min(
+            maxStock,
+            quantity + 1
+          )
+        )
+      )
+    }
+    onDecrease={() =>
+      setQty(
+        String(
+          Math.max(
+            1,
+            quantity - 1
+          )
+        )
+      )
+    }
+    onCheckout={startCheckout}
+    onEditAddress={() => {
+      setView("address");
+    }}
+  />
+)}
 
           {/* SHIPPING ZONE */}
           <div
