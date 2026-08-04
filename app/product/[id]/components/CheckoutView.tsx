@@ -78,46 +78,46 @@ export default function CheckoutView({
   onEditAddress,
 }: CheckoutViewProps) {
   return (
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+  <>
+    <div className="flex-1 overflow-y-auto p-4 space-y-4">
 
-        <AddressCard
-          t={t}
-          shipping={shipping}
-          loading={loadingAddress}
-          onEdit={onEditAddress}
-        />
-
-        <ShippingCard
-          t={t}
-          shipping={shipping}
-          preview={preview}
-          resolvedRegion={resolvedRegion}
-        />
-
-        <ProductCard
-          item={item}
-          qty={qty}
-          quantity={quantity}
-          maxStock={maxStock}
-          onQtyChange={onQtyChange}
-          onIncrease={onIncrease}
-          onDecrease={onDecrease}
-        />
-
-        <SummaryCard
-          t={t}
-          total={total}
-        />
-
-      </div>
-
-      <CheckoutFooter
+      <AddressCard
         t={t}
-        message={message}
-        processing={processing}
         shipping={shipping}
-        onCheckout={onCheckout}
+        loading={loadingAddress}
+        onEdit={onEditAddress}
       />
-    </>
-  );
-}
+
+      <ShippingCard
+        t={t}
+        shipping={shipping}
+        preview={preview}
+        resolvedRegion={resolvedRegion}
+      />
+
+      <ProductCard
+        item={item}
+        qty={qty}
+        quantity={quantity}
+        maxStock={maxStock}
+        onQtyChange={onQtyChange}
+        onIncrease={onIncrease}
+        onDecrease={onDecrease}
+      />
+
+      <SummaryCard
+        t={t}
+        total={total}
+      />
+
+    </div>
+
+    <CheckoutFooter
+      t={t}
+      message={message}
+      processing={processing}
+      shipping={shipping}
+      onCheckout={onCheckout}
+    />
+  </>
+);
