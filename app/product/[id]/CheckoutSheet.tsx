@@ -167,6 +167,7 @@ useEffect(() => {
 }, [open, user, t]);
   useEffect(() => {
   if (!open) {
+    setView("checkout");
     autoPayRef.current = false;
 
     if (messageTimerRef.current) {
@@ -179,8 +180,8 @@ useEffect(() => {
 }, [open]);
 useEffect(() => {
   if (!open) return;
-
   setQty("1");
+  setView("checkout");
 }, [
   open,
   product?.id,
@@ -351,7 +352,7 @@ useEffect(() => {
          {/* ADDRESS */}
 {/* ADDRESS */}
 
-{editingAddress ? (
+{view === "address" ? (
   <AddressEditor
     shipping={shipping}
     t={t}
@@ -360,7 +361,7 @@ useEffect(() => {
     }}
     onSaved={(address) => {
       setShipping(address);
-      setEditingAddress(false);
+      setView("checkout");
     }}
   />
 ) : (
@@ -372,10 +373,11 @@ useEffect(() => {
       setView("address");
     }}
     onEdit={() => {
-      setView("checkout");
-    }}
+  setView("address");
+}}
     onChange={() => {
-      setView("checkout");
+  setView("address");
+}}
     }}
   />
 )}
