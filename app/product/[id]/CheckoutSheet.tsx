@@ -365,20 +365,20 @@ useEffect(() => {
     }}
   />
 ) : (
-  <AddressSection
-    shipping={shipping}
-    loading={loadingAddress}
-    t={t}
-    onAdd={() => {
-      setView("address");
-    }}
-    onEdit={() => {
-  setView("address");
-}}
-    onChange={() => {
-  setView("address");
-}}
-    }}
+ <AddressSection
+  shipping={shipping}
+  loading={loadingAddress}
+  t={t}
+  onAdd={() => {
+    setView("address");
+  }}
+  onEdit={() => {
+    setView("address");
+  }}
+  onChange={() => {
+    setView("address");
+  }}
+/>
   />
 )}
           {/* SHIPPING ZONE */}
