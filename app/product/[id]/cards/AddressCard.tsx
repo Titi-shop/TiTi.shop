@@ -91,14 +91,26 @@ export default function AddressCard({
       item.code === shipping.country
   );
 
-  const fullAddress = [
-    shipping.address_line,
-    shipping.ward,
-    shipping.district,
-    shipping.region,
-  ]
-    .filter(Boolean)
-    .join(", ");
+  const country = countries.find(
+  (item) => item.code === shipping.country
+);
+
+const phone =
+  `${country?.dial ?? ""} ${shipping.phone}`.trim();
+
+const streetLine = [
+  shipping.address_line,
+  shipping.ward,
+]
+  .filter(Boolean)
+  .join(", ");
+
+const locationLine = [
+  shipping.region,
+  `${country?.flag ?? "🌍"} ${country?.name ?? shipping.country} (${shipping.country})`,
+]
+  .filter(Boolean)
+  .join(" • ");
 
   return (
     <div
@@ -156,46 +168,35 @@ export default function AddressCard({
           •
         </span>
 
-        <span className="text-sm">
-          {shipping.phone}
-        </span>
+     <span className="text-sm">
+  {phone}
+</span>
       </div>
 
-      <div
-        className="
-          mt-2
-          text-sm
-          leading-5
-          text-[var(--text-muted)]
-        "
-      >
-        {fullAddress}
-      </div>
+    <div
+  className="
+    mt-2
+    text-sm
+    leading-5
+    text-[var(--text-muted)]
+  "
+>
+  {streetLine}
+</div>
 
-      <div
-        className="
-          mt-2
-          flex
-          flex-wrap
-          items-center
-          gap-x-4
-          gap-y-1
-          text-xs
-          text-[var(--text-muted)]
-        "
-      >
-        <span>
-          {country?.flag ?? "🌍"}{" "}
-          {country?.name ??
-            shipping.country}
-        </span>
+<div
+  className="
+    mt-1
+    text-xs
+    text-[var(--text-muted)]
+  "
+>
+  {locationLine}
 
-        {shipping.postal_code && (
-          <span>
-            ZIP: {shipping.postal_code}
-          </span>
-        )}
-      </div>
+  {shipping.postal_code && (
+    <> • ZIP {shipping.postal_code}</>
+  )}
+</div>
 
     </div>
   );
