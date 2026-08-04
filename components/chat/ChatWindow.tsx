@@ -1,6 +1,7 @@
 "use client";
 import ChatHeader from "./ChatHeader";
 import ChatMessages from "./ChatMessages";
+import ChatInput from "./ChatInput";
 type ChatWindowProps = {
   onClose: () => void;
 };
@@ -44,52 +45,7 @@ export default function ChatWindow({
 
      <ChatMessages />
 
-      {/* INPUT */}
-
-      <div
-        className="
-          border-t
-          border-[var(--border-color)]
-
-          p-3
-        "
-      >
-        <div className="flex gap-2">
-          <input
-            type="text"
-            placeholder="Nhập tin nhắn..."
-            className="
-              flex-1
-
-              rounded-full
-
-              border
-              border-[var(--border-color)]
-
-              bg-[var(--background)]
-
-              px-4
-              py-2.5
-
-              outline-none
-            "
-          />
-
-          <button
-            type="button"
-            className="
-              rounded-full
-
-              bg-[var(--color-primary)]
-
-              px-5
-
-              text-white
-            "
-          >
-            Gửi
-          </button>
-        </div>
+     <ChatInput />
       </div>
     </aside>
   );
