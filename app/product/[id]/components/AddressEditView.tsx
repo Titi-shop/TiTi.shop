@@ -2,9 +2,11 @@
 
 import AddressEditor from "./AddressEditor";
 
-import type { ShippingInfo } from "@/types/checkout";
+import type {
+  ShippingInfo,
+} from "@/types/checkout";
 
-export interface AddressEditViewProps {
+type AddressEditViewProps = {
   shipping: ShippingInfo | null;
 
   t: Record<string, string>;
@@ -14,7 +16,7 @@ export interface AddressEditViewProps {
   onSaved: (
     address: ShippingInfo
   ) => void;
-}
+};
 
 export default function AddressEditView({
   shipping,
@@ -23,31 +25,20 @@ export default function AddressEditView({
   onSaved,
 }: AddressEditViewProps) {
   return (
-    <div
-      className="
-        flex
-        h-full
-        flex-col
-      "
-      style={{
-        background: "var(--card-bg)",
-        color: "var(--foreground)",
-      }}
-    >
+    <div className="flex h-full flex-col">
+
       <div
         className="
           flex
           items-center
           justify-between
           border-b
-          p-4
+          border-[var(--nav-border)]
+          px-4
+          py-3
         "
-        style={{
-          borderColor:
-            "var(--nav-border)",
-        }}
       >
-        <h2 className="text-lg font-semibold">
+        <h2 className="text-base font-semibold">
           {shipping
             ? t.edit_address ??
               "Edit Address"
@@ -56,14 +47,17 @@ export default function AddressEditView({
         </h2>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 overflow-hidden">
+
         <AddressEditor
           shipping={shipping}
           t={t}
           onCancel={onCancel}
           onSaved={onSaved}
         />
+
       </div>
+
     </div>
   );
 }
