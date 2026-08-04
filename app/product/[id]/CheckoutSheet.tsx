@@ -379,8 +379,7 @@ useEffect(() => {
     setView("address");
   }}
 />
-  />
-)}
+
           {/* SHIPPING ZONE */}
           <div
   className="rounded-xl p-3"
