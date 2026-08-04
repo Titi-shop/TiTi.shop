@@ -1,5 +1,5 @@
 "use client";
-
+import ChatHeader from "./ChatHeader";
 type ChatWindowProps = {
   onClose: () => void;
 };
@@ -37,48 +37,9 @@ export default function ChatWindow({
     >
       {/* HEADER */}
 
-      <div
-        className="
-          flex
-          items-center
-          justify-between
-
-          border-b
-          border-[var(--border-color)]
-
-          px-4
-          py-3
-        "
-      >
-        <div className="flex items-center gap-2">
-          <span className="text-green-500">
-            ●
-          </span>
-
-          <span className="font-semibold">
-            TiTi Support
-          </span>
-        </div>
-
-        <button
-          type="button"
-          onClick={onClose}
-          className="
-            flex
-            h-9
-            w-9
-            items-center
-            justify-center
-            rounded-full
-
-            transition-colors
-
-            hover:bg-black/5
-          "
-        >
-          ✕
-        </button>
-      </div>
+   <ChatHeader
+  onClose={onClose}
+/>
 
       {/* MESSAGES */}
 
