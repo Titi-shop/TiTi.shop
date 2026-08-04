@@ -60,22 +60,20 @@ export default function ProductCard({
           "
         />
 
-        <div className="flex-1">
+                <div className="flex-1">
 
-  <p className="font-medium leading-5">
-    {item.name}
-  </p>
+          <p className="font-medium leading-5">
+            {item.name}
+          </p>
 
-  <QuantitySelector
-    qty={qty}
-    quantity={quantity}
-    maxStock={maxStock}
-    onQtyChange={onQtyChange}
-    onIncrease={onIncrease}
-    onDecrease={onDecrease}
-  />
-
-</div>
+          <QuantitySelector
+            qty={qty}
+            quantity={quantity}
+            maxStock={maxStock}
+            onQtyChange={onQtyChange}
+            onIncrease={onIncrease}
+            onDecrease={onDecrease}
+          />
 
         </div>
 
