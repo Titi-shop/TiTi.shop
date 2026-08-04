@@ -46,8 +46,7 @@ export default function CheckoutSheet({
   /* ================= STATE ================= */
 
   const [shipping, setShipping] = useState<ShippingInfo | null>(null);
-  const [editingAddress, setEditingAddress] =
-  useState(false);
+  const [view, setView] = useState<"checkout" | "address">("checkout");
   const [qty, setQty] = useState("1");
   const [message, setMessage] = useState<Message | null>(null);
   const showMessage = (
@@ -357,7 +356,7 @@ useEffect(() => {
     shipping={shipping}
     t={t}
     onCancel={() => {
-      setEditingAddress(false);
+      setView("checkout");
     }}
     onSaved={(address) => {
       setShipping(address);
@@ -370,13 +369,13 @@ useEffect(() => {
     loading={loadingAddress}
     t={t}
     onAdd={() => {
-      setEditingAddress(true);
+      setView("address");
     }}
     onEdit={() => {
-      setEditingAddress(true);
+      setView("checkout");
     }}
     onChange={() => {
-      setEditingAddress(true);
+      setView("checkout");
     }}
   />
 )}
