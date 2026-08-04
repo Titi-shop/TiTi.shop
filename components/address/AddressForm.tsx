@@ -438,7 +438,24 @@ export default function AddressForm({
           )}
 
         </div>
+{/* =====================================
+    WARD
+===================================== */}
 
+{isVN && (
+  <div>
+    <label className="mb-2 block text-sm font-medium">
+      {t.ward ?? "Ward"}
+    </label>
+
+    <input
+      value={form.ward}
+      onChange={handleChange("ward")}
+      placeholder={t.ward ?? "Ward"}
+      className={inputClassName}
+    />
+  </div>
+)}
         {/* =====================================
             ADDRESS
         ====================================== */}
@@ -446,7 +463,7 @@ export default function AddressForm({
         <div>
 
           <label className="mb-2 block text-sm font-medium">
-            {t.address ?? "Address"}
+            {t.street_address ?? "Street Address"}
           </label>
 
           <textarea
@@ -455,7 +472,10 @@ export default function AddressForm({
             onChange={handleChange(
               "address_line"
             )}
-            placeholder={ t.address ?? "Address"}
+            placeholder={
+         t.street_address ??
+      "House number, street, apartment..."
+      }
             className={inputClassName}
           />
 
