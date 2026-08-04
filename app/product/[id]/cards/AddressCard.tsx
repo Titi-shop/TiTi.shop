@@ -87,11 +87,6 @@ export default function AddressCard({
   }
 
   const country = countries.find(
-    (item) =>
-      item.code === shipping.country
-  );
-
-  const country = countries.find(
   (item) => item.code === shipping.country
 );
 
