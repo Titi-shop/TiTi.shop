@@ -16,7 +16,7 @@ import type {
   ShippingInfo,
 } from "@/types/checkout";
 
-type PreviewData = {
+export interface PreviewData {
   buyer_zone?: string;
   shipping_zone?: string;
   shipping_fee?: number;
@@ -212,7 +212,9 @@ export default function CheckoutView({
               </button>
 
               <input
-                value={qty}
+           type="text"
+          inputMode="numeric"
+            value={qty}
                 onChange={(e) => {
                   const value =
                     e.target.value.replace(
@@ -258,15 +260,18 @@ export default function CheckoutView({
               >
                 +
               </button>
-                            <div
-                className="text-right font-bold"
-                style={{
-                  color:
-                    "var(--color-primary)",
-                }}
-              >
-                {formatPi(total)} π
-              </div>
+                      
+             </div>
+
+        <div
+  className="mt-2 text-right font-bold"
+  style={{
+    color:
+      "var(--color-primary)",
+  }}
+>
+  {formatPi(total)} π
+</div>
 
             </div>
 
@@ -288,7 +293,8 @@ export default function CheckoutView({
 
         {message && (
           <div
-            className="mb-3 rounded-xl px-4 py-3 text-sm"
+  role="alert"
+  className="mb-3 rounded-xl px-4 py-3 text-sm"
             style={{
               background:
                 message.type ===
@@ -316,7 +322,7 @@ export default function CheckoutView({
         <button
           type="button"
           onClick={onCheckout}
-          disabled={processing}
+          disabled={processing || !shipping}
           className="
             w-full
             rounded-xl
