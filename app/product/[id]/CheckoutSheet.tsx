@@ -349,10 +349,7 @@ useEffect(() => {
 
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
 
-         {/* ADDRESS */}
-{/* ADDRESS */}
-
-{view === "address" ? (
+        {view === "address" ? (
   <AddressEditor
     shipping={shipping}
     t={t}
@@ -365,20 +362,22 @@ useEffect(() => {
     }}
   />
 ) : (
- <AddressSection
-  shipping={shipping}
-  loading={loadingAddress}
-  t={t}
-  onAdd={() => {
-    setView("address");
-  }}
-  onEdit={() => {
-    setView("address");
-  }}
-  onChange={() => {
-    setView("address");
-  }}
-/>
+  <>
+
+    <AddressSection
+      shipping={shipping}
+      loading={loadingAddress}
+      t={t}
+      onAdd={() => {
+        setView("address");
+      }}
+      onEdit={() => {
+        setView("address");
+      }}
+      onChange={() => {
+        setView("address");
+      }}
+    />
 
           {/* SHIPPING ZONE */}
           <div
