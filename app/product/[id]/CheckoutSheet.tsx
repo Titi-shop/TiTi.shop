@@ -319,14 +319,18 @@ useEffect(() => {
         onClick={onClose}
       />
 
-      <div
-        className="absolute bottom-0 left-0 right-0 h-[65vh] rounded-t-2xl flex flex-col"
-        style={{
-          background: "var(--card-bg)",
-          color: "var(--foreground)",
-          borderTop: "1px solid var(--nav-border)",
-        }}
-      >
+   <div
+  className={
+    view === "address"
+      ? "absolute inset-0 flex flex-col"
+      : "absolute bottom-0 left-0 right-0 h-[65vh] rounded-t-2xl flex flex-col"
+  }
+  style={{
+    background: "var(--card-bg)",
+    color: "var(--foreground)",
+    borderTop: "1px solid var(--nav-border)",
+  }}
+>
         {view === "address" ? (
           <AddressEditView
             shipping={shipping}
