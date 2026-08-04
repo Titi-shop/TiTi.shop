@@ -1,5 +1,6 @@
 "use client";
 import ChatHeader from "./ChatHeader";
+import ChatMessages from "./ChatMessages";
 type ChatWindowProps = {
   onClose: () => void;
 };
@@ -35,35 +36,13 @@ export default function ChatWindow({
         duration-300
       "
     >
-      {/* HEADER */}
+    
 
    <ChatHeader
   onClose={onClose}
 />
 
-      {/* MESSAGES */}
-
-      <div
-        className="
-          flex-1
-          overflow-y-auto
-          p-4
-        "
-      >
-        <div
-          className="
-            flex
-            h-full
-            items-center
-            justify-center
-
-            text-sm
-            text-[var(--text-muted)]
-          "
-        >
-          Chưa có tin nhắn
-        </div>
-      </div>
+     <ChatMessages />
 
       {/* INPUT */}
 
