@@ -83,15 +83,21 @@ export default function AddressSection({
     countries.find(
       (c) => c.code === shipping.country
     );
+const phone =
+  `${country?.dial ?? ""} ${shipping.phone}`.trim();
+  const streetLine = [
+  shipping.address_line,
+  shipping.ward,
+]
+  .filter(Boolean)
+  .join(", ");
 
-  const fullAddress = [
-    shipping.address_line,
-    shipping.ward,
-    shipping.district,
-    shipping.region,
-  ]
-    .filter(Boolean)
-    .join(", ");
+const locationLine = [
+  shipping.region,
+  `${country?.flag ?? "🌍"} ${country?.name ?? shipping.country} (${shipping.country})`,
+]
+  .filter(Boolean)
+  .join(" • ");
 
   return (
     <div
@@ -154,22 +160,36 @@ export default function AddressSection({
         </span>
 
         <span className="text-sm">
-          {shipping.phone}
-        </span>
+  {phone}
+</span>
       </div>
 
       {/* Address */}
 
-      <div
-        className="
-          mt-2
-          text-sm
-          leading-5
-          text-[var(--text-muted)]
-        "
-      >
-        {fullAddress}
-      </div>
+    <div
+  className="
+    mt-2
+    text-sm
+    leading-5
+    text-[var(--text-muted)]
+  "
+>
+  {streetLine}
+</div>
+
+<div
+  className="
+    mt-1
+    text-xs
+    text-[var(--text-muted)]
+  "
+>
+  {locationLine}
+
+  {shipping.postal_code && (
+    <> • ZIP {shipping.postal_code}</>
+  )}
+</div>
 
       {/* Country + ZIP */}
 
