@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { MessageCircle } from "lucide-react";
-
+import { useAuth } from "@/context/AuthContext";
 import ChatWindow from "./ChatWindow";
 
 export interface ChatButtonProps {
@@ -16,7 +16,10 @@ export default function ChatButton({
 }: ChatButtonProps) {
   const [open, setOpen] =
     useState(false);
-
+const { user } = useAuth();
+  if (!user) {
+  return null;
+}
   const badge =
     unreadCount > 99
       ? "99+"
