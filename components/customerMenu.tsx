@@ -192,7 +192,7 @@ console.log(
   icon: (active) => (
     <MessageCircle size={22} color={active ? "#f97316" : "currentColor"} />
   ),
-  path: "/account/messages",
+  path: "",
 },
 
 {
