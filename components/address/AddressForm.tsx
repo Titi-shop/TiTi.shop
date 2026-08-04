@@ -155,13 +155,13 @@ export default function AddressForm({
     );
 
     setForm({
-      ...form,
-      country: e.target.value,
-      region: "",
-      district: "",
-      ward: "",
-      postal_code: "",
-    });
+  ...form,
+  country: e.target.value,
+  region: "",
+  postal_code: "",
+  district: "",
+  ward: "",
+});
   };
 
   /* ======================================================
@@ -440,84 +440,22 @@ export default function AddressForm({
         </div>
 
         {/* =====================================
-            DISTRICT
-        ====================================== */}
-
-        {isVN && (
-
-          <div>
-
-            <label className="mb-2 block text-sm font-medium">
-              {t.district ??
-                "District"}
-            </label>
-
-            <input
-              value={form.district}
-              onChange={handleChange(
-                "district"
-              )}
-              placeholder={
-                t.district ??
-                "District"
-              }
-              className={inputClassName}
-            />
-
-          </div>
-
-        )}
-
-        {/* =====================================
-            WARD
-        ====================================== */}
-
-        {isVN && (
-
-          <div>
-
-            <label className="mb-2 block text-sm font-medium">
-              {t.ward ??
-                "Ward"}
-            </label>
-
-            <input
-              value={form.ward}
-              onChange={handleChange(
-                "ward"
-              )}
-              placeholder={
-                t.ward ??
-                "Ward"
-              }
-              className={inputClassName}
-            />
-
-          </div>
-
-        )}
-
-        {/* =====================================
             ADDRESS
         ====================================== */}
 
         <div>
 
           <label className="mb-2 block text-sm font-medium">
-            {t.address ??
-              "Street Address"}
+            {t.address ?? "Address"}
           </label>
 
           <textarea
-            rows={2}
+            rows={3}
             value={form.address_line}
             onChange={handleChange(
               "address_line"
             )}
-            placeholder={
-              t.address ??
-              "Street Address"
-            }
+            placeholder={ t.address ?? "Address"}
             className={inputClassName}
           />
 
