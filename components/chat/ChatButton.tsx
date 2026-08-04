@@ -16,8 +16,12 @@ export default function ChatButton({
 }: ChatButtonProps) {
   const [open, setOpen] =
     useState(false);
-const { user } = useAuth();
-  if (!user) {
+const {
+  user,
+  loading,
+} = useAuth();
+
+if (loading || !user) {
   return null;
 }
   const badge =
