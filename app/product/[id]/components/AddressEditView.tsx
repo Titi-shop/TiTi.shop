@@ -27,13 +27,15 @@ export default function AddressEditView({
   return (
     <div className="flex h-full flex-col">
 
+      {/* Header */}
       <div
         className="
-          flex
-          items-center
-          justify-between
+          sticky
+          top-0
+          z-10
           border-b
           border-[var(--nav-border)]
+          bg-[var(--card-bg)]
           px-4
           py-3
         "
@@ -47,15 +49,20 @@ export default function AddressEditView({
         </h2>
       </div>
 
-      <div className="flex-1 overflow-hidden">
-
+      {/* Content */}
+      <div
+        className="
+          flex-1
+          overflow-y-auto
+          p-4
+        "
+      >
         <AddressEditor
           shipping={shipping}
           t={t}
           onCancel={onCancel}
           onSaved={onSaved}
         />
-
       </div>
 
     </div>
