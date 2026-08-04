@@ -8,76 +8,149 @@ export default function ChatWindow({
   onClose,
 }: ChatWindowProps) {
   return (
-    <div
+    <aside
       className="
         fixed
-        bottom-36
-        right-5
+        bottom-20
+        right-4
         z-[998]
+
         flex
-        h-[600px]
-        w-[380px]
+        h-[520px]
+        w-[calc(100vw-24px)]
+        max-w-[380px]
         flex-col
+
         overflow-hidden
         rounded-2xl
+
         border
         border-[var(--border-color)]
+
         bg-[var(--card-bg)]
+
         shadow-2xl
+
+        transition-all
+        duration-300
       "
     >
-      {/* Header */}
+      {/* HEADER */}
 
       <div
         className="
           flex
           items-center
           justify-between
+
           border-b
           border-[var(--border-color)]
+
           px-4
           py-3
         "
       >
-        <h2 className="font-semibold">
-          TiTi Support
-        </h2>
+        <div className="flex items-center gap-2">
+          <span className="text-green-500">
+            ●
+          </span>
+
+          <span className="font-semibold">
+            TiTi Support
+          </span>
+        </div>
 
         <button
+          type="button"
           onClick={onClose}
-          className="text-xl"
+          className="
+            flex
+            h-9
+            w-9
+            items-center
+            justify-center
+            rounded-full
+
+            transition-colors
+
+            hover:bg-black/5
+          "
         >
           ✕
         </button>
       </div>
 
-      {/* Messages */}
+      {/* MESSAGES */}
 
-      <div className="flex-1 overflow-y-auto p-4">
-        Chat messages...
+      <div
+        className="
+          flex-1
+          overflow-y-auto
+          p-4
+        "
+      >
+        <div
+          className="
+            flex
+            h-full
+            items-center
+            justify-center
+
+            text-sm
+            text-[var(--text-muted)]
+          "
+        >
+          Chưa có tin nhắn
+        </div>
       </div>
 
-      {/* Input */}
+      {/* INPUT */}
 
       <div
         className="
           border-t
           border-[var(--border-color)]
+
           p-3
         "
       >
-        <input
-          className="
-            w-full
-            rounded-xl
-            border
-            border-[var(--border-color)]
-            px-3
-            py-2
-          "
-          placeholder="Nhập tin nhắn..."
-        />
+        <div className="flex gap-2">
+          <input
+            type="text"
+            placeholder="Nhập tin nhắn..."
+            className="
+              flex-1
+
+              rounded-full
+
+              border
+              border-[var(--border-color)]
+
+              bg-[var(--background)]
+
+              px-4
+              py-2.5
+
+              outline-none
+            "
+          />
+
+          <button
+            type="button"
+            className="
+              rounded-full
+
+              bg-[var(--color-primary)]
+
+              px-5
+
+              text-white
+            "
+          >
+            Gửi
+          </button>
+        </div>
       </div>
-    </div>
+    </aside>
   );
 }
