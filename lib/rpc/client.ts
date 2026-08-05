@@ -545,7 +545,19 @@ if (str(memoObj.text)) {
     let sender: string | null = null;
     let receiver: string | null = null;
     let parseLayer = "NONE";
+if (chainPaymentAmount !== null) {
+    amount = chainPaymentAmount;
+    sender = sourceAccount;
+    parseLayer = "CHAIN_PAYMENT";
+}
 
+if (
+    amount === null &&
+    chainEventAmount !== null
+) {
+    amount = chainEventAmount;
+    parseLayer = "CHAIN_EVENT";
+}
     /* ===== LAYER A ===== */
 
     const parsedEnvelope =
