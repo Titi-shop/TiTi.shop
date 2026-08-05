@@ -25,7 +25,7 @@ async function main() {
   })
     .addOperation(
       StellarSDK.Operation.setOptions({
-        homeDomain: "muasam.titi.onl",
+        homeDomain: "titi7632.pinet.com",
       })
     )
     .setTimeout(30)
@@ -39,7 +39,7 @@ async function main() {
 
   console.log("Home Domain OK!");
   console.log("Issuer:", issuer.publicKey());
-  console.log("Home Domain: muasam.titi.onl");
+  console.log("Home Domain: titi7632.pinet.com");
 }
 
 main().catch((err) => {
