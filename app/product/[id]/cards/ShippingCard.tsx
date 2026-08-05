@@ -20,11 +20,8 @@ import type {
 
 type ShippingCardProps = {
   t: Record<string, string>;
-
   shipping: ShippingInfo | null;
-
-  preview?: PreviewData;
-
+ preview: PreviewData | undefined;
   resolvedRegion: ShippingRate | null;
 };
 

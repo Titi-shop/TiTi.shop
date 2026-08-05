@@ -207,7 +207,7 @@ console.log(
   icon: (active) => (
     <MapPin size={22} color={active ? "#f97316" : "currentColor"} />
   ),
-  path: "/customer/address",
+  path: "",
 },
 
 {

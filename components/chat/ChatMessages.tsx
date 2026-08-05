@@ -1,18 +1,10 @@
 "use client";
 
-export interface ChatMessage {
-  id: string;
-  room_id: string;
-  sender_id: string;
-  message_type: string;
-  content: string;
-  created_at: string;
-}
-
+import type { ChatMessage } from "./chat.types";
 type ChatMessagesProps = {
   messages: ChatMessage[];
 
-  currentUserId?: string;
+  currentUserId: string | undefined;
 };
 
 export default function ChatMessages({

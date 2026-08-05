@@ -5,6 +5,7 @@ import { SendHorizontal } from "lucide-react";
 
 type ChatInputProps = {
   onSend?: (message: string) => void;
+  disabled?: boolean;
 };
 
 export default function ChatInput({

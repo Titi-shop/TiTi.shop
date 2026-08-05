@@ -27,7 +27,7 @@ export interface CheckoutViewProps {
 
   loadingAddress: boolean;
 
-  preview?: PreviewData;
+  preview: PreviewData | undefined;
 
   resolvedRegion: ShippingRate | null;
 
