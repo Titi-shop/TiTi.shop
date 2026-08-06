@@ -7,7 +7,13 @@ const server = new StellarSDK.Horizon.Server(
 const NETWORK_PASSPHRASE = "Pi Testnet";
 
 // THAY BẰNG SECRET KEY THẬT CỦA ISSUER
-const issuer = StellarSDK.Keypair.fromSecret("SECRET_ISSUER");
+require("dotenv").config({
+  path: ".env.local",
+});
+
+const issuer = StellarSDK.Keypair.fromSecret(
+  process.env.PI_ISSUER_SECRET
+);
 
 async function main() {
   // Luôn lấy account mới nhất để có sequence number mới nhất
@@ -25,7 +31,7 @@ async function main() {
   })
     .addOperation(
       StellarSDK.Operation.setOptions({
-        homeDomain: "titi7632.pinet.com",
+        homeDomain: "muasam.titi.onl",
       })
     )
     .setTimeout(30)
@@ -39,7 +45,7 @@ async function main() {
 
   console.log("Home Domain OK!");
   console.log("Issuer:", issuer.publicKey());
-  console.log("Home Domain: titi7632.pinet.com");
+  console.log("Home Domain: muasam.titi.onl");
 }
 
 main().catch((err) => {
