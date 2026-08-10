@@ -112,7 +112,7 @@ export default function PiPriceWidget() {
             if (mounted) {
               setFlash(null);
             }
-          }, 450);
+          }, 400);
         }
 
         prevPriceRef.current =
@@ -129,7 +129,7 @@ export default function PiPriceWidget() {
         );
 
         setHistory((previous) =>
-          [...previous, nextPrice].slice(-60)
+          [...previous, nextPrice].slice(-50)
         );
       } catch (error) {
         console.error(
@@ -229,177 +229,157 @@ export default function PiPriceWidget() {
     <section
       aria-label="PI market price"
       className="
-        w-full
-        rounded-[18px]
-        border
+        relative
+        left-1/2
+        w-screen
+        -translate-x-1/2
+        border-y
         border-slate-200
         bg-white
-        shadow-[0_3px_14px_rgba(15,23,42,0.06)]
-        dark:border-white/10
+        dark:border-white/[0.08]
         dark:bg-[#11151d]
-        dark:shadow-none
+        md:relative
+        md:left-auto
+        md:w-full
+        md:translate-x-0
+        md:rounded-2xl
+        md:border
       "
     >
-      <div className="p-3.5 sm:p-4">
-        {/* =========================================
-            HEADER
-        ========================================= */}
+      <div
+        className="
+          mx-auto
+          max-w-7xl
+          px-4
+          py-2
+          sm:px-5
+          md:px-4
+        "
+      >
+        {/* MAIN ROW */}
 
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex min-w-0 items-center gap-3">
-            {/* PI LOGO */}
+        <div className="flex h-[47px] items-center gap-2.5">
+          {/* PI MARK */}
+
+          <div
+            className="
+              flex
+              h-8
+              w-8
+              shrink-0
+              items-center
+              justify-center
+              rounded-full
+              bg-[#f7b900]
+              text-white
+            "
+          >
+            <span className="text-[16px] font-black">
+              π
+            </span>
+          </div>
+
+          {/* SYMBOL */}
+
+          <div className="w-[66px] shrink-0">
+            <div
+              className="
+                text-[12px]
+                font-bold
+                leading-none
+                text-slate-900
+                dark:text-white
+              "
+            >
+              PI / USDT
+            </div>
 
             <div
               className="
+                mt-1
                 flex
-                h-10
-                w-10
-                shrink-0
                 items-center
-                justify-center
-                rounded-full
-                bg-[#f7b900]
-                text-white
-                shadow-[inset_0_-2px_0_rgba(0,0,0,0.08)]
+                gap-1
+                text-[8px]
+                font-medium
+                text-slate-400
               "
             >
-              <span className="text-[20px] font-black leading-none">
-                π
-              </span>
-            </div>
-
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <h2
-                  className="
-                    truncate
-                    text-[15px]
-                    font-bold
-                    tracking-tight
-                    text-slate-900
-                    dark:text-white
-                  "
-                >
-                  PI / USDT
-                </h2>
-
-                <span
-                  className={`
-                    h-1.5
-                    w-1.5
-                    shrink-0
-                    rounded-full
-                    ${
-                      connected
-                        ? "bg-emerald-500"
-                        : "bg-red-500"
-                    }
-                  `}
-                />
-              </div>
-
               <span
-                className="
-                  text-[10px]
-                  font-medium
-                  text-slate-400
-                  dark:text-white/40
-                "
-              >
-                {connected
-                  ? t.realtime_connected ??
-                    "Realtime"
-                  : t.disconnected ??
-                    "Disconnected"}
-              </span>
+                className={`
+                  h-1.5
+                  w-1.5
+                  rounded-full
+                  ${
+                    connected
+                      ? "bg-emerald-500"
+                      : "bg-red-500"
+                  }
+                `}
+              />
+
+              {connected
+                ? "LIVE"
+                : "OFFLINE"}
             </div>
           </div>
 
-          {/* 24H CHANGE */}
+          {/* PRICE */}
+
+          <div
+            className={`
+              shrink-0
+              text-[22px]
+              font-black
+              leading-none
+              tracking-[-0.04em]
+              text-slate-950
+              transition-transform
+              duration-300
+              dark:text-white
+              ${
+                flash === "up"
+                  ? "scale-[1.02]"
+                  : ""
+              }
+              ${
+                flash === "down"
+                  ? "scale-[0.98]"
+                  : ""
+              }
+            `}
+          >
+            ${formattedPrice}
+          </div>
+
+          {/* CHANGE */}
 
           <div
             className={`
               flex
               shrink-0
               items-center
-              gap-1
+              gap-0.5
               rounded-full
-              px-2.5
-              py-1.5
-              text-[12px]
+              px-1.5
+              py-1
+              text-[10px]
               font-bold
               ${directionBackground}
               ${directionColor}
             `}
           >
             {isUp ? (
-              <TrendingUp size={13} />
+              <TrendingUp size={10} />
             ) : (
-              <TrendingDown size={13} />
+              <TrendingDown size={10} />
             )}
 
-            <span>
-              {isUp ? "+" : ""}
-              {change.toFixed(2)}%
-            </span>
-          </div>
-        </div>
-
-        {/* =========================================
-            PRICE + MINI CHART
-        ========================================= */}
-
-        <div className="mt-2.5 flex items-center gap-3">
-          {/* PRICE */}
-
-          <div className="min-w-[128px] shrink-0">
-            <div
-              className={`
-                text-[27px]
-                font-black
-                leading-none
-                tracking-[-0.04em]
-                text-slate-950
-                transition-transform
-                duration-300
-                dark:text-white
-                ${
-                  flash === "up"
-                    ? "scale-[1.025]"
-                    : ""
-                }
-                ${
-                  flash === "down"
-                    ? "scale-[0.975]"
-                    : ""
-                }
-              `}
-            >
-              $
-              {formattedPrice}
-            </div>
-
-            <div
-              className={`
-                mt-1
-                flex
-                items-center
-                gap-1
-                text-[13px]
-                font-semibold
-                ${directionColor}
-              `}
-            >
-              {isUp ? "↗" : "↘"}
-
-              <span>
-                {isUp ? "+" : ""}
-                {change.toFixed(2)}%
-              </span>
-            </div>
+            {isUp ? "+" : ""}
+            {change.toFixed(2)}%
           </div>
 
-          {/* MINI CHART */}
+          {/* CHART */}
 
           <div className="min-w-0 flex-1">
             <PiTradingChart
@@ -409,157 +389,59 @@ export default function PiPriceWidget() {
           </div>
         </div>
 
-        {/* =========================================
-            MARKET DATA
-        ========================================= */}
+        {/* MARKET META */}
 
         <div
           className="
-            mt-2
-            grid
-            grid-cols-4
+            flex
+            h-[20px]
             items-center
+            justify-between
             gap-2
             border-t
             border-slate-100
-            pt-2.5
-            dark:border-white/[0.07]
+            pt-1
+            text-[9px]
+            font-medium
+            text-slate-400
+            dark:border-white/[0.06]
+            dark:text-white/40
           "
         >
-          {/* HIGH */}
+          <span>
+            H {formatPrice(high24h)}
+          </span>
 
-          <div className="min-w-0">
-            <div
-              className="
-                text-[9px]
-                font-medium
-                uppercase
-                tracking-wide
-                text-slate-400
-                dark:text-white/35
-              "
-            >
-              H
-            </div>
+          <span>
+            L {formatPrice(low24h)}
+          </span>
 
-            <div
-              className="
-                mt-0.5
-                truncate
-                text-[11px]
-                font-semibold
-                text-slate-700
-                dark:text-white/70
-              "
-            >
-              {formatPrice(high24h)}
-            </div>
-          </div>
+          <span className="hidden sm:inline">
+            Vol {formatVolume(volume24h)}
+          </span>
 
-          {/* LOW */}
+          <span className="flex items-center gap-1">
+            <RefreshCw size={9} />
+            {updatedTime}
+          </span>
 
-          <div className="min-w-0">
-            <div
-              className="
-                text-[9px]
-                font-medium
-                uppercase
-                tracking-wide
-                text-slate-400
-                dark:text-white/35
-              "
-            >
-              L
-            </div>
+          <span
+            className="
+              flex
+              items-center
+              gap-1
+              text-emerald-600
+              dark:text-emerald-400
+            "
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
 
-            <div
-              className="
-                mt-0.5
-                truncate
-                text-[11px]
-                font-semibold
-                text-slate-700
-                dark:text-white/70
-              "
-            >
-              {formatPrice(low24h)}
-            </div>
-          </div>
-
-          {/* VOLUME */}
-
-          <div className="min-w-0">
-            <div
-              className="
-                text-[9px]
-                font-medium
-                uppercase
-                tracking-wide
-                text-slate-400
-                dark:text-white/35
-              "
-            >
-              Vol
-            </div>
-
-            <div
-              className="
-                mt-0.5
-                truncate
-                text-[11px]
-                font-semibold
-                text-slate-700
-                dark:text-white/70
-              "
-            >
-              {formatVolume(volume24h)}
-            </div>
-          </div>
-
-          {/* UPDATED */}
-
-          <div className="min-w-0 text-right">
-            <div
-              className="
-                flex
-                items-center
-                justify-end
-                gap-1
-                text-[9px]
-                font-medium
-                text-slate-400
-                dark:text-white/35
-              "
-            >
-              <RefreshCw size={9} />
-
-              <span>
-                {updatedTime}
-              </span>
-            </div>
-
-            <div
-              className="
-                mt-0.5
-                flex
-                items-center
-                justify-end
-                gap-1
-                text-[10px]
-                font-semibold
-                text-emerald-600
-                dark:text-emerald-400
-              "
-            >
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-
-              <span>
-                {connected
-                  ? "LIVE"
-                  : "OFFLINE"}
-              </span>
-            </div>
-          </div>
+            {connected
+              ? t.realtime_connected ??
+                "LIVE"
+              : t.disconnected ??
+                "OFFLINE"}
+          </span>
         </div>
       </div>
     </section>
