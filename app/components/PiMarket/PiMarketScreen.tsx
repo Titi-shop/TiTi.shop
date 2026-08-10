@@ -192,7 +192,7 @@ export default function PiMarketScreen({
       />
 
      <div className="relative mx-auto flex h-[100dvh] w-full max-w-[560px] flex-col overflow-hidden bg-white shadow-2xl dark:bg-[#0f1117]">
-        <header className="border-b border-slate-200 px-4 pb-3 pt-4">
+        <header className="shrink-0 border-b border-slate-200 px-4 pb-2.5 pt-3 dark:border-white/10">
           <div className="flex items-center justify-between gap-3">
            <button
   type="button"
@@ -240,7 +240,7 @@ export default function PiMarketScreen({
             </div>
           </div>
 
-          <div className="mt-4">
+          <div className="mt-2">
             <p className="text-3xl font-black tracking-tight text-slate-900">
               ${formatPrice(currentPrice)}
             </p>
@@ -272,14 +272,14 @@ export default function PiMarketScreen({
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-3 pb-4 pt-3">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 pb-6 pt-2">
           <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
             {loading ? (
-              <div className="flex h-[52vh] min-h-[320px] items-center justify-center text-sm text-slate-500">
+              <div className="flex h-[46vh] min-h-[280px] items-center justify-center text-sm text-slate-500">
                 Loading candles...
               </div>
             ) : error ? (
-              <div className="flex h-[52vh] min-h-[320px] flex-col items-center justify-center gap-2 px-6 text-center">
+              <div className="flex h-[46vh] min-h-[280px] flex-col items-center justify-center gap-2 px-6 text-center">
                 <p className="text-sm font-semibold text-slate-800">
                   {error}
                 </p>
