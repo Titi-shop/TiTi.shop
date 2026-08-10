@@ -42,7 +42,8 @@ export default function PiPriceWidget() {
   const [flash, setFlash] = useState<
     "up" | "down" | null
   >(null);
-const [marketOpen, setMarketOpen] = useState(false);
+  const [marketOpen, setMarketOpen] =
+    useState(false);
   const prevPriceRef = useRef(0);
   const fetchErrorLoggedRef = useRef(false);
 
@@ -236,21 +237,22 @@ const [marketOpen, setMarketOpen] = useState(false);
   return (
     <>
       <section
-  aria-label="PI market price"
-  role="button"
-  tabIndex={0}
-  onClick={() => setMarketOpen(true)}
-  onKeyDown={(event) => {
-    if (
-      event.key === "Enter" ||
-      event.key === " "
-    ) {
-      event.preventDefault();
-      setMarketOpen(true);
-    }
-  }}
-  className="
-    cursor-pointer
+        aria-label="PI market price"
+        role="button"
+        tabIndex={0}
+        onClick={() => setMarketOpen(true)}
+        onTouchEnd={() => setMarketOpen(true)}
+        onKeyDown={(event) => {
+          if (
+            event.key === "Enter" ||
+            event.key === " "
+          ) {
+            event.preventDefault();
+            setMarketOpen(true);
+          }
+        }}
+        className="
+          cursor-pointer
         relative
         left-1/2
         w-screen
@@ -267,8 +269,8 @@ const [marketOpen, setMarketOpen] = useState(false);
         md:rounded-2xl
         md:border
       "
-    >
-      <div
+      >
+        <div
         className="
           mx-auto
           max-w-7xl
@@ -277,7 +279,7 @@ const [marketOpen, setMarketOpen] = useState(false);
           sm:px-5
           md:px-4
         "
-      >
+        >
         {/* MAIN ROW */}
 
         <div className="flex h-[47px] items-center gap-2.5">
@@ -465,8 +467,8 @@ const [marketOpen, setMarketOpen] = useState(false);
                 "OFFLINE"}
           </span>
         </div>
-          </div>
-        </section>
+        </div>
+      </section>
 
       <PiMarketScreen
         open={marketOpen}
