@@ -234,7 +234,8 @@ const [marketOpen, setMarketOpen] = useState(false);
     : "--:--";
 
   return (
-    <section
+    <>
+      <section
   aria-label="PI market price"
   role="button"
   tabIndex={0}
@@ -465,13 +466,14 @@ const [marketOpen, setMarketOpen] = useState(false);
           </span>
         </div>
           </div>
-    </section>
+        </section>
 
-    <PiMarketScreen
-      open={marketOpen}
-      onClose={() => setMarketOpen(false)}
-      currentPrice={price}
-      change24h={change}
-    />
+      <PiMarketScreen
+        open={marketOpen}
+        onClose={() => setMarketOpen(false)}
+        currentPrice={price}
+        change24h={change}
+      />
+    </>
   );
 }
