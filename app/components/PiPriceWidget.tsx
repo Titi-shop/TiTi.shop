@@ -464,13 +464,14 @@ const [marketOpen, setMarketOpen] = useState(false);
                 "OFFLINE"}
           </span>
         </div>
-      </div>
-        </section>
+          </div>
+    </section>
 
-    {marketOpen && (
-      <PiMarketScreen
-        onClose={() => setMarketOpen(false)}
-      />
-    )}
+    <PiMarketScreen
+      open={marketOpen}
+      onClose={() => setMarketOpen(false)}
+      currentPrice={price}
+      change24h={change}
+    />
   );
 }
