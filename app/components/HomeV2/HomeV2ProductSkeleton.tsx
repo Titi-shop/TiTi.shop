@@ -3,21 +3,16 @@ import React from "react";
 
 export default function HomeV2ProductSkeleton() {
   return (
-    <div className="card overflow-hidden">
-      <div className="skeleton h-44 w-full relative overflow-hidden">
-        <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.2s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+    <div className="overflow-hidden rounded-[24px] border border-slate-100 bg-white shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+      <div className="relative h-36 w-full overflow-hidden bg-slate-100">
+        <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.2s_infinite] bg-gradient-to-r from-transparent via-white/60 to-transparent" />
       </div>
 
-      <div className="p-2 space-y-2">
-        <div className="h-3 w-full bg-surface-2 rounded animate-pulse" />
-        <div className="h-3 w-3/4 bg-surface-2 rounded animate-pulse" />
-
-        <div className="flex items-center gap-2 mt-2">
-          <div className="h-3 w-12 bg-surface-2 rounded animate-pulse" />
-          <div className="h-3 w-16 bg-surface-2 rounded animate-pulse" />
-        </div>
-
-        <div className="h-4 w-20 bg-surface-2 rounded animate-pulse mt-2" />
+      <div className="space-y-2 p-3">
+        <div className="h-3 w-full rounded-full bg-slate-100" />
+        <div className="h-3 w-3/4 rounded-full bg-slate-100" />
+        <div className="mt-2 h-3 w-16 rounded-full bg-slate-100" />
+        <div className="h-8 w-full rounded-2xl bg-slate-100" />
       </div>
     </div>
   );
