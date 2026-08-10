@@ -185,23 +185,42 @@ export default function PiMarketScreen({
   }
 
   return (
-    <div className="fixed inset-0 z-[90]">
+    <div className="fixed inset-0 z-[999] bg-white dark:bg-[#0f1117]">
       <div
         className="absolute inset-0 bg-slate-900/40"
         onClick={onClose}
       />
 
-      <div className="relative mx-auto flex h-full w-full max-w-[560px] flex-col bg-white shadow-2xl">
+     <div className="relative mx-auto flex h-[100dvh] w-full max-w-[560px] flex-col overflow-hidden bg-white shadow-2xl dark:bg-[#0f1117]">
         <header className="border-b border-slate-200 px-4 pb-3 pt-4">
           <div className="flex items-center justify-between gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-700"
-              aria-label="Close PI market detail"
-            >
-              <X size={18} />
-            </button>
+           <button
+  type="button"
+  onClick={onClose}
+  aria-label="Đóng biểu đồ PI"
+  className="
+    inline-flex
+    h-10
+    w-10
+    shrink-0
+    items-center
+    justify-center
+    rounded-full
+    border
+    border-slate-200
+    bg-white
+    text-slate-700
+    shadow-sm
+    transition
+    hover:bg-slate-50
+    active:scale-95
+    dark:border-white/10
+    dark:bg-white/5
+    dark:text-white
+  "
+>
+  <X size={20} />
+</button>
 
             <div className="text-center">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
