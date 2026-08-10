@@ -46,6 +46,9 @@ export default function PiPriceWidget() {
     useState(false);
   const prevPriceRef = useRef(0);
   const fetchErrorLoggedRef = useRef(false);
+  const openMarket = () => {
+    setMarketOpen(true);
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -240,15 +243,15 @@ export default function PiPriceWidget() {
         aria-label="PI market price"
         role="button"
         tabIndex={0}
-        onClick={() => setMarketOpen(true)}
-        onTouchEnd={() => setMarketOpen(true)}
+        onClick={openMarket}
+        onTouchEnd={openMarket}
         onKeyDown={(event) => {
           if (
             event.key === "Enter" ||
             event.key === " "
           ) {
             event.preventDefault();
-            setMarketOpen(true);
+            openMarket();
           }
         }}
         className="
