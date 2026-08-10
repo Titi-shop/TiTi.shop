@@ -43,6 +43,7 @@ export default function PiPriceWidget() {
   >(null);
 
   const prevPriceRef = useRef(0);
+  const fetchErrorLoggedRef = useRef(false);
 
   useEffect(() => {
     let mounted = true;
@@ -127,15 +128,21 @@ export default function PiPriceWidget() {
         setUpdatedAt(
           data.updated_at ?? null
         );
+        fetchErrorLoggedRef.current = false;
 
         setHistory((previous) =>
           [...previous, nextPrice].slice(-50)
         );
       } catch (error) {
-        console.error(
-          "PI_PRICE_WIDGET_ERROR",
-          error
-        );
+        if (!fetchErrorLoggedRef.current) {
+          console.warn(
+            "PI_PRICE_WIDGET_FETCH_FAILED",
+            error instanceof Error
+              ? error.message
+              : "UNKNOWN_ERROR"
+          );
+          fetchErrorLoggedRef.current = true;
+        }
 
         if (mounted) {
           setConnected(false);
