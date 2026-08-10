@@ -27,8 +27,8 @@ export default function PiTradingChart({
       .map((close, index, values) => {
         const previous =
           index === 0
-            ? values[0]
-            : values[index - 1];
+            ? values[0] ?? close
+            : values[index - 1] ?? close;
 
         const open = previous;
 
