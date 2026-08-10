@@ -13,6 +13,7 @@ import {
 
 import { useTranslationClient as useTranslation } from "@/app/lib/i18n/client";
 import PiTradingChart from "./PiTradingChart";
+import PiMarketScreen from "./PiMarket/PiMarketScreen";
 
 interface PiPriceResponse {
   symbol: string;
@@ -41,7 +42,7 @@ export default function PiPriceWidget() {
   const [flash, setFlash] = useState<
     "up" | "down" | null
   >(null);
-
+const [marketOpen, setMarketOpen] = useState(false);
   const prevPriceRef = useRef(0);
   const fetchErrorLoggedRef = useRef(false);
 
@@ -234,8 +235,21 @@ export default function PiPriceWidget() {
 
   return (
     <section
-      aria-label="PI market price"
-      className="
+  aria-label="PI market price"
+  role="button"
+  tabIndex={0}
+  onClick={() => setMarketOpen(true)}
+  onKeyDown={(event) => {
+    if (
+      event.key === "Enter" ||
+      event.key === " "
+    ) {
+      event.preventDefault();
+      setMarketOpen(true);
+    }
+  }}
+  className="
+    cursor-pointer
         relative
         left-1/2
         w-screen
@@ -451,6 +465,12 @@ export default function PiPriceWidget() {
           </span>
         </div>
       </div>
-    </section>
+        </section>
+
+    {marketOpen && (
+      <PiMarketScreen
+        onClose={() => setMarketOpen(false)}
+      />
+    )}
   );
 }
