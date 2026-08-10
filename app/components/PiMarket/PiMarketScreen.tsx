@@ -185,13 +185,13 @@ export default function PiMarketScreen({
   }
 
   return (
-    <div className="fixed left-0 right-0 top-[195px] bottom-[82px] z-[999] bg-white dark:bg-[#0f1117]">
+    <div className="fixed inset-0 z-[90] bg-slate-900/40">
       <div
-        className="absolute inset-0 bg-slate-900/40"
+        className="absolute inset-0"
         onClick={onClose}
       />
 
-     <div className="relative mx-auto flex h-full w-full max-w-[560px] flex-col overflow-hidden bg-white dark:bg-[#0f1117]">
+      <div className="relative mx-auto flex h-dvh w-full max-w-[560px] flex-col overflow-hidden bg-white shadow-2xl pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] dark:bg-[#0f1117]">
         <header className="shrink-0 border-b border-slate-200 px-3 pb-1.5 pt-2 dark:border-white/10">
           <div className="flex items-center justify-between gap-3">
            <button
