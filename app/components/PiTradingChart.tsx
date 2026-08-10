@@ -5,9 +5,11 @@ import {
   LineSeries,
 } from "lightweight-charts";
 
-  import type {
-    UTCTimestamp,
-  } from "lightweight-charts";
+import type {
+  IChartApi,
+  ISeriesApi,
+  UTCTimestamp,
+} from "lightweight-charts";
 
 import {
   useEffect,
@@ -21,63 +23,83 @@ interface Props {
 
 export default function PiTradingChart({
   data,
-  color = "#34d399",
+  color = "#10b981",
 }: Props) {
   const containerRef =
     useRef<HTMLDivElement>(null);
 
+  const chartRef =
+    useRef<IChartApi | null>(null);
+
+  const seriesRef =
+    useRef<ISeriesApi<"Line"> | null>(null);
+
+  /*
+   * Create chart only once.
+   * Realtime price updates should update
+   * the existing series instead of destroying
+   * and recreating the whole chart.
+   */
   useEffect(() => {
-    if (
-      !containerRef.current ||
-      data.length < 2
-    )
+    if (!containerRef.current) {
       return;
+    }
+
+    const container =
+      containerRef.current;
 
     const chart = createChart(
-      containerRef.current,
+      container,
       {
-        width:
-          containerRef.current
-            .clientWidth,
-
-        height: 220,
+        width: container.clientWidth,
+        height: 54,
 
         layout: {
           background: {
             color: "transparent",
           },
+
           textColor:
-            "rgba(255,255,255,0.5)",
+            "rgba(100,116,139,0.35)",
         },
 
         grid: {
           vertLines: {
-            color:
-              "rgba(255,255,255,0.05)",
+            visible: false,
           },
+
           horzLines: {
-            color:
-              "rgba(255,255,255,0.05)",
+            visible: false,
           },
+        },
+
+        leftPriceScale: {
+          visible: false,
         },
 
         rightPriceScale: {
-          borderVisible: false,
+          visible: false,
         },
 
         timeScale: {
+          visible: false,
           borderVisible: false,
-          timeVisible: true,
+          timeVisible: false,
+          secondsVisible: false,
         },
 
         crosshair: {
           vertLine: {
-            visible: true,
+            visible: false,
           },
+
           horzLine: {
-            visible: true,
+            visible: false,
           },
         },
+
+        handleScroll: false,
+        handleScale: false,
       }
     );
 
@@ -85,27 +107,30 @@ export default function PiTradingChart({
       chart.addSeries(LineSeries, {
         color,
         lineWidth: 2,
+        priceLineVisible: false,
+        lastValueVisible: false,
+        crosshairMarkerVisible: false,
       });
 
-    series.setData(
-      data.map(
-        (price, index) => ({
-          time:
-              (index + 1) as UTCTimestamp,
-          value: price,
-        })
-      )
-    );
-
-    chart.timeScale().fitContent();
+    chartRef.current = chart;
+    seriesRef.current = series;
 
     const resize = () => {
+      if (!containerRef.current) {
+        return;
+      }
+
       chart.applyOptions({
         width:
           containerRef.current
-            ?.clientWidth ?? 0,
+            .clientWidth,
       });
     };
+
+    const observer =
+      new ResizeObserver(resize);
+
+    observer.observe(container);
 
     window.addEventListener(
       "resize",
@@ -113,23 +138,64 @@ export default function PiTradingChart({
     );
 
     return () => {
+      observer.disconnect();
+
       window.removeEventListener(
         "resize",
         resize
       );
 
       chart.remove();
+
+      chartRef.current = null;
+      seriesRef.current = null;
     };
-  }, [data, color]);
+  }, []);
+
+  /*
+   * Update chart data without recreating
+   * the chart instance.
+   */
+  useEffect(() => {
+    const series =
+      seriesRef.current;
+
+    if (!series || data.length < 2) {
+      return;
+    }
+
+    const chartData = data.map(
+      (price, index) => ({
+        time:
+          (index + 1) as UTCTimestamp,
+        value: price,
+      })
+    );
+
+    series.setData(chartData);
+
+    chartRef.current
+      ?.timeScale()
+      .fitContent();
+  }, [data]);
+
+  /*
+   * Update line color independently.
+   */
+  useEffect(() => {
+    seriesRef.current?.applyOptions({
+      color,
+    });
+  }, [color]);
 
   return (
     <div
       ref={containerRef}
       className="
-        h-[220px]
+        h-[54px]
         w-full
       "
+      aria-label="PI price chart"
     />
   );
 }
-
