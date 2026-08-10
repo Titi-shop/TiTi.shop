@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo } from "react";
-
 interface Props {
   data: number[];
   color?: string;
