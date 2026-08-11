@@ -444,7 +444,10 @@ const trendingProducts = useMemo(
 const flashSaleProducts = useMemo(
   () =>
     products
-      .filter((p) => p.sale_price)
+      .filter(
+        (product) =>
+          getDiscount(product) > 0
+      )
       .slice(0, 10),
   [products]
 );
@@ -795,244 +798,260 @@ useEffect(() => {
 </div>
 </section>
 
-      {/* FLASH SALE */}
-<section className="mt-2 px-1 relative z-10">
-  <div className="rounded-2xl bg-gradient-to-r from-red-600 via-orange-500 to-red-500 text-white p-3 overflow-hidden">
+     {/* FLASH SALE */}
 
+<section className="relative z-10 mt-2 px-1">
+  <div
+    className="
+      overflow-hidden
+      rounded-2xl
+      bg-gradient-to-r
+      from-red-600
+      via-orange-500
+      to-red-500
+      p-3
+      text-white
+      shadow-lg
+    "
+  >
     {/* HEADER */}
-    <div className="flex items-center justify-between mb-3">
+
+    <div className="mb-3 flex items-center justify-between">
       <div>
-        <div className="inline-flex items-center gap-1 bg-white/20 px-2 py-1 rounded-full text-[11px]">
+        <div
+          className="
+            inline-flex
+            items-center
+            gap-1
+            rounded-full
+            bg-white/20
+            px-2
+            py-1
+            text-[11px]
+            font-semibold
+            backdrop-blur
+          "
+        >
           <Flame size={12} />
-          {t.flash_sale}
+
+          {t.flash_sale || "Flash Sale"}
         </div>
 
         <h2 className="mt-1 text-sm font-bold">
-          {t.limited_time_deals}
+          {t.limited_time_deals ||
+            "Limited time deals"}
         </h2>
       </div>
 
       <button
-        onClick={() => router.push("")}
-        className="text-[11px] bg-white/20 px-3 py-1 rounded-lg"
+        type="button"
+        onClick={() =>
+          router.push("/categories")
+        }
+        className="
+          rounded-lg
+          bg-white/20
+          px-3
+          py-1.5
+          text-[11px]
+          font-semibold
+          backdrop-blur
+          transition
+          active:scale-95
+        "
       >
-        {t.view}
+        {t.view || "View"}
       </button>
     </div>
 
-    {/* SCROLL FIX */}
-    <div
-      className="
-        flex gap-3
-        overflow-x-auto
-    overflow-y-hidden
-    pb-2
-    -mx-1 px-1
-    snap-x snap-mandatory
-    scroll-smooth
-      "
-      style={{
-        WebkitOverflowScrolling: "touch",
-      }}
-    >
-  {flashSaleProducts.map((product) => {
-  const discount =
-    getDiscount(product);
+    {/* PRODUCTS */}
 
-  const salePrice =
-    getSalePrice(product);
-
-  return (
-    <div
-      key={product.id}
-      onClick={() =>
-        router.push(
-          `/product/${product.id}`
-        )
-      }
-      className="
-        group
-        relative
-        min-w-[148px]
-        max-w-[148px]
-        flex-shrink-0
-        snap-start
-        overflow-hidden
-        rounded-2xl
-        bg-white
-        text-black
-        shadow-md
-        transition
-        active:scale-[0.97]
-      "
-    >
-      {/* IMAGE */}
-
-      <div className="relative h-28 w-full overflow-hidden">
-        <Image
-          src={getMainImage(product)}
-          alt={product.name}
-          width={300}
-          height={300}
-          className="
-            h-full
-            w-full
-            object-cover
-            transition-transform
-            duration-500
-            group-active:scale-105
-          "
-        />
-
-        {/* SALE PERCENT */}
-
-        {discount > 0 && (
-          <div
-            className="
-              absolute
-              left-2
-              top-2
-              rounded-full
-              bg-red-600
-              px-2
-              py-1
-              text-[10px]
-              font-black
-              text-white
-              shadow-md
-            "
-          >
-            -{discount}%
-          </div>
-        )}
-
-        {/* FLASH */}
-
-        <div
-          className="
-            absolute
-            right-2
-            top-2
-            flex
-            h-6
-            w-6
-            items-center
-            justify-center
-            rounded-full
-            bg-orange-500
-            text-white
-            shadow-md
-          "
-        >
-          <Flame size={13} />
-        </div>
+    {flashSaleProducts.length === 0 ? (
+      <div className="rounded-xl bg-white/10 p-4 text-center text-xs text-white/80">
+        {t.no_flash_sale ||
+          "No active flash sale"}
       </div>
+    ) : (
+      <div
+        className="
+          flex
+          gap-3
+          overflow-x-auto
+          overflow-y-hidden
+          pb-2
+          -mx-1
+          px-1
+          snap-x
+          snap-mandatory
+          scroll-smooth
+          scrollbar-hide
+        "
+        style={{
+          WebkitOverflowScrolling: "touch",
+        }}
+      >
+        {flashSaleProducts.map((product) => {
+          const discount =
+            getDiscount(product);
 
-      {/* CONTENT */}
+          const salePrice =
+            getSalePrice(product);
 
-      <div className="p-2">
-        <p
-          className="
-            line-clamp-2
-            min-h-[30px]
-            text-[11px]
-            font-semibold
-            leading-snug
-          "
-        >
-          {product.name}
-        </p>
-
-        {/* PRICE */}
-
-        <div className="mt-1">
-          <p className="text-sm font-black text-red-500">
-            {formatPi(salePrice)} π
-          </p>
-
-          {discount > 0 && (
-            <p className="text-[9px] text-gray-400 line-through">
-              {formatPi(
-                Number(
-                  product.price ?? 0
+          return (
+            <div
+              key={product.id}
+              onClick={() =>
+                router.push(
+                  `/product/${product.id}`
                 )
-              )}{" "}
-              π
-            </p>
-          )}
-        </div>
+              }
+              className="
+                group
+                relative
+                min-w-[148px]
+                max-w-[148px]
+                flex-shrink-0
+                snap-start
+                cursor-pointer
+                overflow-hidden
+                rounded-2xl
+                bg-white
+                text-black
+                shadow-md
+                transition
+                active:scale-[0.97]
+              "
+            >
+              {/* IMAGE */}
 
-        {/* COUNTDOWN */}
+              <div className="relative h-28 w-full overflow-hidden">
+                <Image
+                  src={getMainImage(product)}
+                  alt={product.name}
+                  width={300}
+                  height={300}
+                  className="
+                    h-full
+                    w-full
+                    object-cover
+                    transition-transform
+                    duration-500
+                    group-active:scale-105
+                  "
+                />
 
-        {/* 
-          Đặt SaleCountdown ở đây sau khi
-          xác nhận tên field thời gian sale.
-        */}
+                {/* DISCOUNT */}
+
+                {discount > 0 && (
+                  <div
+                    className="
+                      absolute
+                      left-2
+                      top-2
+                      rounded-full
+                      bg-red-600
+                      px-2
+                      py-1
+                      text-[10px]
+                      font-black
+                      text-white
+                      shadow-md
+                    "
+                  >
+                    -{discount}%
+                  </div>
+                )}
+
+                {/* FLASH ICON */}
+
+                <div
+                  className="
+                    absolute
+                    right-2
+                    top-2
+                    flex
+                    h-7
+                    w-7
+                    items-center
+                    justify-center
+                    rounded-full
+                    bg-orange-500
+                    text-white
+                    shadow-md
+                  "
+                >
+                  <Flame size={14} />
+                </div>
+              </div>
+
+              {/* CONTENT */}
+
+              <div className="p-2">
+                <p
+                  className="
+                    min-h-[30px]
+                    line-clamp-2
+                    text-[11px]
+                    font-semibold
+                    leading-snug
+                  "
+                >
+                  {product.name}
+                </p>
+
+                {/* PRICE */}
+
+                <div className="mt-1">
+                  <p className="text-sm font-black text-red-500">
+                    {formatPi(salePrice)} π
+                  </p>
+
+                  {discount > 0 && (
+                    <p className="text-[9px] text-gray-400 line-through">
+                      {formatPi(
+                        Number(
+                          product.price ?? 0
+                        )
+                      )}{" "}
+                      π
+                    </p>
+                  )}
+                </div>
+
+                {/* DISCOUNT INFO */}
+
+                {discount > 0 && (
+                  <div className="mt-2">
+                    <span
+                      className="
+                        inline-flex
+                        rounded-md
+                        bg-red-50
+                        px-1.5
+                        py-1
+                        text-[9px]
+                        font-bold
+                        text-red-600
+                      "
+                    >
+                      Save {discount}%
+                    </span>
+                  </div>
+                )}
+
+                {/* SALE COUNTDOWN */}
+
+                {/* 
+                  Chỉ thêm SaleCountdown tại đây
+                  khi Product có trường sale_end_at.
+                */}
+              </div>
+            </div>
+          );
+        })}
       </div>
-    </div>
-  );
-})}
-    <Image
-      src={getMainImage(product)}
-      alt={product.name}
-      width={300}
-      height={300}
-      className="
-        h-24
-        w-full
-        object-cover
-      "
-    />
-
-    <div className="p-2">
-      <p className="text-[11px] line-clamp-2">
-        {product.name}
-      </p>
-
-      <p className="mt-1 text-sm font-bold text-red-500">
-        {formatPi(
-          product.final_price ||
-          product.price
-        )}{" "}
-        π
-      </p>
-    </div>
+    )}
   </div>
-))}
-    </div>
-  </div>
-</section>
-
-      {/* PRODUCTS */}
-
-      <section className="mt-2 px-0">
-  <div className="px-4 mb-5">
-    <h2 className="text-2xl font-black">
-      {t.discover_products || "Discover Products"}
-    </h2>
-    <p className="mt-1 text-sm text-[var(--text-muted)]">
-      {t.curated_products_for_you || "Curated products for you"}
-    </p>
-  </div>
-
-  {loading ? (
-    <div className="grid grid-cols-2 gap-[3px] px-1">
-      {Array.from({ length: 8 }).map((_, i) => (
-        <ProductSkeleton key={i} />
-      ))}
-    </div>
-  ) : (
-    <div className="grid grid-cols-2 gap-[6px] px-1">
-      {filteredProducts.map((product) => (
-        <ProductCard
-          key={product.id}
-          product={product}
-          onAddToCart={handleAddToCart}
-          t={t}
-        />
-      ))}
-    </div>
-  )}
 </section>
     </main>
   );
