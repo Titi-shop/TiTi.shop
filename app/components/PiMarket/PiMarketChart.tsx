@@ -416,15 +416,11 @@ export default function PiMarketChart({
         IChartApi["subscribeCrosshairMove"]
       >[0]) => {
         if (
-          !param.time ||
-          !param.seriesData.size
-        ) {
-          onCrosshairChange?.(
-            null
-          );
-
-          return;
-        }
+  !param.time ||
+  !param.seriesData.size
+) {
+     return;
+    }
 
         const candleData =
           param.seriesData.get(
@@ -443,12 +439,8 @@ export default function PiMarketChart({
             | undefined;
 
         if (!candleData) {
-          onCrosshairChange?.(
-            null
-          );
-
-          return;
-        }
+      return;
+      }
 
         onCrosshairChange?.({
           timeLabel:
