@@ -132,9 +132,15 @@ export async function GET() {
 
     const json: OkxResponse = await res.json();
 
-    if (!json.data?.length) {
-      throw new Error("EMPTY_OKX_DATA");
-    }
+if (json.code !== "0") {
+  throw new Error(
+    `OKX_API_${json.code ?? "UNKNOWN"}`
+  );
+}
+
+if (!json.data?.length) {
+  throw new Error("EMPTY_OKX_DATA");
+}
 
     const ticker = json.data[0];
 
@@ -143,13 +149,9 @@ export async function GET() {
     }
 
     const price = safeNumber(ticker.last);
-
     const open24h = safeNumber(ticker.open24h);
-
     const high24h = safeNumber(ticker.high24h);
-
     const low24h = safeNumber(ticker.low24h);
-
     const volume24h = safeNumber(ticker.vol24h);
 
     if (!price || price <= 0) {
