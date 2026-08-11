@@ -282,53 +282,75 @@ export default function CategoriesToolbar({
                 >
                   {/* COVER */}
 
-                  <div
-                    className={`
-                      relative
-                      h-[92px]
-                      w-full
-                      overflow-hidden
-                      ${
-                        active
-                          ? "bg-[var(--color-primary)]/10"
-                          : "bg-[var(--surface)]"
-                      }
-                    `}
-                  >
-                    {cover ? (
-                      <Image
-                        src={cover}
-                        alt={getCategoryName(
-                          category,
-                          t
-                        )}
-                        fill
-                        sizes="
-                          (max-width: 640px) 112px,
-                          128px
-                        "
-                        className="
-                          object-cover
-                          transition-transform
-                          duration-300
-                          hover:scale-105
-                        "
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center">
-                        <span className="text-3xl">
-                          {category.icon ||
-                            "🛍️"}
-                        </span>
-                      </div>
-                    )}
+<div
+  className={`
+    relative
+    h-[108px]
+    w-full
+    overflow-hidden
+    ${
+      active
+        ? "bg-[var(--color-primary)]/10"
+        : "bg-[var(--surface)]"
+    }
+  `}
+>
+  {cover ? (
+    <Image
+      src={cover}
+      alt={getCategoryName(category, t)}
+      fill
+      sizes="
+        (max-width: 640px) 112px,
+        128px
+      "
+      className="
+        object-cover
+        transition-transform
+        duration-300
+        hover:scale-105
+      "
+    />
+  ) : (
+    <div
+      className="
+        flex
+        h-full
+        w-full
+        items-center
+        justify-center
+      "
+    >
+      <span
+        className="
+          flex
+          h-16
+          w-16
+          items-center
+          justify-center
+          rounded-2xl
+          bg-[var(--card-secondary)]
+          text-[42px]
+          leading-none
+          drop-shadow-sm
+        "
+      >
+        {category.icon || "🛍️"}
+      </span>
+    </div>
+  )}
 
-                    {/* ACTIVE OVERLAY */}
-
-                    {active && (
-                      <div className="pointer-events-none absolute inset-0 bg-[var(--color-primary)]/10" />
-                    )}
-                  </div>
+  {active && (
+    <div
+      className="
+        pointer-events-none
+        absolute
+        inset-0
+        bg-[var(--color-primary)]/10
+      "
+    />
+  )}
+</div>
 
                   {/* CONTENT */}
 
