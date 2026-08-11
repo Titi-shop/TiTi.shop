@@ -20,51 +20,43 @@ export default function PiTradingChart({
   color,
 }: Props) {
   const candles = useMemo<Candle[]>(() => {
-    if (data.length < 2) {
-      return [];
-    }
+  const prices = data
+    .filter(
+      (value) =>
+        Number.isFinite(value) &&
+        value > 0
+    )
+    .slice(-32);
 
-    return data
-      .filter(
-        (value) =>
-          Number.isFinite(value) &&
-          value > 0
-      )
-      .slice(-32)
-      .map((close, index, values) => {
-        const previous =
-          index === 0
-            ? values[0] ?? close
-            : values[index - 1] ?? close;
+  if (prices.length < 2) {
+    return [];
+  }
 
-        const open = previous;
+  return prices.map((close, index) => {
+    const open =
+      index === 0
+        ? prices[index]
+        : prices[index - 1];
 
-        /*
-         * The API only provides ticker prices.
-         * Do not invent OHLC data.
-         *
-         * Therefore high/low are limited to
-         * the actual observed open/close values.
-         */
-        const high = Math.max(
-          open,
-          close
-        );
+    const high = Math.max(
+      open,
+      close
+    );
 
-        const low = Math.min(
-          open,
-          close
-        );
+    const low = Math.min(
+      open,
+      close
+    );
 
-        return {
-          open,
-          close,
-          high,
-          low,
-          up: close >= open,
-        };
-      });
-  }, [data]);
+    return {
+      open,
+      close,
+      high,
+      low,
+      up: close > open,
+    };
+  });
+}, [data]);
 
   if (candles.length < 2) {
     return (
