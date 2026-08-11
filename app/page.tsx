@@ -1,4 +1,3 @@
-Tiếp theo sửa app/page.tsx phần hiển thị sản phẩm sale hiển thị phần trăm sale , thêm thời gian sale dành cho người dùng .
 "use client";
 export const dynamic = "force-dynamic";
 import { useEffect, useMemo, useState } from "react";
