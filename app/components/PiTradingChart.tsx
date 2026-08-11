@@ -15,54 +15,56 @@ interface Candle {
   up: boolean;
 }
 
+const UP_COLOR = "#10b981";
+const DOWN_COLOR = "#ef4444";
+
 export default function PiTradingChart({
   data,
-  color,
 }: Props) {
   const candles = useMemo<Candle[]>(() => {
-  const prices = data
-    .filter(
-      (value) =>
-        Number.isFinite(value) &&
-        value > 0
-    )
-    .slice(-32);
+    const prices = data
+      .filter(
+        (value) =>
+          Number.isFinite(value) &&
+          value > 0
+      )
+      .slice(-32);
 
-  if (prices.length < 2) {
-    return [];
-  }
+    if (prices.length < 2) {
+      return [];
+    }
 
-  return prices.map((close, index) => {
-    const open =
-      index === 0
-        ? prices[index]
-        : prices[index - 1];
+    return prices.map((close, index) => {
+      const open =
+        index === 0
+          ? prices[0] ?? close
+          : prices[index - 1] ?? close;
 
-    const high = Math.max(
-      open,
-      close
-    );
+      const high = Math.max(
+        open,
+        close
+      );
 
-    const low = Math.min(
-      open,
-      close
-    );
+      const low = Math.min(
+        open,
+        close
+      );
 
-    return {
-      open,
-      close,
-      high,
-      low,
-      up: close > open,
-    };
-  });
-}, [data]);
+      return {
+        open,
+        close,
+        high,
+        low,
+        up: close > open,
+      };
+    });
+  }, [data]);
 
   if (candles.length < 2) {
     return (
       <div
         className="
-          h-[44px]
+          h-[52px]
           w-full
           overflow-hidden
           rounded-xl
@@ -104,10 +106,6 @@ export default function PiTradingChart({
     ...prices
   );
 
-  /*
-   * Add a small visual breathing room
-   * around the actual price range.
-   */
   const rawRange =
     maxPrice - minPrice;
 
@@ -148,7 +146,7 @@ export default function PiTradingChart({
     candles[candles.length - 2];
 
   const isLatestUp =
-    latest.close >= latest.open;
+    latest.close > latest.open;
 
   const latestChange =
     previous.close !== 0
@@ -158,17 +156,20 @@ export default function PiTradingChart({
         100
       : 0;
 
-  const upColor =
-    color ?? "#10b981";
-
-  const downColor =
-    "#ef4444";
-
   /*
-   * Build a lightweight SVG price path.
-   * This is only a visual guide and uses
-   * the real close values from the ticker.
+   * IMPORTANT:
+   *
+   * Candle colors are determined by
+   * each candle's own open/close.
+   *
+   * Do NOT use the current price color
+   * for all candles.
    */
+  const lineColor =
+    isLatestUp
+      ? UP_COLOR
+      : DOWN_COLOR;
+
   const linePoints = candles
     .map((candle, index) => {
       const x =
@@ -190,8 +191,6 @@ export default function PiTradingChart({
   const latestY =
     getY(latest.close);
 
-  const latestX = 100;
-
   return (
     <div
       className="
@@ -208,7 +207,7 @@ export default function PiTradingChart({
       "
       aria-label="PI price mini candlestick chart"
     >
-      {/* SUBTLE GRID */}
+      {/* GRID */}
 
       <div
         className="
@@ -263,11 +262,7 @@ export default function PiTradingChart({
         <polyline
           points={linePoints}
           fill="none"
-          stroke={
-            isLatestUp
-              ? upColor
-              : downColor
-          }
+          stroke={lineColor}
           strokeWidth="1.4"
           vectorEffect="non-scaling-stroke"
         />
@@ -280,8 +275,8 @@ export default function PiTradingChart({
           absolute
           inset-x-1
           top-1
-          h-[44px]
           flex
+          h-[44px]
           items-stretch
           justify-between
           gap-[2px]
@@ -290,24 +285,16 @@ export default function PiTradingChart({
         {candles.map(
           (candle, index) => {
             const openY =
-              getY(
-                candle.open
-              );
+              getY(candle.open);
 
             const closeY =
-              getY(
-                candle.close
-              );
+              getY(candle.close);
 
             const highY =
-              getY(
-                candle.high
-              );
+              getY(candle.high);
 
             const lowY =
-              getY(
-                candle.low
-              );
+              getY(candle.low);
 
             const bodyTop =
               Math.min(
@@ -320,7 +307,7 @@ export default function PiTradingChart({
                 Math.abs(
                   closeY - openY
                 ),
-                2.5
+                3
               );
 
             const wickHeight =
@@ -333,10 +320,17 @@ export default function PiTradingChart({
               index ===
               candles.length - 1;
 
+            /*
+             * THIS is the important part.
+             *
+             * Every candle independently
+             * decides whether it is green
+             * or red.
+             */
             const candleColor =
               candle.up
-                ? upColor
-                : downColor;
+                ? UP_COLOR
+                : DOWN_COLOR;
 
             return (
               <div
@@ -365,8 +359,8 @@ export default function PiTradingChart({
                       candleColor,
                     opacity:
                       isLast
-                        ? 0.8
-                        : 0.45,
+                        ? 0.9
+                        : 0.55,
                   }}
                 />
 
@@ -390,15 +384,15 @@ export default function PiTradingChart({
                     opacity:
                       isLast
                         ? 1
-                        : 0.9,
+                        : 0.95,
                     boxShadow:
                       isLast
-                        ? `0 0 7px ${candleColor}55`
+                        ? `0 0 7px ${candleColor}66`
                         : undefined,
                   }}
                 />
 
-                {/* LAST CANDLE MARKER */}
+                {/* LAST CANDLE */}
 
                 {isLast && (
                   <span
@@ -429,7 +423,7 @@ export default function PiTradingChart({
         )}
       </div>
 
-      {/* LATEST PRICE DOT */}
+      {/* CURRENT PRICE DOT */}
 
       <span
         className="
@@ -450,19 +444,19 @@ export default function PiTradingChart({
           )}px`,
           backgroundColor:
             isLatestUp
-              ? upColor
-              : downColor,
+              ? UP_COLOR
+              : DOWN_COLOR,
           boxShadow:
             `0 0 0 3px ${
               isLatestUp
-                ? upColor
-                : downColor
+                ? UP_COLOR
+                : DOWN_COLOR
             }22`,
         }}
         aria-hidden="true"
       />
 
-      {/* CHANGE LABEL */}
+      {/* CHANGE */}
 
       <div
         className="
@@ -482,9 +476,9 @@ export default function PiTradingChart({
         "
         style={{
           color:
-            isLatestUp
-              ? upColor
-              : downColor,
+            latestChange >= 0
+              ? UP_COLOR
+              : DOWN_COLOR,
         }}
       >
         {latestChange >= 0
