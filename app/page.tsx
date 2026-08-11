@@ -216,6 +216,9 @@ function ProductCard({
 }) {
   const router = useRouter();
 
+  const discount = getDiscount(product);
+  const salePrice = getSalePrice(product);
+
   return (
     <div
   onClick={() => router.push(`/product/${product.id}`)}
@@ -243,7 +246,7 @@ function ProductCard({
   />
 
  {/* SALE */}
-{getDiscount(product) > 0 && (
+{discount > 0 && (
   <div
     className="
       absolute
@@ -256,9 +259,10 @@ function ProductCard({
       text-[10px]
       font-bold
       text-white
+      shadow-md
     "
   >
-    -{getDiscount(product)}%
+    -{discount}%
   </div>
 )}
 
@@ -344,20 +348,19 @@ function ProductCard({
 <div className="mt-auto flex items-end justify-between">
   <div className="flex flex-col">
     <p className="text-sm font-black text-primary">
-      {formatPi(
-        product.final_price ||
-          product.price
-      )}{" "}
-      π
+      {formatPi(salePrice)} π
     </p>
 
-    {product.sale_price && (
+    {discount > 0 && (
       <p className="text-[10px] text-[var(--text-muted)] line-through">
-        {formatPi(product.price)} π
+        {formatPi(
+          Number(product.price ?? 0)
+        )}{" "}
+        π
       </p>
     )}
-     </div>
-    </div>
+  </div>
+</div>
       </div>
     </div>
   );
