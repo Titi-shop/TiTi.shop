@@ -4,7 +4,6 @@ import { Circle, X } from "lucide-react";
 import {
   useCallback,
   useEffect,
-  useMemo,
   useState,
 } from "react";
 import { createPortal } from "react-dom";
@@ -201,10 +200,7 @@ export default function PiMarketScreen({
     ? "text-emerald-600"
     : "text-red-600";
 
-  const selectedStats = useMemo(
-    () => selected,
-    [selected]
-  );
+  const selectedStats = selected;
 
   if (!open) {
     return null;
@@ -391,12 +387,14 @@ export default function PiMarketScreen({
                 </button>
               </div>
             ) : (
-              <PiMarketChart
-                candles={candles}
-                onCrosshairChange={
-                  setSelected
-                }
-              />
+             <PiMarketChart
+  candles={candles}
+  onCrosshairChange={(snapshot) => {
+    if (snapshot) {
+      setSelected(snapshot);
+    }
+  }}
+/>
             )}
           </section>
 
