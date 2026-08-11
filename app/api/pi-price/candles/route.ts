@@ -115,14 +115,15 @@ export async function GET(request: NextRequest) {
 
   try {
     const res = await fetch(upstream.toString(), {
-      method: "GET",
-      signal: controller.signal,
-      headers: {
-        Accept: "application/json",
-      },
-      cache: "no-store",
-      next: { revalidate: 30 },
-    });
+  method: "GET",
+  signal: controller.signal,
+  headers: {
+    Accept: "application/json",
+  },
+  next: {
+    revalidate: 30,
+  },
+});
 
     if (!res.ok) {
       return NextResponse.json(
@@ -135,7 +136,15 @@ export async function GET(request: NextRequest) {
     }
 
     const json: OkxCandlesResponse = await res.json();
-
+if (json.code !== "0") {
+  return NextResponse.json(
+    {
+      error: "OKX_CANDLE_API_ERROR",
+      code: json.code ?? "UNKNOWN",
+    },
+    { status: 502 }
+  );
+}
     if (!json.data?.length) {
       return NextResponse.json(
         {
