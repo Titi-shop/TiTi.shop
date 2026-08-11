@@ -53,22 +53,151 @@ function getMainImage(product: Product) {
   return "/placeholder.png";
 }
 
-function getDiscount(product: Product) {
-  const price = Number(product.price || 0);
+function getSalePrice(product: Product): number {
+  const price = Number(product.price ?? 0);
 
-  const final = Number(
+  const finalPrice = Number(
     product.final_price ??
-    product.sale_price ??
-    product.price
+      product.sale_price ??
+      product.price ??
+      0
   );
 
-  if (price > final) {
-    return Math.round(
-      ((price - final) / price) * 100
+  if (
+    !Number.isFinite(finalPrice) ||
+    finalPrice <= 0
+  ) {
+    return price;
+  }
+
+  return finalPrice;
+}
+
+function getDiscount(product: Product): number {
+  const price = Number(
+    product.price ?? 0
+  );
+
+  const final = getSalePrice(product);
+
+  if (
+    !Number.isFinite(price) ||
+    !Number.isFinite(final) ||
+    price <= 0 ||
+    final <= 0 ||
+    final >= price
+  ) {
+    return 0;
+  }
+
+  return Math.round(
+    ((price - final) / price) * 100
+  );
+}
+function SaleCountdown({
+  endAt,
+}: {
+  endAt: string | number | Date;
+}) {
+  const [remaining, setRemaining] =
+    useState<number>(() => {
+      const time =
+        new Date(endAt).getTime();
+
+      return Number.isFinite(time)
+        ? Math.max(
+            0,
+            time - Date.now()
+          )
+        : 0;
+    });
+
+  useEffect(() => {
+    const end =
+      new Date(endAt).getTime();
+
+    if (!Number.isFinite(end)) {
+      setRemaining(0);
+      return;
+    }
+
+    const update = () => {
+      setRemaining(
+        Math.max(
+          0,
+          end - Date.now()
+        )
+      );
+    };
+
+    update();
+
+    const timer = window.setInterval(
+      update,
+      1000
+    );
+
+    return () =>
+      window.clearInterval(timer);
+  }, [endAt]);
+
+  if (remaining <= 0) {
+    return (
+      <span className="text-[9px] font-bold text-red-600">
+        Sale ended
+      </span>
     );
   }
 
-  return 0;
+  const totalSeconds =
+    Math.floor(remaining / 1000);
+
+  const days =
+    Math.floor(
+      totalSeconds / 86400
+    );
+
+  const hours =
+    Math.floor(
+      (totalSeconds % 86400) / 3600
+    );
+
+  const minutes =
+    Math.floor(
+      (totalSeconds % 3600) / 60
+    );
+
+  const seconds =
+    totalSeconds % 60;
+
+  const pad = (value: number) =>
+    String(value).padStart(2, "0");
+
+  return (
+    <div
+      className="
+        inline-flex
+        items-center
+        gap-1
+        rounded-md
+        bg-red-50
+        px-1.5
+        py-1
+        text-[9px]
+        font-bold
+        text-red-600
+      "
+    >
+      <span>
+        {days > 0
+          ? `${days}d `
+          : ""}
+        {pad(hours)}:
+        {pad(minutes)}:
+        {pad(seconds)}
+      </span>
+    </div>
+  );
 }
 
 /* =========================================================
@@ -706,27 +835,143 @@ useEffect(() => {
         WebkitOverflowScrolling: "touch",
       }}
     >
-    {flashSaleProducts.map((product) => (
-  <div
-    key={product.id}
-    onClick={() =>
-      router.push(
-        `/product/${product.id}`
-      )
-    }
-    className="
-      min-w-[130px]
-      flex-shrink-0
-      rounded-xl
-      bg-white
-      text-black
-      overflow-hidden
-      shadow-sm
-      snap-start
-      active:scale-[0.97]
-      transition
-    "
-  >
+  {flashSaleProducts.map((product) => {
+  const discount =
+    getDiscount(product);
+
+  const salePrice =
+    getSalePrice(product);
+
+  return (
+    <div
+      key={product.id}
+      onClick={() =>
+        router.push(
+          `/product/${product.id}`
+        )
+      }
+      className="
+        group
+        relative
+        min-w-[148px]
+        max-w-[148px]
+        flex-shrink-0
+        snap-start
+        overflow-hidden
+        rounded-2xl
+        bg-white
+        text-black
+        shadow-md
+        transition
+        active:scale-[0.97]
+      "
+    >
+      {/* IMAGE */}
+
+      <div className="relative h-28 w-full overflow-hidden">
+        <Image
+          src={getMainImage(product)}
+          alt={product.name}
+          width={300}
+          height={300}
+          className="
+            h-full
+            w-full
+            object-cover
+            transition-transform
+            duration-500
+            group-active:scale-105
+          "
+        />
+
+        {/* SALE PERCENT */}
+
+        {discount > 0 && (
+          <div
+            className="
+              absolute
+              left-2
+              top-2
+              rounded-full
+              bg-red-600
+              px-2
+              py-1
+              text-[10px]
+              font-black
+              text-white
+              shadow-md
+            "
+          >
+            -{discount}%
+          </div>
+        )}
+
+        {/* FLASH */}
+
+        <div
+          className="
+            absolute
+            right-2
+            top-2
+            flex
+            h-6
+            w-6
+            items-center
+            justify-center
+            rounded-full
+            bg-orange-500
+            text-white
+            shadow-md
+          "
+        >
+          <Flame size={13} />
+        </div>
+      </div>
+
+      {/* CONTENT */}
+
+      <div className="p-2">
+        <p
+          className="
+            line-clamp-2
+            min-h-[30px]
+            text-[11px]
+            font-semibold
+            leading-snug
+          "
+        >
+          {product.name}
+        </p>
+
+        {/* PRICE */}
+
+        <div className="mt-1">
+          <p className="text-sm font-black text-red-500">
+            {formatPi(salePrice)} π
+          </p>
+
+          {discount > 0 && (
+            <p className="text-[9px] text-gray-400 line-through">
+              {formatPi(
+                Number(
+                  product.price ?? 0
+                )
+              )}{" "}
+              π
+            </p>
+          )}
+        </div>
+
+        {/* COUNTDOWN */}
+
+        {/* 
+          Đặt SaleCountdown ở đây sau khi
+          xác nhận tên field thời gian sale.
+        */}
+      </div>
+    </div>
+  );
+})}
     <Image
       src={getMainImage(product)}
       alt={product.name}
