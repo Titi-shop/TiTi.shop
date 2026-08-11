@@ -7,6 +7,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 
 import PiMarketChart, {
   PiMarketCandle,
@@ -67,18 +68,25 @@ export default function PiMarketScreen({
 }: PiMarketScreenProps) {
   const [timeframe, setTimeframe] =
     useState<Timeframe>("1D");
+
   const [candles, setCandles] = useState<
     PiMarketCandle[]
   >([]);
+
   const [selected, setSelected] =
     useState<CrosshairSnapshot | null>(null);
+
   const [loading, setLoading] = useState(false);
+
   const [error, setError] = useState<string | null>(
     null
   );
 
   const fetchCandles = useCallback(
-    async (signal: AbortSignal, nextTimeframe: Timeframe) => {
+    async (
+      signal: AbortSignal,
+      nextTimeframe: Timeframe
+    ) => {
       setLoading(true);
       setError(null);
 
@@ -114,7 +122,10 @@ export default function PiMarketScreen({
         setCandles(payload.candles);
 
         const latest =
-          payload.candles[payload.candles.length - 1];
+          payload.candles[
+            payload.candles.length - 1
+          ];
+
         if (latest) {
           setSelected({
             timeLabel: new Date(
@@ -139,7 +150,9 @@ export default function PiMarketScreen({
 
         setCandles([]);
         setSelected(null);
-        setError("Unable to load PI market candles.");
+        setError(
+          "Unable to load PI market candles."
+        );
       } finally {
         setLoading(false);
       }
@@ -153,10 +166,18 @@ export default function PiMarketScreen({
     }
 
     const controller = new AbortController();
-    fetchCandles(controller.signal, timeframe);
+
+    fetchCandles(
+      controller.signal,
+      timeframe
+    );
 
     return () => controller.abort();
-  }, [open, timeframe, fetchCandles]);
+  }, [
+    open,
+    timeframe,
+    fetchCandles,
+  ]);
 
   useEffect(() => {
     if (!open) {
@@ -165,16 +186,21 @@ export default function PiMarketScreen({
 
     const previousOverflow =
       document.body.style.overflow;
+
     document.body.style.overflow = "hidden";
+
     return () => {
-      document.body.style.overflow = previousOverflow;
+      document.body.style.overflow =
+        previousOverflow;
     };
   }, [open]);
 
   const isPositive = change24h >= 0;
+
   const changeClass = isPositive
     ? "text-emerald-600"
     : "text-red-600";
+
   const selectedStats = useMemo(
     () => selected,
     [selected]
@@ -184,53 +210,102 @@ export default function PiMarketScreen({
     return null;
   }
 
-  return (
-    <div className="fixed inset-0 z-[90] bg-slate-900/40">
+  const screen = (
+    <div
+      className="
+        fixed
+        inset-0
+        z-[9999]
+        bg-slate-900/40
+      "
+    >
+      {/* BACKDROP */}
       <div
         className="absolute inset-0"
         onClick={onClose}
+        aria-hidden="true"
       />
 
-      <div className="relative mx-auto flex h-dvh w-full max-w-[560px] flex-col overflow-hidden bg-white shadow-2xl pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] dark:bg-[#0f1117]">
-        <header className="shrink-0 border-b border-slate-200 px-3 pb-1.5 pt-2 dark:border-white/10">
+      {/* PI MARKET PANEL */}
+      <div
+        className="
+          relative
+          z-[10000]
+          mx-auto
+          flex
+          h-dvh
+          w-full
+          max-w-[560px]
+          flex-col
+          overflow-hidden
+          bg-white
+          shadow-2xl
+          pt-[env(safe-area-inset-top)]
+          pb-[env(safe-area-inset-bottom)]
+          dark:bg-[#0f1117]
+        "
+      >
+        {/* HEADER */}
+        <header
+          className="
+            relative
+            z-10
+            shrink-0
+            border-b
+            border-slate-200
+            px-3
+            pb-1.5
+            pt-2
+            dark:border-white/10
+          "
+        >
           <div className="flex items-center justify-between gap-3">
-           <button
-  type="button"
-  onClick={onClose}
-  aria-label="Đóng biểu đồ PI"
-  className="
-    inline-flex
-    h-10
-    w-10
-    shrink-0
-    items-center
-    justify-center
-    rounded-full
-    border
-    border-slate-200
-    bg-white
-    text-slate-700
-    shadow-sm
-    transition
-    hover:bg-slate-50
-    active:scale-95
-    dark:border-white/10
-    dark:bg-white/5
-    dark:text-white
-  "
->
-  <X size={20} />
-</button>
+            {/* CLOSE */}
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Đóng biểu đồ PI"
+              className="
+                relative
+                z-20
+                inline-flex
+                h-10
+                w-10
+                shrink-0
+                items-center
+                justify-center
+                rounded-full
+                border
+                border-slate-200
+                bg-white
+                text-slate-700
+                shadow-sm
+                transition
+                hover:bg-slate-50
+                active:scale-95
+                dark:border-white/10
+                dark:bg-white/5
+                dark:text-white
+              "
+            >
+              <X
+                size={20}
+                strokeWidth={2.5}
+              />
+            </button>
 
+            {/* TITLE */}
             <div className="text-center">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
                 Pi Market
               </p>
-              <h2 className="text-lg font-bold text-slate-900">
+
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">
                 PI / USDT
               </h2>
             </div>
 
+            {/* LIVE */}
             <div className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">
               <Circle
                 size={8}
@@ -241,9 +316,10 @@ export default function PiMarketScreen({
           </div>
 
           <div className="mt-1">
-            <p className="text-2xl font-black tracking-tight text-slate-900">
+            <p className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
               ${formatPrice(currentPrice)}
             </p>
+
             <p
               className={`mt-1 text-sm font-semibold ${changeClass}`}
             >
@@ -253,13 +329,16 @@ export default function PiMarketScreen({
           </div>
         </header>
 
-        <div className="shrink-0 border-b border-slate-200 px-2 py-1.5">
+        {/* TIMEFRAME */}
+        <div className="relative z-10 shrink-0 border-b border-slate-200 px-2 py-1.5 dark:border-white/10">
           <div className="grid grid-cols-5 gap-2">
             {TIMEFRAMES.map((item) => (
               <button
                 key={item}
                 type="button"
-                onClick={() => setTimeframe(item)}
+                onClick={() =>
+                  setTimeframe(item)
+                }
                 className={`h-8 rounded-xl text-sm font-semibold transition ${
                   timeframe === item
                     ? "bg-slate-900 text-white"
@@ -272,7 +351,18 @@ export default function PiMarketScreen({
           </div>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pb-3 pt-1.5">
+        {/* CONTENT */}
+        <div
+          className="
+            min-h-0
+            flex-1
+            overflow-y-auto
+            overscroll-contain
+            px-2
+            pb-3
+            pt-1.5
+          "
+        >
           <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
             {loading ? (
               <div className="flex h-[46vh] min-h-[280px] items-center justify-center text-sm text-slate-500">
@@ -283,12 +373,14 @@ export default function PiMarketScreen({
                 <p className="text-sm font-semibold text-slate-800">
                   {error}
                 </p>
+
                 <button
                   type="button"
                   className="rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700"
                   onClick={() => {
                     const controller =
                       new AbortController();
+
                     fetchCandles(
                       controller.signal,
                       timeframe
@@ -301,11 +393,14 @@ export default function PiMarketScreen({
             ) : (
               <PiMarketChart
                 candles={candles}
-                onCrosshairChange={setSelected}
+                onCrosshairChange={
+                  setSelected
+                }
               />
             )}
           </section>
 
+          {/* STATS */}
           <section className="mt-2 rounded-xl border border-slate-200 bg-slate-50 p-2">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
               {selectedStats
@@ -315,7 +410,10 @@ export default function PiMarketScreen({
 
             <div className="mt-2 grid grid-cols-2 gap-2 text-sm sm:grid-cols-3">
               <div className="rounded-lg bg-white p-2">
-                <p className="text-xs text-slate-500">Open</p>
+                <p className="text-xs text-slate-500">
+                  Open
+                </p>
+
                 <p className="font-semibold text-slate-900">
                   $
                   {formatPrice(
@@ -323,8 +421,12 @@ export default function PiMarketScreen({
                   )}
                 </p>
               </div>
+
               <div className="rounded-lg bg-white p-2">
-                <p className="text-xs text-slate-500">High</p>
+                <p className="text-xs text-slate-500">
+                  High
+                </p>
+
                 <p className="font-semibold text-emerald-600">
                   $
                   {formatPrice(
@@ -332,8 +434,12 @@ export default function PiMarketScreen({
                   )}
                 </p>
               </div>
+
               <div className="rounded-lg bg-white p-2">
-                <p className="text-xs text-slate-500">Low</p>
+                <p className="text-xs text-slate-500">
+                  Low
+                </p>
+
                 <p className="font-semibold text-red-600">
                   $
                   {formatPrice(
@@ -341,8 +447,12 @@ export default function PiMarketScreen({
                   )}
                 </p>
               </div>
+
               <div className="rounded-lg bg-white p-2">
-                <p className="text-xs text-slate-500">Close</p>
+                <p className="text-xs text-slate-500">
+                  Close
+                </p>
+
                 <p className="font-semibold text-slate-900">
                   $
                   {formatPrice(
@@ -350,8 +460,12 @@ export default function PiMarketScreen({
                   )}
                 </p>
               </div>
+
               <div className="rounded-lg bg-white p-2 sm:col-span-2">
-                <p className="text-xs text-slate-500">Volume</p>
+                <p className="text-xs text-slate-500">
+                  Volume
+                </p>
+
                 <p className="font-semibold text-slate-900">
                   {formatVolume(
                     selectedStats?.volume ?? 0
@@ -363,5 +477,10 @@ export default function PiMarketScreen({
         </div>
       </div>
     </div>
+  );
+
+  return createPortal(
+    screen,
+    document.body
   );
 }
