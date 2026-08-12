@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { apiAuthFetch } from "@/lib/api/apiAuthFetch";
 import type { ReturnRecord } from "./types/returns";
+type ReturnApiItem = Record<string, unknown> & { id?: string | null; status?: ReturnRecord["status"] | null; order_id?: string | null; orderId?: string | null; order?: { id?: string | null } | null; };
 import ReturnList from "./components/ReturnList";
 import ReturnsSkeleton from "./components/ReturnsSkeleton";
 export default function ReturnsPage() {
@@ -45,25 +46,39 @@ const [tab, setTab] =
       return;
     }
 
-    const data = await res.json();
+    const data: unknown = await res.json();
 
-    const list = Array.isArray(data)
+    const isRecord = (value: unknown): value is Record<string, unknown> =>
+      typeof value === "object" &&
+      value !== null;
+
+    const list: unknown[] = Array.isArray(data)
       ? data
-      : Array.isArray(data?.items)
+      : isRecord(data) && Array.isArray(data.items)
       ? data.items
       : [];
 
     // 🔥 FIX: chuẩn hóa order_id
-    const normalized = list.map((item: any) => ({
-      ...item,
 
-      order_id:
-        item.order_id ||
-        item.orderId ||
-        item.order?.id ||
-        null,
-    }));
+    const normalized: ReturnRecord[] = list
+      .filter(
+        (item): item is ReturnApiItem =>
+          typeof item === "object" &&
+          item !== null
+      )
+      .map((item) => ({
+        ...item,
 
+        order_id:
+          item.order_id ||
+          item.orderId ||
+          item.order?.id ||
+          null,
+      }))
+      .filter((item): item is ReturnRecord =>
+        typeof item.id === "string" &&
+        typeof item.status === "string"
+      );
     setReturns(normalized);
   } catch (error) {
     console.error("❌ LOAD RETURNS ERROR", error);

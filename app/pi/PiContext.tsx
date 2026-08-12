@@ -21,7 +21,7 @@ export function PiProvider({ children }: { children: React.ReactNode }) {
       timer = setInterval(async () => {
         if (typeof window === "undefined") return;
 
-        if (window.Pi && (window as any).__pi_initialized) {
+        if (window.Pi && window.__pi_initialized) {
           console.log("🟢 [PiContext] SDK fully ready");
 
           setReady(true);

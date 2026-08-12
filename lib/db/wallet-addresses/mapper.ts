@@ -1,11 +1,44 @@
 import type { WalletAddress } from "./types";
 
-/* =========================================================
-   MAP ROW
-========================================================= */
+export type WalletAddressRow = {
+  id: string;
+
+  wallet_id: string;
+  user_id: string;
+
+  network: WalletAddress["network"];
+
+  address: string;
+
+  label: string | null;
+
+  status: WalletAddress["status"];
+
+  is_default: boolean;
+
+  validation_status: WalletAddress["validation_status"];
+  validation_error: string | null;
+
+  validated_at: Date | null;
+
+  is_verified: boolean;
+  verified_at: Date | null;
+
+  used_count: number | string | null;
+
+  last_used_at: Date | null;
+
+  created_at: Date;
+  updated_at: Date;
+
+  deleted_at: Date | null;
+
+  created_by: string | null;
+  updated_by: string | null;
+};
 
 export function mapWalletAddress(
-  row: any
+  row: WalletAddressRow
 ): WalletAddress {
   return {
     id: row.id,

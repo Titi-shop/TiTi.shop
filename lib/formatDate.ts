@@ -32,7 +32,13 @@ export function toISO(dateString: string | null): string | null {
 }
 
 /** Chuẩn hóa các trường ngày của sản phẩm */
-export function normalizeSaleDates(product: any) {
+type SaleDateProduct = {
+  saleStart: string | null;
+  saleEnd: string | null;
+  [key: string]: unknown;
+};
+
+export function normalizeSaleDates(product: SaleDateProduct) {
   return {
     ...product,
     saleStart: toISO(product.saleStart),

@@ -1,6 +1,6 @@
 import { query } from "@/lib/db";
 
-import { mapWalletAddress } from "./mapper";
+import { mapWalletAddress, type WalletAddressRow } from "./mapper";
 
 /* =========================
    INCREMENT USAGE
@@ -9,7 +9,7 @@ import { mapWalletAddress } from "./mapper";
 export async function incrementWalletAddressUsage(
   walletAddressId: string
 ) {
-  const res = await query(
+  const res = await query<WalletAddressRow>(
     `
     UPDATE wallet_addresses
     SET
@@ -34,7 +34,7 @@ export async function incrementWalletAddressUsage(
 export async function touchWalletAddress(
   walletAddressId: string
 ) {
-  const res = await query(
+  const res = await query<WalletAddressRow>(
     `
     UPDATE wallet_addresses
     SET
@@ -58,7 +58,7 @@ export async function touchWalletAddress(
 export async function resetWalletAddressUsage(
   walletAddressId: string
 ) {
-  const res = await query(
+  const res = await query<WalletAddressRow>(
     `
     UPDATE wallet_addresses
     SET

@@ -40,7 +40,7 @@ type ReturnDetail = {
    SAFE HELPERS
 ===================================================== */
 
-const safeArray = <T,>(v: any): T[] => (Array.isArray(v) ? v : []);
+const safeArray = <T,>(v: unknown): T[] => (Array.isArray(v) ? v : []);
 
 /* =====================================================
    PAGE

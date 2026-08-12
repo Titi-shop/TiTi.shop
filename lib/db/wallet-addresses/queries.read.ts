@@ -1,6 +1,6 @@
 import { query } from "@/lib/db";
 
-import { mapWalletAddress } from "./mapper";
+import { mapWalletAddress, type WalletAddressRow } from "./mapper";
 
 /* =========================
    GET WALLET ADDRESSES
@@ -9,7 +9,7 @@ import { mapWalletAddress } from "./mapper";
 export async function getWalletAddressesByUser(
   userId: string
 ) {
-  const res = await query(
+  const res = await query<WalletAddressRow>(
     `
     SELECT *
     FROM wallet_addresses
@@ -33,7 +33,7 @@ export async function getWalletAddressById(
   userId: string,
   walletAddressId: string
 ) {
-  const res = await query(
+  const res = await query<WalletAddressRow>(
     `
     SELECT *
     FROM wallet_addresses
@@ -57,7 +57,7 @@ export async function getWalletAddressById(
 export async function getDefaultWalletAddress(
   userId: string
 ) {
-  const res = await query(
+  const res = await query<WalletAddressRow>(
     `
     SELECT *
     FROM wallet_addresses
@@ -82,7 +82,7 @@ export async function getWalletAddressByAddress(
   userId: string,
   address: string
 ) {
-  const res = await query(
+  const res = await query<WalletAddressRow>(
     `
     SELECT *
     FROM wallet_addresses

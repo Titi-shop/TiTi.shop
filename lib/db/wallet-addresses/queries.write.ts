@@ -1,6 +1,6 @@
 import { query } from "@/lib/db";
 
-import { mapWalletAddress } from "./mapper";
+import { mapWalletAddress, type WalletAddressRow } from "./mapper";
 import type { CreateWalletAddressInput } from "./types";
 
 /* =========================
@@ -24,7 +24,7 @@ export async function createWalletAddress(
     );
   }
 
-  const res = await query(
+  const res = await query<WalletAddressRow>(
     `
     INSERT INTO wallet_addresses (
       wallet_id,
@@ -59,5 +59,11 @@ export async function createWalletAddress(
     ]
   );
 
-  return mapWalletAddress(res.rows[0]);
+  const row = res.rows[0];
+
+  if (!row) {
+    throw new Error("Failed to create wallet address");
+  }
+
+  return mapWalletAddress(row);
 }

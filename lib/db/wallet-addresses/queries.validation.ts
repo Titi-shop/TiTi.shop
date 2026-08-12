@@ -1,6 +1,6 @@
 import { query } from "@/lib/db";
 
-import { mapWalletAddress } from "./mapper";
+import { mapWalletAddress, type WalletAddressRow } from "./mapper";
 
 /* =========================
    MARK VALID
@@ -9,7 +9,7 @@ import { mapWalletAddress } from "./mapper";
 export async function markWalletAddressValid(
   walletAddressId: string
 ) {
-  const res = await query(
+  const res = await query<WalletAddressRow>(
     `
     UPDATE wallet_addresses
     SET
@@ -36,7 +36,7 @@ export async function markWalletAddressInvalid(
   walletAddressId: string,
   error: string
 ) {
-  const res = await query(
+  const res = await query<WalletAddressRow>(
     `
     UPDATE wallet_addresses
     SET
@@ -62,7 +62,7 @@ export async function markWalletAddressInvalid(
 export async function markWalletAddressVerified(
   walletAddressId: string
 ) {
-  const res = await query(
+  const res = await query<WalletAddressRow>(
     `
     UPDATE wallet_addresses
     SET
@@ -87,7 +87,7 @@ export async function markWalletAddressVerified(
 export async function resetWalletAddressValidation(
   walletAddressId: string
 ) {
-  const res = await query(
+  const res = await query<WalletAddressRow>(
     `
     UPDATE wallet_addresses
     SET
@@ -107,4 +107,3 @@ export async function resetWalletAddressValidation(
     ? mapWalletAddress(res.rows[0])
     : null;
 }
-

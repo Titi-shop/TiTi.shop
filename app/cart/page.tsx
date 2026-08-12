@@ -1,10 +1,11 @@
-﻿"use client";
+"use client";
 
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/app/context/CartContext";
+import type { CheckoutProduct } from "@/types/checkout";
 import { useTranslationClient as useTranslation } from "@/app/lib/i18n/client";
 import CheckoutSheet from "@/app/product/[id]/CheckoutSheet";
 import { apiAuthFetch } from "@/lib/api/apiAuthFetch";
@@ -30,7 +31,7 @@ export default function CartPage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const [openCheckout, setOpenCheckout] = useState(false);
-  const [checkoutItem, setCheckoutItem] = useState<any>(null);
+  const [checkoutItem, setCheckoutItem] = useState<CheckoutProduct | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   
   /* =====================================================
