@@ -21,7 +21,7 @@ export default function CategoriesProductCard({
   }
 
   return (
-    <Link key={product.id} href={`/product/${product.id}`}>
+    <Link href={`/product/${product.id}`}>
       <div className="group overflow-hidden rounded-[28px] border border-surface-2 bg-[var(--card-bg)] shadow-sm transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg">
         <div className="relative overflow-hidden">
           <Image src={getImage(product.thumbnail)} alt={product.name} width={500} height={500} className="aspect-[4/3] w-full object-cover" />

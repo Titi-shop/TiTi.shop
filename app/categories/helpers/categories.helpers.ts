@@ -38,9 +38,5 @@ export const filterProducts = (
     });
   }
 
-  if (sortType === "latest") {
-    list.reverse();
-  }
-
   return list;
 };

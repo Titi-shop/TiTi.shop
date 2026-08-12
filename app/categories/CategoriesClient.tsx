@@ -1,18 +1,14 @@
-﻿"use client";
+"use client";
 
 import { useState, type MouseEvent } from "react";
 
 import { useCart } from "@/app/context/CartContext";
 import { useTranslationClient as useTranslation } from "@/app/lib/i18n/client";
 import type { Product } from "@/types/Product";
-import AppLoading from "@/components/AppLoading";
-
 import useCategories from "./hooks/useCategories";
 import CategoriesSearch from "../components/Categories/CategoriesSearch";
-import CategoriesFilters from "../components/Categories/CategoriesFilters";
 import CategoriesHero from "../components/Categories/CategoriesHero";
 import CategoriesMessage from "../components/Categories/CategoriesMessage";
-import CategoriesPagination from "../components/Categories/CategoriesPagination";
 import CategoriesToolbar from "../components/Categories/CategoriesToolbar";
 import CategoriesProductGrid from "../components/Categories/CategoriesProductGrid";
 
@@ -20,7 +16,6 @@ export default function CategoriesClient() {
   const { t } = useTranslation();
   const { addToCart } = useCart();
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const {
     categories,
@@ -76,38 +71,38 @@ export default function CategoriesClient() {
     showMessage(t.added_to_cart || "Added to cart", "success");
   };
 
-  if (loading) return <AppLoading />;
-
   return (
-    <main className="min-h-screen pb-28 bg-[var(--background)] text-[var(--foreground)] transition-colors">
-      {message && <CategoriesMessage message={message} />}
+  <main className="min-h-screen pb-28 bg-[var(--background)] text-[var(--foreground)] transition-colors">
+    {message && <CategoriesMessage message={message} />}
 
-      <CategoriesSearch search={search} setSearch={setSearch} onOpenFilters={() => setIsFilterOpen(true)} t={t} />
-      <CategoriesFilters
-        open={isFilterOpen}
-        onClose={() => setIsFilterOpen(false)}
-        categories={categories}
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
-        sortType={sortType}
-        setSortType={setSortType}
-        search={search}
-        setSearch={setSearch}
-        t={t}
-      />
-      <CategoriesHero count={filteredProducts.length} t={t} />
+    <CategoriesSearch
+      search={search}
+      setSearch={setSearch}
+      t={t}
+    />
 
-      <CategoriesToolbar
-        categories={categories}
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
-        sortType={sortType}
-        setSortType={setSortType}
-        t={t}
-      />
 
-      <CategoriesProductGrid filteredProducts={filteredProducts} loading={loading} handleAddToCart={handleAddToCart} t={t} />
-      <CategoriesPagination page={1} totalPages={1} onPageChange={() => {}} />
-    </main>
-  );
+    <CategoriesHero
+      count={filteredProducts.length}
+      t={t}
+    />
+
+    <CategoriesToolbar
+      categories={categories}
+      selectedCategory={selectedCategory}
+      setSelectedCategory={setSelectedCategory}
+      sortType={sortType}
+      setSortType={setSortType}
+      t={t}
+    />
+
+    <CategoriesProductGrid
+      filteredProducts={filteredProducts}
+      loading={loading}
+      handleAddToCart={handleAddToCart}
+      t={t}
+    />
+
+  </main>
+);
 }

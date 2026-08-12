@@ -1,5 +1,4 @@
 "use client";
-import React from "react";
 
 export default function CategoriesEmpty({ t }: { t: Record<string, string> }) {
   return (

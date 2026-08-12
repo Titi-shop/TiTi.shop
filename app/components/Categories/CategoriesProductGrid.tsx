@@ -16,25 +16,34 @@ export default function CategoriesProductGrid({
   handleAddToCart: (e: React.MouseEvent, p: Product) => void;
   t: Record<string, string>;
 }) {
-  if (filteredProducts.length === 0) {
-    return <CategoriesEmpty t={t} />;
-  }
-
+  if (loading) {
   return (
     <section className="px-4 pb-8 sm:px-6">
-      {loading ? (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <CategoriesSkeleton key={i} />
-          ))}
-        </div>
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {filteredProducts.map((product) => (
-            <CategoriesProductCard key={product.id} product={product} onAddToCart={handleAddToCart} t={t} />
-          ))}
-        </div>
-      )}
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <CategoriesSkeleton key={i} />
+        ))}
+      </div>
     </section>
   );
+}
+
+if (filteredProducts.length === 0) {
+  return <CategoriesEmpty t={t} />;
+}
+
+return (
+  <section className="px-4 pb-8 sm:px-6">
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      {filteredProducts.map((product) => (
+        <CategoriesProductCard
+          key={product.id}
+          product={product}
+          onAddToCart={handleAddToCart}
+          t={t}
+        />
+      ))}
+    </div>
+  </section>
+);
 }

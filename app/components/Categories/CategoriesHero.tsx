@@ -1,5 +1,4 @@
 "use client";
-import type { ReactNode } from "react";
 
 export default function CategoriesHero({ count, t }: { count: number; t: Record<string, string> }) {
   return (
