@@ -140,13 +140,17 @@ export default function PiTradingChart({
       chartHeight;
 
   const latest =
-    candles[candles.length - 1];
+  candles[candles.length - 1];
 
-  const previous =
-    candles[candles.length - 2];
+const previous =
+  candles[candles.length - 2];
 
-  const isLatestUp =
-    latest.close > latest.open;
+if (!latest || !previous) {
+  return null;
+}
+
+const isLatestUp =
+  latest.close > latest.open;
 
   const latestChange =
     previous.close !== 0

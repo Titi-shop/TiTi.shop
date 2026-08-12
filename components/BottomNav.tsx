@@ -194,16 +194,16 @@ export default function BottomNav() {
       icon: Search,
     },
     {
-      href: "/notifications",
-      label:
-        t.notifications ||
-        "Notifications",
-      icon: Bell,
-      badge:
-        unreadCount > 0
-          ? unreadCount
-          : undefined,
-    },
+
+  href: "/notifications",
+  label:
+    t.notifications ||
+    "Notifications",
+  icon: Bell,
+  ...(unreadCount > 0
+    ? { badge: unreadCount }
+    : {}),
+},
     {
       href: "/account",
       label:

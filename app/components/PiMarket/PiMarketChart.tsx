@@ -12,10 +12,10 @@ import type {
   CandlestickData,
   IChartApi,
   ISeriesApi,
+  MouseEventParams,
   Time,
   UTCTimestamp,
 } from "lightweight-charts";
-
 import {
   useEffect,
   useMemo,
@@ -411,10 +411,9 @@ export default function PiMarketChart({
     /*
      * CROSSHAIR
      */
-    const handleCrosshairMove =
-      (param: Parameters<
-        IChartApi["subscribeCrosshairMove"]
-      >[0]) => {
+    const handleCrosshairMove = (
+  param: MouseEventParams
+) => {
         if (
   !param.time ||
   !param.seriesData.size
