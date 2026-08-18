@@ -10,7 +10,6 @@ import {
 
 import {
   getWalletSecurityByUserId,
-  hasWalletPin,
 
   createWalletSecurity,
   setWalletPin,
@@ -202,33 +201,6 @@ export async function getWalletSecurity(
    HAS PIN
 ===================================================== */
 
-export async function hasWalletPinFlow(
-  userId: string
-) {
-
-  logger.info(
-    "WALLET_SECURITY.HAS_PIN_START",
-    {
-      userId: maskId(userId),
-    }
-  );
-
-  const enabled =
-    await hasWalletPin(
-      userId
-    );
-
-  logger.info(
-    "WALLET_SECURITY.HAS_PIN_DONE",
-    {
-      userId: maskId(userId),
-      enabled,
-    }
-  );
-
-  return enabled;
-
-}
 
 /* =====================================================
    CREATE SECURITY IF NOT EXISTS
@@ -827,208 +799,32 @@ export async function changeWalletPinFlow(
    RESET PIN
 ===================================================== */
 
-export async function resetWalletPinFlow(
-  userId: string
-) {
-
-  logger.info(
-    "WALLET_SECURITY.RESET_START",
-    {
-      userId: maskId(userId),
-    }
-  );
-
-  const security =
-    await getWalletSecurityByUserId(
-      userId
-    );
-
-  if (!security) {
-
-    logger.error(
-      "WALLET_SECURITY.SECURITY_NOT_FOUND",
-      {
-        userId: maskId(userId),
-      }
-    );
-
-    throw new Error(
-      "SECURITY_NOT_FOUND"
-    );
-
-  }
-
-  await resetWalletFailedAttempts(
-    userId
-  );
-
-  await unlockWalletSecurity(
-    userId
-  );
-
-  logger.info(
-    "WALLET_SECURITY.RESET_SUCCESS",
-    {
-      userId: maskId(userId),
-    }
-  );
-
-  return security;
-
-}
 
 /* =====================================================
    ENABLE TOTP
 ===================================================== */
 
-export async function enableTotpFlow(
-  userId: string
-) {
-
-  logger.info(
-    "WALLET_SECURITY.TOTP_ENABLE_START",
-    {
-      userId: maskId(userId),
-    }
-  );
-
-  /**
-   * TODO
-   * Generate Secret
-   * QR Code
-   * Save Secret
-   */
-
-  logger.debug(
-    "WALLET_SECURITY.TOTP_ENABLE_PENDING"
-  );
-
-}
 
 /* =====================================================
    DISABLE TOTP
 ===================================================== */
 
-export async function disableTotpFlow(
-  userId: string
-) {
-
-  logger.info(
-    "WALLET_SECURITY.TOTP_DISABLE_START",
-    {
-      userId: maskId(userId),
-    }
-  );
-
-  /**
-   * TODO
-   */
-
-  logger.debug(
-    "WALLET_SECURITY.TOTP_DISABLE_PENDING"
-  );
-
-}
 
 /* =====================================================
    ENABLE BIOMETRIC
 ===================================================== */
 
-export async function enableBiometricFlow(
-  userId: string
-) {
-
-  logger.info(
-    "WALLET_SECURITY.BIOMETRIC_ENABLE_START",
-    {
-      userId: maskId(userId),
-    }
-  );
-
-  /**
-   * TODO
-   * Face ID
-   * Touch ID
-   */
-
-  logger.debug(
-    "WALLET_SECURITY.BIOMETRIC_ENABLE_PENDING"
-  );
-
-}
 
 /* =====================================================
    DISABLE BIOMETRIC
 ===================================================== */
 
-export async function disableBiometricFlow(
-  userId: string
-) {
-
-  logger.info(
-    "WALLET_SECURITY.BIOMETRIC_DISABLE_START",
-    {
-      userId: maskId(userId),
-    }
-  );
-
-  /**
-   * TODO
-   */
-
-  logger.debug(
-    "WALLET_SECURITY.BIOMETRIC_DISABLE_PENDING"
-  );
-
-}
 
 /* =====================================================
    ENABLE PASSKEY
 ===================================================== */
 
-export async function enablePasskeyFlow(
-  userId: string
-) {
-
-  logger.info(
-    "WALLET_SECURITY.PASSKEY_ENABLE_START",
-    {
-      userId: maskId(userId),
-    }
-  );
-
-  /**
-   * TODO
-   * WebAuthn
-   */
-
-  logger.debug(
-    "WALLET_SECURITY.PASSKEY_ENABLE_PENDING"
-  );
-
-}
 
 /* =====================================================
    DISABLE PASSKEY
 ===================================================== */
-
-export async function disablePasskeyFlow(
-  userId: string
-) {
-
-  logger.info(
-    "WALLET_SECURITY.PASSKEY_DISABLE_START",
-    {
-      userId: maskId(userId),
-    }
-  );
-
-  /**
-   * TODO
-   */
-
-  logger.debug(
-    "WALLET_SECURITY.PASSKEY_DISABLE_PENDING"
-  );
-
-}

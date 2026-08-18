@@ -126,7 +126,7 @@ export default function ReturnDetailPage() {
 
   function getStatusText(status: string) {
     return (
-      t[`return_status_${status}`] ?? status
+      t[`return_${status}`] ?? t[status] ?? status
     );
   }
 
@@ -233,7 +233,7 @@ export default function ReturnDetailPage() {
       {/* REASON */}
       <div className="bg-[var(--card-bg)] p-4">
         <p className="font-semibold mb-1">
-          {t.reason}
+          {t.return_reason}
         </p>
         <p className="text-[var(--text-muted)] text-sm">
           {data.reason}

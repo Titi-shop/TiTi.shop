@@ -108,13 +108,6 @@ export type SetWalletPinInput = {
    VERIFY PIN
 ===================================================== */
 
-export type VerifyWalletPinInput = {
-
-  user_id: string;
-
-  pin_hash: string;
-
-};
 
 /* =====================================================
    CHANGE PIN
@@ -134,66 +127,27 @@ export type ChangeWalletPinInput = {
    LOCK
 ===================================================== */
 
-export type LockWalletSecurityInput = {
-
-  user_id: string;
-
-  locked_until: Date;
-
-};
 
 /* =====================================================
    FAILED ATTEMPTS
 ===================================================== */
 
-export type FailedAttemptInput = {
-
-  user_id: string;
-
-};
 
 /* =====================================================
    RESET FAILED ATTEMPTS
 ===================================================== */
 
-export type ResetFailedAttemptsInput = {
-
-  user_id: string;
-
-};
 
 /* =====================================================
    ENABLE TOTP
 ===================================================== */
 
-export type EnableTotpInput = {
-
-  user_id: string;
-
-  secret: string;
-
-};
 
 /* =====================================================
    ENABLE BIOMETRIC
 ===================================================== */
 
-export type EnableBiometricInput = {
-
-  user_id: string;
-
-  enabled: boolean;
-
-};
 
 /* =====================================================
    ENABLE PASSKEY
 ===================================================== */
-
-export type EnablePasskeyInput = {
-
-  user_id: string;
-
-  enabled: boolean;
-
-};

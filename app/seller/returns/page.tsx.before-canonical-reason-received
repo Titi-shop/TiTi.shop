@@ -290,7 +290,7 @@ export default function SellerReturnsPage() {
         );
 
       case "received":
-        return t.return_received;
+        return t.received;
 
       case "refund_pending":
         return (
@@ -536,7 +536,7 @@ export default function SellerReturnsPage() {
                 <div className="mt-5">
 
                   <p className="text-sm font-semibold">
-                    {t.return_reason}
+                    {t.reason}
                   </p>
 
                   <p className="text-sm text-[var(--text-secondary)] mt-1 whitespace-pre-wrap">

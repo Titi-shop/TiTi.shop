@@ -14,9 +14,6 @@ import type {
   CreateWalletSecurityInput,
   SetWalletPinInput,
   ChangeWalletPinInput,
-  EnableTotpInput,
-  EnableBiometricInput,
-  EnablePasskeyInput,
 } from "./types";
 
 /* =====================================================
@@ -172,122 +169,12 @@ export async function changeWalletPin(
    ENABLE TOTP
 ===================================================== */
 
-export async function enableWalletTotp(
-  input: EnableTotpInput
-) {
-
-  const res =
-    await query(
-      `
-      UPDATE wallet_security
-
-      SET
-
-        totp_enabled = true,
-
-        totp_secret = $2,
-
-        totp_created_at = NOW(),
-
-        updated_at = NOW()
-
-      WHERE user_id = $1
-
-      RETURNING *
-      `,
-      [
-
-        input.user_id,
-
-        input.secret,
-
-      ]
-    );
-
-  return res.rows[0]
-    ? mapWalletSecurity(
-        res.rows[0]
-      )
-    : null;
-
-}
 
 /* =====================================================
    BIOMETRIC
 ===================================================== */
 
-export async function setWalletBiometric(
-  input: EnableBiometricInput
-) {
-
-  const res =
-    await query(
-      `
-      UPDATE wallet_security
-
-      SET
-
-        biometric_enabled = $2,
-
-        updated_at = NOW()
-
-      WHERE user_id = $1
-
-      RETURNING *
-      `,
-      [
-
-        input.user_id,
-
-        input.enabled,
-
-      ]
-    );
-
-  return res.rows[0]
-    ? mapWalletSecurity(
-        res.rows[0]
-      )
-    : null;
-
-}
 
 /* =====================================================
    PASSKEY
 ===================================================== */
-
-export async function setWalletPasskey(
-  input: EnablePasskeyInput
-) {
-
-  const res =
-    await query(
-      `
-      UPDATE wallet_security
-
-      SET
-
-        passkey_enabled = $2,
-
-        updated_at = NOW()
-
-      WHERE user_id = $1
-
-      RETURNING *
-      `,
-      [
-
-        input.user_id,
-
-        input.enabled,
-
-      ]
-    );
-
-  return res.rows[0]
-    ? mapWalletSecurity(
-        res.rows[0]
-      )
-    : null;
-
-}

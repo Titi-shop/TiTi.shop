@@ -45,7 +45,6 @@ export function useWallet() {
 
   const {
   data,
-  error,
   isLoading,
   mutate,
 } = useSWR(
@@ -216,7 +215,6 @@ export function useWallet() {
         !data
     ),
 
-    error,
 
     refreshing,
 

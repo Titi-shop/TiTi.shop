@@ -40,8 +40,15 @@ const addressResponse =
       cache: "no-store",
     }
   );
+
+  if (!addressResponse.ok) {
+    throw new Error(
+      "INVALID_WALLET_ADDRESSES_RESPONSE"
+    );
+  }
+
   const addressJson: unknown =
-  await addressResponse.json();
+    await addressResponse.json();
   if (!response.ok) {
 
     return {

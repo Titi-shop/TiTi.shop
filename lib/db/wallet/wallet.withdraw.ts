@@ -420,24 +420,6 @@ export async function getWalletWithdrawalById(
 
   return rs.rows[0] ?? null;
 }
-export async function getWithdrawalByPaymentId(
-  piPaymentId: string
-): Promise<WalletWithdrawalRow | null> {
-
-  const rs =
-    await query<WalletWithdrawalRow>(
-      `
-      SELECT
-        *
-      FROM wallet_withdrawals
-      WHERE pi_payment_id = $1
-      LIMIT 1
-      `,
-      [piPaymentId]
-    );
-
-  return rs.rows[0] ?? null;
-}
 export async function getProcessingWithdrawals(): Promise<
   WalletWithdrawalRow[]
 > {
