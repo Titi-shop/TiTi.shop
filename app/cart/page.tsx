@@ -1,74 +1,61 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/app/context/CartContext";
 import type { CheckoutProduct } from "@/types/checkout";
 import { useTranslationClient as useTranslation } from "@/app/lib/i18n/client";
 import CheckoutSheet from "@/app/product/[id]/CheckoutSheet";
 import { apiAuthFetch } from "@/lib/api/apiAuthFetch";
-import { formatPi } from "@/lib/pi";
-import AppLoading from "@/components/AppLoading";
-import { useAuth } from "@/context/AuthContext";
 
-/* =====================================================
-   PAGE
-===================================================== */
+import CartHeader from "./components/CartHeader";
+import CartItemRow from "./components/CartItemRow";
+import CartSummary from "./components/CartSummary";
+import CartEmptyState from "./components/CartEmptyState";
+import CartSkeleton from "./components/CartSkeleton";
 
 export default function CartPage() {
-   const router = useRouter();
   const { t } = useTranslation();
-   const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const {
     cart,
     loading,
     updateQty,
     removeFromCart,
-} = useCart();
-  
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  } = useCart();
 
-  const [openCheckout, setOpenCheckout] = useState(false);
-  const [checkoutItem, setCheckoutItem] = useState<CheckoutProduct | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-  
-  /* =====================================================
-     MESSAGE
-  ===================================================== */
+  const [selectedIds, setSelectedIds] = useState<
+    string[]
+  >([]);
+  const [openCheckout, setOpenCheckout] =
+    useState(false);
+  const [checkoutItem, setCheckoutItem] =
+    useState<CheckoutProduct | null>(null);
+  const [message, setMessage] = useState<
+    string | null
+  >(null);
 
   const showMessage = (msg: string) => {
     setMessage(msg);
     setTimeout(() => setMessage(null), 3000);
   };
 
-  /* =====================================================
-     SELECTED ITEMS
-  ===================================================== */
-
   const selectedItems = useMemo(() => {
-    return cart.filter((i) => selectedIds.includes(i.id));
+    return cart.filter((i) =>
+      selectedIds.includes(i.id)
+    );
   }, [cart, selectedIds]);
 
-  /* =====================================================
-     TOTAL
-  ===================================================== */
-
   const total = useMemo(() => {
-  return selectedItems.reduce((sum, item) => {
-    const unit =
-      item.final_price ??
-      item.sale_price ??
-      item.price;
+    return selectedItems.reduce((sum, item) => {
+      const unit =
+        item.final_price ??
+        item.sale_price ??
+        item.price;
 
-    return sum + unit * item.quantity;
-  }, 0);
-}, [selectedItems]);
-
-  /* =====================================================
-     TOGGLE ITEM
-  ===================================================== */
+      return sum + unit * item.quantity;
+    }, 0);
+  }, [selectedItems]);
 
   const toggleItem = (id: string) => {
     setSelectedIds((prev) =>
@@ -78,349 +65,169 @@ export default function CartPage() {
     );
   };
 
-  /* =====================================================
-     CHECKOUT VALIDATION (LIGHT ONLY)
-  ===================================================== */
-
   const validate = () => {
-  if (selectedItems.length !== 1) {
-    showMessage(
-      t.only_one_product_supported ??
-        "Select 1 product"
-    );
-    return false;
-  }
+    if (selectedItems.length !== 1) {
+      showMessage(
+        t.only_one_product_supported ??
+          "Select 1 product"
+      );
+      return false;
+    }
 
-  return true;
-};
-
-  /* =====================================================
-     CHECKOUT ACTION
-===================================================== */
+    return true;
+  };
 
   const handleCheckout = async () => {
-  if (!validate()) return;
+    if (!validate()) return;
 
-  if (!user) {
-    showMessage(
-      t.login_required ??
-      "Please login before checkout."
+    if (!user) {
+      showMessage(
+        t.login_required ??
+          "Please login before checkout."
+      );
+      return;
+    }
+
+    const item = selectedItems[0];
+
+    if (!item) {
+      showMessage("No item selected for checkout.");
+      return;
+    }
+
+    const res = await apiAuthFetch(
+      `/api/products/${item.product_id}`
     );
-    return;
+
+    if (!res.ok) {
+      showMessage("Cannot load product");
+      return;
+    }
+
+    const product = await res.json();
+    const selectedVariant =
+      product.variants?.find(
+        (v: { id: string }) =>
+          v.id === item.variant_id
+      ) ?? null;
+
+    setCheckoutItem({
+      ...product,
+      selectedVariant,
+      quantity: item.quantity,
+      stock:
+        selectedVariant?.stock ??
+        product.stock,
+      price:
+        selectedVariant?.price ??
+        product.price,
+      sale_price:
+        selectedVariant?.sale_price ??
+        product.sale_price,
+      final_price:
+        selectedVariant?.final_price ??
+        product.final_price,
+    });
+
+    setOpenCheckout(true);
+  };
+
+  if (authLoading || loading) {
+    return <CartSkeleton />;
   }
-  const item = selectedItems[0];
 
-  if (!item) {
-    showMessage("No item selected for checkout.");
-    return;
-  }
-
-  const res = await apiAuthFetch(
-  `/api/products/${item.product_id}`
-);
-
-  if (!res.ok) {
-    showMessage("Cannot load product");
-    return;
-  }
-
-  const product = await res.json();
-  const selectedVariant =
-    product.variants?.find(
-      (v: { id: string }) => v.id === item.variant_id
-    ) ?? null;
-
-  setCheckoutItem({
-  ...product,
-  selectedVariant,
-
-  quantity: item.quantity,
-
-  stock:
-    selectedVariant?.stock ??
-    product.stock,
-
-  price:
-    selectedVariant?.price ??
-    product.price,
-
-  sale_price:
-    selectedVariant?.sale_price ??
-    product.sale_price,
-
-  final_price:
-    selectedVariant?.final_price ??
-    product.final_price,
-});
-
-  setOpenCheckout(true);
-};
-
-  /* =====================================================
-     EMPTY CART
-===================================================== */
-if (authLoading || loading) {
-  return <AppLoading />;
-}
   if (cart.length === 0) {
-    return (
-      <main className="flex min-h-[60vh] items-center justify-center">
-        <div className="text-center">
-          <p className="mb-3 text-[var(--text-muted)]">
-            {t.empty_cart ?? "Cart is empty"}
-          </p>
-
-          <Link href="/" className="text-orange-500 font-semibold">
-            {t.back_to_shop ?? "Back to shop"}
-          </Link>
-        </div>
-      </main>
-    );
+    return <CartEmptyState t={t} />;
   }
 
-  /* =====================================================
-     UI
-===================================================== */
-   return (
+  return (
     <main className="min-h-screen bg-[var(--background)] pb-40">
-      {/* MESSAGE */}
-
       {message && (
-  <div
-    className="
-      fixed left-1/2 top-20 z-50
-      -translate-x-1/2
-      rounded-xl
-      bg-green-600
-      px-4 py-2
-      text-sm text-white
-    "
-  >
-    {message}
-  </div>
-)}
-
-      {/* LIST */}
-
-      <div className="bg-card">
-        {cart.map((item) => {
-          const unit =
-       item.final_price ??
-        item.sale_price ??
-         item.price;
-
-          const hasSale =
-  Number.isFinite(item.final_price) &&
-  item.final_price < item.price;
-
-          return (
-            <div
-              key={item.id}
-              className="
-  flex gap-3 p-4
-  border-b
-  border-[var(--nav-border)]
-"
-            >
-              {/* CHECKBOX */}
-
-              <div className="pt-5">
-                <input
-                  type="checkbox"
-                  checked={selectedIds.includes(
-                    item.id
-                  )}
-                  onChange={() =>
-                    toggleItem(item.id)
-                  }
-                  className="h-4 w-4 accent-[var(--color-primary)]"
-                />
-              </div>
-
-              {/* IMAGE */}
-
-              <Link
-  href={`/product/${item.product_id}`}
-  className="relative block"
->
-  <Image
-    src={item.thumbnail || "/placeholder.png"}
-    alt={item.name}
-    width={88}
-    height={88}
-    className="
-      h-[88px] w-[88px]
-      rounded-xl
-      border
-      border-[var(--nav-border)]
-      object-cover
-    "
-  />
-
-  {hasSale && (
-    <div className="absolute left-0 top-0 rounded-br-lg bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
-      SALE
-    </div>
-  )}
-</Link>
-
-              {/* CONTENT */}
-
-              <div className="min-w-0 flex-1">
-                <Link
-  href={`/product/${item.product_id}`}
-  className="block"
->
-  <p className="line-clamp-2 text-sm font-semibold hover:text-orange-500">
-    {item.name}
-  </p>
-</Link>
-{[
-  item.option_1,
-  item.option_2,
-  item.option_3,
-]
-.filter(Boolean)
-.length > 0 && (
-  <p className="mt-1 text-xs text-[var(--text-muted)]">
-    {[
-      item.option_1,
-      item.option_2,
-      item.option_3,
-    ]
-      .filter(Boolean)
-      .join(" / ")}
-  </p>
-)}
-                {/* PRICE */}
-
-                <div className="mt-2 flex items-center gap-2">
-                  {hasSale && (
-                    <span className="text-xs text-muted line-through">
-                      π
-                      {formatPi(item.price)}
-                    </span>
-                  )}
-
-                  <span className="pi-price text-sm">
-                    π
-                    {formatPi(unit)}
-                  </span>
-                </div>
-
-                {/* QTY */}
-
-                <div className="mt-3 flex items-center justify-between gap-3">
-                  <div className="flex items-center overflow-hidden rounded-xl border border-[var(--nav-border)]">
-                    <button
-                      onClick={() =>
-                        updateQty(
-                          item.id,
-                          item.quantity - 1
-                        )
-                      }
-                      disabled={item.quantity <= 1}
-                      className="
-  bg-[var(--card-secondary)]
-  px-3 py-1 text-lg
-  disabled:opacity-30
-"
-                    >
-                      -
-                    </button>
-
-                    <div className="px-4 text-sm font-semibold">
-                      {item.quantity}
-                    </div>
-
-                    <button
-                      onClick={() =>
-                        updateQty(
-                          item.id,
-                          item.quantity + 1
-                        )
-                      }
-                      className="
-  px-3 py-1 text-lg
-  bg-[var(--card-secondary)]
-"
-                    >
-                      +
-                    </button>
-                  </div>
-
-                  <div className="text-right">
-                    <p className="pi-price text-sm">
-                      π
-                      {formatPi(
-                        unit * item.quantity
-                      )}
-                    </p>
-                  </div>
-                </div>
-
-                {/* DELETE */}
-
-                <button
-                  onClick={() =>
-                    removeFromCart(item.id)
-                  }
-                  className="mt-2 text-xs text-red-500"
-                >
-                  {t.delete ??
-                    "Delete"}
-                </button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* FOOTER */}
-
-     <div className="
-fixed bottom-16 left-0 right-0
-border-t
-bg-[var(--card-bg)]
-"
-style={{
-  borderColor: "var(--nav-border)",
-}}>  
-        <div className="mb-4 flex items-center justify-between">
-          <span className="text-sm text-muted">
-            {t.total ??
-              "Total"}
-          </span>
-
-          <span className="pi-price text-lg">
-            π{formatPi(total)}
-          </span>
+        <div className="fixed left-1/2 top-20 z-50 -translate-x-1/2 rounded-xl border border-[var(--nav-border)] bg-[var(--card-bg)] px-4 py-2 text-sm text-[var(--foreground)] shadow-lg">
+          {message}
         </div>
-
-
-        <button
-  onClick={handleCheckout}
-  className="w-full bg-primary text-white py-3 rounded-xl font-bold"
->
-  {user
-    ? (t.pay_now ?? "Checkout")
-    : (t.login_to_checkout ?? "Login to Checkout")}
-</button>
-
-      </div>
-
-      {/* CHECKOUT SHEET */}
-      {checkoutItem && (
-       <CheckoutSheet
-  open={openCheckout}
-  onClose={() => setOpenCheckout(false)}
-  product={checkoutItem}
-          
-/>
       )}
 
+      <div className="mx-auto w-full max-w-6xl px-3 py-4 sm:px-4">
+        <div className="mb-4">
+          <CartHeader
+            t={t}
+            itemCount={cart.length}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
+          <section className="space-y-3">
+            {cart.map((item) => (
+              <CartItemRow
+                key={item.id}
+                item={item}
+                checked={selectedIds.includes(
+                  item.id
+                )}
+                t={t}
+                onToggle={toggleItem}
+                onDecrease={(
+                  id,
+                  quantity
+                ) =>
+                  updateQty(id, quantity)
+                }
+                onIncrease={(
+                  id,
+                  quantity
+                ) =>
+                  updateQty(id, quantity)
+                }
+                onRemove={removeFromCart}
+              />
+            ))}
+          </section>
+
+          <aside className="hidden lg:block">
+            <div className="sticky top-24">
+              <CartSummary
+                t={t}
+                total={total}
+                selectedCount={
+                  selectedItems.length
+                }
+                canCheckout={Boolean(user)}
+                onCheckout={handleCheckout}
+              />
+            </div>
+          </aside>
+        </div>
+      </div>
+
+      <div
+        className="
+          fixed bottom-16 left-0 right-0
+          border-t bg-[var(--card-bg)] p-3 lg:hidden
+        "
+        style={{
+          borderColor: "var(--nav-border)",
+        }}
+      >
+        <div className="mx-auto w-full max-w-6xl">
+          <CartSummary
+            t={t}
+            total={total}
+            selectedCount={selectedItems.length}
+            canCheckout={Boolean(user)}
+            onCheckout={handleCheckout}
+            compact
+          />
+        </div>
+      </div>
+
+      {checkoutItem && (
+        <CheckoutSheet
+          open={openCheckout}
+          onClose={() => setOpenCheckout(false)}
+          product={checkoutItem}
+        />
+      )}
     </main>
   );
 }
-
-
