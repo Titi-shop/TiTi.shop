@@ -8,14 +8,6 @@ import type {
   OrdersResponse,
 } from "@/types/orders";
 
-function normalizeOrder(
-  order: Order
-): Order {
-  return {
-    ...order,
-  };
-}
-
 async function safeJson<T>(
   res: Response
 ): Promise<T | null> {
@@ -52,11 +44,7 @@ async function fetchOrders(): Promise<Order[]> {
   const typed =
     data as OrdersResponse;
 
-  return (
-    typed.orders?.map(
-      normalizeOrder
-    ) ?? []
-  );
+  return typed.orders ?? [];
 }
 
 export function useOrders(

@@ -1,4 +1,4 @@
-﻿              "use client";
+              "use client";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
@@ -11,7 +11,6 @@ import CustomerOrdersList from "@/components/CustomerOrdersList";
 import { formatPi } from "@/lib/pi";
 import { useOrders } from "./hooks/useOrders";
 import { useOrderReviews } from "./hooks/useOrderReviews";
-import { useOptimisticOrders } from "./hooks/useOptimisticOrders";
 import { useOrderActions } from "./hooks/useOrderActions";
 
 import CancelOrderModal from "./modals/CancelOrderModal";
@@ -41,9 +40,6 @@ export default function CustomerOrdersPage() {
     mutate,
     isLoading,
   } = useOrders(user);
-
-  const mergedOrders =
-    useOptimisticOrders(orders);
 
   const {
     reviewedMap,
@@ -147,7 +143,7 @@ export default function CustomerOrdersPage() {
           </p>
 
           <p className="mt-1 text-xs text-[var(--text-muted)]">
-            {mergedOrders.length}
+            {orders.length}
             {" · "}
             π{formatPi(totalPi)}
           </p>
@@ -156,7 +152,7 @@ export default function CustomerOrdersPage() {
 
       <CustomerOrdersList
         initialTab="all"
-        orders={mergedOrders}
+        orders={orders}
         reviewedMap={reviewedMap}
         onDetail={(id) =>
           router.push(
@@ -210,7 +206,7 @@ export default function CustomerOrdersPage() {
         onClose={resetReview}
         onSubmit={() => {
           const order =
-            mergedOrders.find(
+            orders.find(
               item =>
                 item.id ===
                 activeReviewId
@@ -257,5 +253,3 @@ export default function CustomerOrdersPage() {
     </main>
   );
 }
-
-
